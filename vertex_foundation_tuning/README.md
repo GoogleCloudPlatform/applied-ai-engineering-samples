@@ -3,7 +3,7 @@
 This repository provides a comprehensive Jupyter notebook that illustrates the step-by-step procedure for tuning foundational models (PaLM 2) with Google Cloud's Vertex AI. This repository will guide users through the entire setup and integration process – starting from environment setup, foundational model selection, to tuning it with Vertex AI.
 
 Architecture:    
-![Architecture](/images/architecture.png "Architecture")
+![Architecture](images/architecture.png "Architecture")
 
 
 ## Repository structure
