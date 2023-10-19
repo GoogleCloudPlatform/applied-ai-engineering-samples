@@ -11,12 +11,9 @@ Architecture:
 ```
 .
 ├── images
-└── notebooks
 ```
 
 - [`/images`](/images): Architecture diagrams.  
-- [`/notebooks`](/notebooks): Sample notebooks demonstrating the concepts covered in this demonstration.  
-
 
 ## Notebook
 
