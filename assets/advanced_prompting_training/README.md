@@ -1,4 +1,4 @@
-dvanced Prompt Engineering Training
+# Advanced Prompt Engineering Training
 
 The [notebook](./cot_react.ipynb) in this folder teaches two powerful prompting technqiues: chain of thought and ReAct (Reasoning + Acting).
 
