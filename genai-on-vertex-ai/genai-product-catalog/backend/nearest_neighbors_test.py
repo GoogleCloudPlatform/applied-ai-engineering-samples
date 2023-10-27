@@ -2,7 +2,7 @@
 
 Ensures we can access the vector store and nearest neighbors are returned 
 the expected format. This integration test assumes:
--A Vector Store is already running and the appropriate constants have been set 
+-A Vector Store is already running and the appropriate variables have been set 
 in config.py
 -The test is run from an environment that has permission to call the API
 
