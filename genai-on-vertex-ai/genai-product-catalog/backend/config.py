@@ -12,7 +12,16 @@ DEPLOYED_INDEX = 'muiltimodal_13K_train'
 NUM_NEIGHBORS = 7
 
 # BigQuery
-MASTER_PRODUCT_TABLE = 'solutions-2023-mar-107.mercari.13K_synthetic_attributes_embeddings'
+PRODUCT_REFERENCE_TABLE = 'solutions-2023-mar-107.mercari.13K_synthetic_attributes_embeddings'
+COLUMN_ID = 'id'
+COLUMN_CATEGORIES = [ # List of category column names from root to leaf
+    'c0_name',
+    'c1_name',
+    'c2_name',
+]
+
+# Category
+CATEGORY_DEPTH = len(COLUMN_CATEGORIES) # number of levels in category hierarchy to consider
 
 # Testing
 GCS_TEST_IMAGE = 'gs://genai-product-catalog/toy_images/shorts.jpg' # Any image you have access to in GCS
