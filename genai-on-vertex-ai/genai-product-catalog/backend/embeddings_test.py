@@ -15,7 +15,13 @@ class EmbeddingsTest(unittest.TestCase):
 
   def test_embeddings_api(self):
     res = embeddings.embed(
-        config.PROJECT,
+        'This is a test description',
+    )
+    self.assertEqual(len(res.text_embedding), 1408)
+    self.assertIsNone(res.image_embedding)
+
+  def test_embeddings_api_with_image(self):
+    res = embeddings.embed(
         'This is a test description',
         config.GCS_TEST_IMAGE,
     )
