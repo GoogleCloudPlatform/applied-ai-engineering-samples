@@ -1,13 +1,18 @@
+"""Invoke Vertex Embedding API."""
+
 import base64
-from google.cloud import aiplatform
-from google.protobuf import struct_pb2
 from functools import cache
 import time
-import typing
+from typing import NamedTuple, Optional, Sequence
 
-class EmbeddingResponse(typing.NamedTuple):
-  text_embedding: typing.Sequence[float]
-  image_embedding: typing.Sequence[float]
+from google.cloud import aiplatform
+from google.protobuf import struct_pb2
+
+import config
+
+class EmbeddingResponse(NamedTuple):
+  text_embedding: Sequence[float]
+  image_embedding: Sequence[float]
 
 
 class EmbeddingPredictionClient:
@@ -23,7 +28,7 @@ class EmbeddingPredictionClient:
     self.project = project
 
   def get_embedding(self, text : str = None, image_path : str = None):
-    """image_path can be a local path or a GCS URI."""
+    """Image_path can be a local path or a GCS URI."""
     if not text and not image_path:
       raise ValueError('At least one of text or image_bytes must be specified.')
 
@@ -65,10 +70,25 @@ def get_client(project):
   return EmbeddingPredictionClient(project)
 
 
-def embed(project,text,image_path=None):
+def embed(
+  text: str,
+  image_path: Optional[str] = None, 
+  project: str = config.PROJECT) -> EmbeddingResponse:
+  """Invoke vertex multimodal embedding API.
+
+  Args:
+    text: text to embed
+    image_path: local path OR GCS_URI of image to embed
+    project: GCP Project ID
+
+  Returns:
+    named tuple with the following attributes:
+      text_embedding: 1408 dimension vector of type Sequence[float]
+      image_embedding: 1408 dimension vector of type Sequence[float] OR None if
+        no image_path provide
+  """
   client = get_client(project)
   start = time.time()
   response = client.get_embedding(text=text, image_path=image_path)
   end = time.time()
-  #print('Embedding Time: ', end - start)
   return response
