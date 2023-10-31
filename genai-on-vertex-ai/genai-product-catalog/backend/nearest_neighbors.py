@@ -17,7 +17,7 @@ def get_nn(embeds: list[list[float]], num_neighbors: int = config.NUM_NEIGHBORS)
 
     Args:
         embeds: list of embeddings to find neareast neighbors
-        num_neigbhors: number of nearest neighbors to return EACH embedding
+        num_neigbhors: number of nearest neighbors to return for EACH embedding
 
     Returns:
         A list of named tuples containing the the following attributes
