@@ -1,4 +1,5 @@
 """Functions related to product categorization"""
+from collections import defaultdict
 import logging
 import re
 from typing import Optional
@@ -17,7 +18,8 @@ llm = vertexai.language_models.TextGenerationModel.from_pretrained("text-bison")
 
 def join_categories(
     ids: list[str], 
-    category_depth:int = config.CATEGORY_DEPTH) -> dict:
+    category_depth:int = config.CATEGORY_DEPTH,
+    allow_trailing_nulls:bool = config.ALLOW_TRAILING_NULLS) -> dict[str:list[str]]:
     """Given list of product IDs, join category names.
     
     Args:
@@ -25,7 +27,8 @@ def join_categories(
         category_depth: number of levels in category hierarchy to return
 
     Returns:
-        dict mapping product IDs to category name (id:category_name)
+        dict mapping product IDs to category name. The category name will be
+        a list of strings e.g. ['level 1 category', 'level 2 category']
     """
     query = f"""
     SELECT
@@ -38,9 +41,19 @@ def join_categories(
     """
     query_job = bq_client.query(query)
     rows = query_job.result()
-    categories = {} 
+    categories = defaultdict(list) 
     for row in rows:
-        categories[row['id']] = [row['c0_name'],row['c1_name'],row['c2_name']]
+      for col in config.COLUMN_CATEGORIES:
+        if row[col]:
+          categories[row['id']].append(row[col])
+        else:
+          if allow_trailing_nulls:
+            if col == config.COLUMN_CATEGORIES[0]:
+              raise ValueError(f'Top level category {col} for product {row["id"]} is null')
+            else:
+              break # return existing categories
+          else:
+              raise ValueError(f'Column {col} for product {row["id"]} is null. To allow nulls update config.py')
     return categories
 
 
@@ -76,11 +89,12 @@ def retrieve(
     return sorted(candidates, key=lambda d: d['distance'])
 
 def _rank(desc: str, candidates: list[list[str]]) -> list[list[str]]:
-  """See external version rank() for docstring."""
+  """See rank() for docstring."""
+  logging.debug(f'Candidates:\n{candidates}')
 
   query = f"""
   Given the following product description:
-  {description}
+  {desc}
 
   Rank the following categories from most relevant to least:
   {(chr(10)+'  ').join(['->'.join(cat) for cat in candidates])}
