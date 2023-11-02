@@ -59,7 +59,8 @@ def join_categories(
 
 def retrieve(
     desc: str, 
-    image_uri: Optional[str] = None, 
+    image: Optional[str] = None, 
+    base64: bool = False,
     num_neighbors: int = config.NUM_NEIGHBORS) -> list[dict]:
     """Returns list of categories based on nearest neighbors.
 
@@ -69,7 +70,9 @@ def retrieve(
 
     Args:
         desc: user provided description of product
-        image_uri: GCS URI of product image
+        image: can be local file path, GCS URI or base64 encoded image
+        base64: True indicates image is base64. False (default) will be 
+          interpreted as image path (either local or GCS)
         num_neigbhors: number of nearest neighbors to return for EACH embedding
 
     Returns:
@@ -79,7 +82,7 @@ def retrieve(
             category: category in list form e.g. ['level 1 category', 'level 2 category']
             distance: embedding distance in range [0,1], 0 being the closest match
     """
-    res = embeddings.embed(desc,image_uri)
+    res = embeddings.embed(desc,image, base64)
     embeds = [res.text_embedding, res.image_embedding] if res.image_embedding else [res.text_embedding]
     neighbors = nearest_neighbors.get_nn(embeds)
     ids = [n.id[:-2] for n in neighbors] # last 3 chars are not part of product ID
@@ -144,18 +147,21 @@ def rank(desc: str, candidates: list[list[str]]) -> list[list[str]]:
 
 def retrieve_and_rank(    
     desc: str, 
-    image_uri: Optional[str] = None, 
+    image: Optional[str] = None, 
+    base64: bool = False,
     num_neighbors: int = config.NUM_NEIGHBORS) -> list[dict]:
     """Wrapper function to sequence retrieve and rank functions.
     
     Args:
         desc: user provided description of product
-        image_uri: Optional. GCS URI of product image
+        image: can be local file path, GCS URI or base64 encoded image
+        base64: True indicates image is base64. False (default) will be 
+          interpreted as image path (either local or GCS)
         num_neigbhors: number of nearest neighbors to return for EACH embedding
 
     Returns:
       The candidates ranked by the LLM from most to least relevant. If there are
       duplicate candidates the list is deduped prior to returning
     """
-    candidates = retrieve(desc, image_uri, num_neighbors)
+    candidates = retrieve(desc, image, base64, num_neighbors)
     return rank(desc, [candidate['category'] for candidate in candidates])
