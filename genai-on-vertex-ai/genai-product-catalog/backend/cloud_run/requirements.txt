@@ -1,3 +1,0 @@
-google-cloud-aiplatform==1.35.0
-flask-restful==0.3.10
-debugpy # Required for debugging.
