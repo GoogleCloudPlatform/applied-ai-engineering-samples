@@ -1,6 +1,6 @@
 # Advanced Prompt Engineering Training
 
-The [notebook](./cot_react.ipynb) in this folder teaches two powerful prompting technqiues: chain of thought and ReAct (Reasoning + Acting).
+The [notebook](./cot_react.ipynb) in this folder teaches two powerful prompting techniques: chain of thought and ReAct (Reasoning + Acting).
 
 ReAct (and its variants) are the current state-of-the-art prompting technique to improve LLM reasoning while minimizing hallucinations. And chain of thought is a relatively low-effort technique to improve prompt performance and robustness by adding verbal reasoning.
 
