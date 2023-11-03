@@ -9,6 +9,7 @@ import api
 import config
 
 ENDPOINT = 'http://localhost:8080/v1/'
+#ENDPOINT = 'https://product-catalog-u2uyzke6ea-uc.a.run.app/v1/'
 
 class APITest(unittest.TestCase):
 

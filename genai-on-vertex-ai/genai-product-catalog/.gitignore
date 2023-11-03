@@ -2,3 +2,4 @@
 backend/__pycache__/
 notebooks/sandbox.ipynb
 backend/application_default_credentials.json
+.env
