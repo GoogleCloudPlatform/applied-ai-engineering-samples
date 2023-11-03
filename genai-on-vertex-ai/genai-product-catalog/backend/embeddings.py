@@ -3,7 +3,7 @@
 import base64
 from functools import cache
 import time
-from typing import NamedTuple, Optional, Sequence, Union
+from typing import NamedTuple, Optional, Sequence
 
 from google.cloud import aiplatform
 from google.protobuf import struct_pb2
