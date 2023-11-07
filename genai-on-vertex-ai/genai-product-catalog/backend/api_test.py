@@ -45,5 +45,17 @@ class APITest(unittest.TestCase):
     self.assertIsInstance(res.json()[0][0],str)
     logging.info(res.json())
 
+  def test_generate_marketing_copy(self):
+    res = requests.get(
+      ENDPOINT+'marketing/', 
+      params={
+        'description':'Kids jacket', 
+        'attributes': ['rainbow', 'reversable']},
+      headers=headers
+      )
+    self.assertEqual(res.status_code, 200)
+    self.assertIsInstance(res.text,str)
+    logging.info(res.text)
+
 if __name__ == '__main__':
   unittest.main()
