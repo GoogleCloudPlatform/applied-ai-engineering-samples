@@ -3,10 +3,8 @@
 These tests assume:
 -The appropriate variables have been set in config.py
 -The test is run from an environment that has permission to call cloud APIs
-
-https://cloud.google.com/vertex-ai/docs/generative-ai/embeddings/get-multimodal-embeddings
 """
-import logging; logging.basicConfig(level=logging.DEBUG)
+import logging; logging.basicConfig(level=logging.INFO)
 import unittest
 
 import category
@@ -16,7 +14,7 @@ class CategoryTest(unittest.TestCase):
 
   def test_join_categories(self):
     res = category.join_categories([config.TEST_PRODUCT_ID])
-    logging.debug(res)
+    logging.info(res)
     self.assertIsNotNone(res.get(config.TEST_PRODUCT_ID))
     self.assertIsInstance(res[config.TEST_PRODUCT_ID],list)
     self.assertIsInstance(res[config.TEST_PRODUCT_ID][0],str)
@@ -26,7 +24,7 @@ class CategoryTest(unittest.TestCase):
         'This is a test description',
         config.TEST_GCS_IMAGE
     )
-    logging.debug(res)
+    logging.info(res)
     self.assertIsInstance(res, list)
     self.assertEqual(len(res), config.NUM_NEIGHBORS*2)
     self.assertEqual(set(res[0].keys()), {'id','category','distance'})
@@ -37,7 +35,7 @@ class CategoryTest(unittest.TestCase):
         'This is a test description',
         candidates
     )
-    logging.debug(res)
+    logging.info(res)
     self.assertEqual(sorted(candidates),sorted(res))
 
   def test_retrieve_and_rank(self):
