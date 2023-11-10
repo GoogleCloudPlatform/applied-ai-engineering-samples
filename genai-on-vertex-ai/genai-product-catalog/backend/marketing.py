@@ -1,9 +1,8 @@
 """Functions to generate marketing copy."""
-import vertexai
 import config
+import utils
 
-vertexai.init(project=config.PROJECT, location=config.LOCATION)
-llm = vertexai.language_models.TextGenerationModel.from_pretrained("text-bison")
+llm = utils.get_llm()
 
 def generate_marketing_copy(desc: str, attributes: list[str]) -> str:
     """Given list of product IDs, join category names.

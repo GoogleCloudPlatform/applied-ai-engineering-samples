@@ -1,20 +1,16 @@
-"""Functions related to product categorization"""
+"""Functions related to product categorization."""
 from collections import defaultdict
 import logging
 import re
 from typing import Optional
 
-from google.cloud import aiplatform
-from google.cloud import bigquery
-import vertexai
-
 import config
 import embeddings
 import nearest_neighbors
+import utils
 
-bq_client = bigquery.Client(config.PROJECT)
-vertexai.init(project=config.PROJECT, location=config.LOCATION)
-llm = vertexai.language_models.TextGenerationModel.from_pretrained("text-bison")
+bq_client = utils.get_bq_client()
+llm = utils.get_llm()
 
 def join_categories(
     ids: list[str], 
@@ -93,7 +89,7 @@ def retrieve(
 
 def _rank(desc: str, candidates: list[list[str]]) -> list[list[str]]:
   """See rank() for docstring."""
-  logging.debug(f'Candidates:\n{candidates}')
+  logging.info(f'Candidates:\n{candidates}')
 
   query = f"""
   Given the following product description:
@@ -116,14 +112,14 @@ def _rank(desc: str, candidates: list[list[str]]) -> list[list[str]]:
   if not res:
     raise ValueError('ERROR: No LLM response returned. This seems to be an intermittent bug')
   
-  logging.debug(f'Query:\n{query}')
+  logging.info(f'Query:\n{query}')
   formatted_res = [re.sub(r"^\d+\.\s+", "", line.lstrip()).split('->') for line in res]
   
   if len(formatted_res[0]) != len(candidates[0]):
     raise ValueError(f'ERROR: length of response - {formatted_res} and candidate - {candidates[0]} must match.')
   
   unique_res = list(dict.fromkeys([tuple(l) for l in formatted_res]))
-  logging.debug(f'Formatted Response:\n {unique_res}')
+  logging.info(f'Formatted Response:\n {unique_res}')
   return unique_res
 
 def rank(desc: str, candidates: list[list[str]]) -> list[list[str]]:
