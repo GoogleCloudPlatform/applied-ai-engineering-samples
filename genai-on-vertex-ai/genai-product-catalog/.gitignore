@@ -5,3 +5,4 @@ backend/application_default_credentials.json
 .env
 backend/app.yaml
 backend/service_account_key.json
+backend/config_*.py
