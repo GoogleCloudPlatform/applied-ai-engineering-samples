@@ -27,9 +27,6 @@ ALLOW_TRAILING_NULLS = True # whether to allow trailing category levels to be
 # Category
 CATEGORY_DEPTH = len(COLUMN_CATEGORIES) # number of levels in category hierarchy to consider
 
-# Attributes
-ATTRIBUTES_FORMAT =  'key_value' # can be 'flat' or 'key_value'
-
 # Testing
 TEST_GCS_IMAGE = 'gs://genai-product-catalog/toy_images/shorts.jpg' # Any image you have access to in GCS
 TEST_PRODUCT_ID = '8f87b1af1e8ab42c1d559f2f9caf70bb' # Any valid product ID in reference table
