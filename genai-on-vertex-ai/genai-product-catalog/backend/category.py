@@ -33,7 +33,7 @@ def join_categories(
     FROM
         `{config.PRODUCT_REFERENCE_TABLE}`
     WHERE
-        id IN {str(ids).replace('[','(').replace(']',')')}
+        {config.COLUMN_ID} IN {str(ids).replace('[','(').replace(']',')')}
     """
     query_job = bq_client.query(query)
     rows = query_job.result()
@@ -41,15 +41,15 @@ def join_categories(
     for row in rows:
       for col in config.COLUMN_CATEGORIES:
         if row[col]:
-          categories[row['id']].append(row[col])
+          categories[row[config.COLUMN_ID]].append(row[col])
         else:
           if allow_trailing_nulls:
             if col == config.COLUMN_CATEGORIES[0]:
-              raise ValueError(f'Top level category {col} for product {row["id"]} is null')
+              raise ValueError(f'Top level category {col} for product {row[config.COLUMN_ID]} is null')
             else:
               break # return existing categories
           else:
-              raise ValueError(f'Column {col} for product {row["id"]} is null. To allow nulls update config.py')
+              raise ValueError(f'Column {col} for product {row[config.COLUMN_ID]} is null. To allow nulls update config.py')
     return categories
 
 
