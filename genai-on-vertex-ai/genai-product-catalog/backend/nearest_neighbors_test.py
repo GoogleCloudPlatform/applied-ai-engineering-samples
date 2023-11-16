@@ -8,6 +8,7 @@ in config.py
 
 https://cloud.google.com/vertex-ai/docs/vector-search/overview
 """
+import logging; logging.basicConfig(level=logging.INFO)
 import unittest
 import nearest_neighbors
 
@@ -19,6 +20,7 @@ class NearestNeighborsTest(unittest.TestCase):
     embeds = [emb1, emb2]
     num_neigbhors = 3
     res = nearest_neighbors.get_nn(embeds, num_neigbhors)
+    logging.info(res)
     self.assertEqual(len(res), len(embeds) * num_neigbhors)
     self.assertEqual(res[0]._fields, ('id','distance'))
 
