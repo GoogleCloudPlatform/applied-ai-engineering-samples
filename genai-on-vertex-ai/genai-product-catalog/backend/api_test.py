@@ -12,7 +12,7 @@ from google.auth.transport.requests import Request
 from google.oauth2 import id_token
 
 ENDPOINT = 'http://localhost:8080/v1/'
-ENDPOINT = 'https://vijay-sandbox-335018.uc.r.appspot.com/v1/'
+#ENDPOINT = 'https://vijay-sandbox-335018.uc.r.appspot.com/v1/'
 
 open_id_connect_token = id_token.fetch_id_token(Request(), 'client_id')
 headers = {
@@ -20,7 +20,7 @@ headers = {
 }
 class APITest(unittest.TestCase):
 
-  def test_category_get(self):
+  def test_category(self):
     image_base64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII='
     res = requests.post(
       ENDPOINT+'categories/', 
@@ -33,7 +33,7 @@ class APITest(unittest.TestCase):
     self.assertIsInstance(res.json()[0][0],str)
     logging.info(res.json())
 
-  def test_category_get_text_only(self):
+  def test_category_text_only(self):
     res = requests.post(
       ENDPOINT+'categories/', 
       json={'description':'test description'},
@@ -46,16 +46,27 @@ class APITest(unittest.TestCase):
     logging.info(res.json())
 
   def test_generate_marketing_copy(self):
-    res = requests.get(
+    res = requests.post(
       ENDPOINT+'marketing/', 
-      params={
-        'description':'Kids jacket', 
-        'attributes': ['rainbow', 'reversable']},
+      params={'description':'Mens Hooded Puffer Jacket'},
+      json={'attributes': '{"color":"green", "material": "down"}'},
       headers=headers
       )
     self.assertEqual(res.status_code, 200)
     self.assertIsInstance(res.text,str)
     logging.info(res.text)
+
+  def test_attributes(self):
+    image_base64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII='
+    res = requests.post(
+      ENDPOINT+'attributes/', 
+      json={'description':'test description', 'image':image_base64},
+      headers=headers
+      )
+    self.assertEqual(res.status_code, 200)
+    self.assertIsInstance(res.json(),dict)
+    self.assertGreater(len(res.json()),0)
+    logging.info(res.json())
 
 if __name__ == '__main__':
   unittest.main()
