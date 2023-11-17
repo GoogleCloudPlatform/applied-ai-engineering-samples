@@ -16,15 +16,15 @@ parameters = {
 }
 
 def join_attributes(
-    ids: list[str]) -> dict[str:dict]:
+    ids: list[str]) -> dict[str:dict[str,str]]:
     """Gets the attributes for given product IDs.
 
     Args:
         ids: The product IDs to get the attributes for.
 
     Returns
-        dict mapping product IDs to attributes. The attributes will be a dict
-            e.g.  {'color':'green', 'pattern': striped}
+        dict mapping product IDs to attributes. The attributes will themselves
+         be a dict e.g.  {'color':'green', 'pattern': striped}
     """
     query = f"""
     SELECT
@@ -50,9 +50,8 @@ def retrieve(
     num_neighbors: int = config.NUM_NEIGHBORS) -> list[dict]:
     """Returns list of attributes based on nearest neighbors.
 
-    This is a 'greedy' retrieval approach that embeds the provided desc and
-    (optionally) image and returns the attributes corresponding to the closest
-    products in embedding space. 
+    Embeds the provided desc and (optionally) image and returns the attributes
+    corresponding to the closest products in embedding space. 
     
     TODO: If category is provided the retrieval is restricted to products in
      the same category.
@@ -69,7 +68,7 @@ def retrieve(
         List of candidates sorted by embedding distance. Each candidate is a
         dict with the following keys:
             id: product ID
-            attributes: attributes in dict form e.g. {'color':'green', 'pattern': striped}
+            attributes: attributes in dict form e.g. {'color':'green', 'pattern': 'striped'}
             distance: embedding distance in range [0,1], 0 being the closest match
     """
     res = embeddings.embed(desc,image, base64)
@@ -87,7 +86,7 @@ def generate_attributes(
     image: Optional[str] = None,
     base64: bool = False,
     num_neighbors: int = config.NUM_NEIGHBORS
-) -> dict:
+) -> dict[str,str]:
     """Temporary Implementation
 
     Just returns attributes of nearest neighbor
