@@ -145,7 +145,7 @@ def retrieve_and_rank(
     desc: str, 
     image: Optional[str] = None, 
     base64: bool = False,
-    num_neighbors: int = config.NUM_NEIGHBORS) -> list[dict]:
+    num_neighbors: int = config.NUM_NEIGHBORS) -> list[list[str]]:
     """Wrapper function to sequence retrieve and rank functions.
     
     Args:
