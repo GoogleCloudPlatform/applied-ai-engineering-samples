@@ -7,8 +7,8 @@ import config
 class MarketingTest(unittest.TestCase):
 
   def test_generate_marketing_copy(self):
-    desc = 'New Men’s Nike Sportswear Storm-Fit Hooded Puffer Jacket   Retail~$200'
-    attributes = ['Coat', 'Green']
+    desc = "Men’s Hooded Puffer Jacket"
+    attributes = {'color':'green', 'pattern': 'striped', 'material': 'down'}
     res = marketing.generate_marketing_copy(desc, attributes)
     self.assertIsInstance(res, str)
     logging.info(res)

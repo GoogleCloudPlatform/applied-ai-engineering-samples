@@ -4,12 +4,12 @@ import utils
 
 llm = utils.get_llm()
 
-def generate_marketing_copy(desc: str, attributes: list[str]) -> str:
+def generate_marketing_copy(desc: str, attributes: dict[str,str]) -> str:
     """Given list of product IDs, join category names.
     
     Args:
         desc: sparse description of product
-        attributes: list of product attributes
+        attributes: e.g. {'color':'green', 'pattern': 'striped'}
 
     Returns:
         Marketing copy that can be used for a product page
@@ -26,6 +26,7 @@ def generate_marketing_copy(desc: str, attributes: list[str]) -> str:
     """
     llm_parameters = {
       "max_output_tokens": 1024,
+      "temperature": 0.5,
     }
     response = llm.predict(
         prompt,
