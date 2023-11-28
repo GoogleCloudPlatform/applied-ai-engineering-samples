@@ -20,6 +20,13 @@ class EmbeddingsTest(unittest.TestCase):
     self.assertEqual(len(res.text_embedding), 1408)
     self.assertIsNone(res.image_embedding)
 
+  def test_embeddings_api_long_text(self):
+    res = embeddings.embed(
+        'This is a description longer than 1024 characters. This is a description longer than 1024 characters. This is a description longer than 1024 characters. This is a description longer than 1024 characters. This is a description longer than 1024 characters. This is a description longer than 1024 characters. This is a description longer than 1024 characters. This is a description longer than 1024 characters. This is a description longer than 1024 characters. This is a description longer than 1024 characters. This is a description longer than 1024 characters. This is a description longer than 1024 characters. This is a description longer than 1024 characters. This is a description longer than 1024 characters. This is a description longer than 1024 characters. This is a description longer than 1024 characters. This is a description longer than 1024 characters. This is a description longer than 1024 characters. This is a description longer than 1024 characters. This is a description longer than 1024 characters. This is a description longer than 1024 characters.',
+    )
+    self.assertEqual(len(res.text_embedding), 1408)
+    self.assertIsNone(res.image_embedding)
+
   def test_embeddings_api_with_image(self):
     res = embeddings.embed(
         'This is a test description',
