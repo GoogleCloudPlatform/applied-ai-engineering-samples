@@ -49,6 +49,10 @@ class EmbeddingPredictionClient:
 
     instance = struct_pb2.Struct()
     if text:
+      if len(text) > 1024:
+        warnings.warn('Text must be less than 1024 characters.')
+        text = text[:1023] #https://b.corp.google.com/issues/311115576
+        print(f'truncated the text to {len(text)} characters')
       instance.fields['text'].string_value = text
 
     if image:
