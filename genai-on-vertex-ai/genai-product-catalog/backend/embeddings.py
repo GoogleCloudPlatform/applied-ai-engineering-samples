@@ -3,6 +3,7 @@
 import base64
 from functools import cache
 import time
+import logging
 from typing import NamedTuple, Optional, Sequence
 
 from google.cloud import aiplatform
@@ -49,10 +50,9 @@ class EmbeddingPredictionClient:
 
     instance = struct_pb2.Struct()
     if text:
-      if len(text) > 1024:
-        warnings.warn('Text must be less than 1024 characters.')
-        text = text[:1023] #https://b.corp.google.com/issues/311115576
-        print(f'truncated the text to {len(text)} characters')
+      if len(text) >= 1024:
+        logging.warning('Text must be less than 1024 characters. Truncating text.')
+        text = text[:1023]
       instance.fields['text'].string_value = text
 
     if image:
@@ -70,25 +70,22 @@ class EmbeddingPredictionClient:
     instances = [instance]
     endpoint = (f"projects/{self.project}/locations/{self.location}"
       "/publishers/google/models/multimodalembedding@001")
-    try:
-      response = self.client.predict(endpoint=endpoint, instances=instances)
+    response = self.client.predict(endpoint=endpoint, instances=instances)
 
-      text_embedding = None
-      if text:
-        text_emb_value = response.predictions[0]['textEmbedding']
-        text_embedding = [v for v in text_emb_value]
+    text_embedding = None
+    if text:
+      text_emb_value = response.predictions[0]['textEmbedding']
+      text_embedding = [v for v in text_emb_value]
 
-      image_embedding = None
-      if image:
-        image_emb_value = response.predictions[0]['imageEmbedding']
-        image_embedding = [v for v in image_emb_value]
+    image_embedding = None
+    if image:
+      image_emb_value = response.predictions[0]['imageEmbedding']
+      image_embedding = [v for v in image_emb_value]
 
-      return EmbeddingResponse(
-        text_embedding=text_embedding,
-        image_embedding=image_embedding)
-    except Exception as e:
-      print(e)
-      return None
+    return EmbeddingResponse(
+      text_embedding=text_embedding,
+      image_embedding=image_embedding)
+
 
 
 @cache
