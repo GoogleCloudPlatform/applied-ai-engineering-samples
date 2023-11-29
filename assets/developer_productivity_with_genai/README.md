@@ -1,5 +1,5 @@
 # developer-productivity-with-genai
-Those sample assets can be used to show builders and partners with Codey APIs and other GCP services, how to solve different developer tasks such as code generation, code explanation, unit test generation, comment generation, code debugging, code migration and talk to code and doc in software development life cycles to increase developer productivity. 
+Those sample assets can be used to show builders and partners how to solve different developer tasks such as code generation, code explanation, unit test generation, comment generation, code debugging, code migration and talk to code and doc in software development life cycles to increase developer productivity with Codey APIs and other GCP services.
 
 ## Contents
 ### E2E codey api notebook covers
