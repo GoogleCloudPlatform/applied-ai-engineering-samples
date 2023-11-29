@@ -2,6 +2,9 @@
 Those sample assets can be used to show builders and partners with Codey APIs and other GCP services, how to solve different developer tasks such as code generation, code explanation, unit test generation, comment generation, code debugging, code migration and talk to code and doc in software development life cycles to increase developer productivity. 
 
 ## Contents
+### E2E codey api notebook covers
+All User Journeys mentioned below such as code generation, fine-tuning, debugging, migration, and talk to code and doc.
+
 ### wireframe to live website notebook covers 
 User Journey - Code Generation support for more languages (HTML , CSS, Objective-C etc):
 
