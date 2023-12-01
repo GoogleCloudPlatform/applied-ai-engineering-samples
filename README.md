@@ -6,7 +6,7 @@ This repo contains Generative AI / GenAI code examples, demos, educational and t
 * **[Langchain Observability Code Snippet](./assets/langchain_observability_snippet/README.md)**: A [Langchain callback](https://python.langchain.com/docs/modules/callbacks/) to aid with understanding/observing the exact LLM calls made by a Langchain agent. The callback is provided in a Jupyter notebook, which also includes a demonstration of the code snippet.
 * **[Advanced Prompting Training](./assets/advanced_prompting_training/README.md)**: A detailed notebook on prompt engineering, demonstrating and explaining chain of thought and ReAct (reasoning + acting) prompting. Chain of thought is a very low-effort way to improve prompt performance, and ReAct is the state-of-the-art for using LLMs to interact with external systems.
 * **[Vertex AI LLM Evaluation Services](./assets/vertex_evaluation_services/README.md)**: We offer a comprehensive set of notebooks that demonstrate how to use Vertex AI LLM Evaluation Services in conjunction with other Vertex AI services. Additionally, we have provided notebooks that delve into the theory behind evaluation metrics.
-
+* **[Developer Productivity with GenAI](./assets/developer_productivity_with_genai/README.md)**: A collection of code samples to show builders and partners how to solve different developer tasks such as code generation, code explanation, unit test generation, comment generation, code debugging, code migration and talk to code and doc in software development life cycles to increase developer productivity with Codey APIs and other GCP services.
 
 ## Getting help
 
