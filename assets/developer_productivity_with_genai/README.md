@@ -35,7 +35,7 @@ User Journey - Migrate/Upgrade/Translate code languages and framework.
 Tech Task:
 - Translating code from one language to another
 
-### doc-code-search covers 
+### doc code search covers 
 User Journey: 
 Document Search to assist code review and other tasks
 
@@ -47,6 +47,9 @@ Codebase chat
 
 Tech Task
 - Codebase pattern chat for developers to ask questions regarding codebase
+
+### webhook cloud function with RAG covers 
+An example to show you how to make a webhook cloud functions with Codey, RAG, and different retreivers.Once you have this one set up, you can deploy cloud functions, set up webhooks for Dialogflow, and use this RAG in Dialogflow chatbot.
 
 ## Setups
 
