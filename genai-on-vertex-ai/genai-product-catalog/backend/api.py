@@ -16,6 +16,7 @@
 import os
 from typing import Optional
 from fastapi import FastAPI, Query
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 import attributes
@@ -28,6 +29,19 @@ class Product(BaseModel):
     main_image_base64: Optional[str] = None
 
 app = FastAPI()
+
+origins = [
+    "http://localhost:4000",
+    "http://localhost:8080",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.post("/v1/categories/")
 def suggest_categories(product: Product) -> list[list[str]]:
