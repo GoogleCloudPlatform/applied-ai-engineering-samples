@@ -51,6 +51,9 @@ Tech Task
 ### webhook cloud function with RAG covers 
 An example to show you how to make a webhook cloud functions with Codey, RAG, and different retreivers.Once you have this one set up, you can deploy cloud functions, set up webhooks for Dialogflow, and use this RAG in Dialogflow chatbot.
 
+### CICD and Github Use Cases
+For Developer productivity CICD use cases including Streamlining tedious or complicated Git processes, CICD  scanning & compliance, and Automated Release Processing, please refer to this link: https://gitlab.com/google-cloud-solutions/genai-for-developers
+
 ## Setups
 
 For all journeys/notebooks except talk to code and doc use cases/notebook:
