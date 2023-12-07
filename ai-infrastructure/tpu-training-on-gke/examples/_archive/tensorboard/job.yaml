@@ -1,0 +1,39 @@
+# Copyright 2023 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: tb-1 
+  namespace: tpu-training
+spec:
+  backoffLimit: 0
+  completions: 1
+  parallelism: 1
+  template:
+    spec:
+      restartPolicy: Never
+      serviceAccountName: cloud-tpu-sa
+      nodeSelector:
+        #cloud.google.com/gke-tpu-accelerator: tpu-v4-podslice
+        #cloud.google.com/gke-tpu-topology: 2x2x2
+#        iam.gke.io/gke-metadata-server-enabled: "true"
+      containers:
+      - name: tb-uploader
+        image: gcr.io/jk-mlops-dev/tb-uploader
+        command:
+        - tb-gcp-uploader
+        - --logdir=gs://jk-gke-aiml-repository/runs/maxtext-singleslice-512/tensorboard
+        - --tensorboard_resource_name=projects/895222332033/locations/us-central1/tensorboards/1035537643225481216
+        - --experiment_name=maxtext-singleslice-512

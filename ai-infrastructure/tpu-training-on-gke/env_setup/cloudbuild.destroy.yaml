@@ -1,0 +1,62 @@
+# Copyright 2023 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+steps:
+  - id: log parameters 
+    name: google/cloud-sdk:alpine
+    entrypoint: /bin/bash
+    args:
+      - -c
+      - |
+          echo ENVIRONMENT SETTINGS:
+          echo state_gcs_location=$_TF_STATE_BUCKET/$_TF_STATE_PREFIX
+          echo project_id=$PROJECT_ID
+          echo region=$_REGION
+          echo tensorboard_region=$_TENSORBOARD_REGION
+          echo zone=$_ZONE
+          echo network_name=$_NETWORK_NAME
+          echo subnet_name=$_SUBNET_NAME
+          echo repository_bucket_name=$_ARTIFACT_REPOSITORY_BUCKET_NAME
+          echo cluster_name=$_CLUSTER_NAME
+          echo tpu_namespace=$_NAMESPACE
+          echo tpu_type=$_TPU_TYPE
+          echo num_tpu_pools=$_NUM_TPU_POOLS
+  - id: 'tf init'
+    name: 'hashicorp/terraform:1.6.2'
+    entrypoint: 'sh'
+    dir: terraform
+    args: 
+    - '-c'
+    - |
+        terraform init -backend-config="bucket=$_TF_STATE_BUCKET" -backend-config="prefix=$_TF_STATE_PREFIX"
+
+  - id: 'tf destroy'
+    name: 'hashicorp/terraform'
+    entrypoint: 'sh'
+    dir: terraform
+    args: 
+    - '-c'
+    - |
+        terraform destroy -auto-approve \
+        -var=project_id=$PROJECT_ID \
+        -var=region=$_REGION \
+        -var=tensorboard_region=$_TENSORBOARD_REGION \
+        -var=network_name=$_NETWORK_NAME \
+        -var=subnet_name=$_SUBNET_NAME \
+        -var=cluster_name=$_CLUSTER_NAME \
+        -var=tpu_namespace=$_NAMESPACE \
+        -var=artifact_repository_bucket_name=$_ARTIFACT_REPOSITORY_BUCKET_NAME \
+        -var=tpu_type=$_TPU_TYPE \
+        -var=num_tpu_pools=$_NUM_TPU_POOLS \
+        -var=zone=$_ZONE

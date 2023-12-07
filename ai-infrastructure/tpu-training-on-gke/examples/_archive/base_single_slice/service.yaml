@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: headless-svc
+  namespace: default 
+spec:
+  clusterIP: None 
+  selector:
+    job-name: train-job-name 
