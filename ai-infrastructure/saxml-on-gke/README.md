@@ -36,7 +36,7 @@ Before proceeding with other deployment stages, you must:
 - Enable the necessary services.
 - Configure an automation service account and a Google Cloud storage bucket.
 
-If you are the project owner, you can utilize the Terraform scripts in the `environment/bootstrap` folder to enable the necessary services, as well as to create the automation service account and the automation storage bucket. Refer to the *Configuring the prerequisites using the bootstrap Terraform* section for instructions on how to use the bootstrat Terraform configuration.
+If you are the project owner, you can utilize the Terraform scripts in the `environment/0-bootstrap` folder to enable the necessary services, as well as to create the automation service account and the automation storage bucket. Refer to the *Configuring the prerequisites using the bootstrap Terraform* section for instructions on how to use the bootstrat Terraform configuration.
 
 If you are not the project owner request that the following services are enabled in your project:
 
@@ -72,7 +72,7 @@ You also need a GCS bucket that will be used for managing Terraform state and ot
 
 From [Cloud Shell](https://cloud.google.com/shell):
 - Clone this repo
-- Change the current folder to `environment/bootstrap`
+- Change the current folder to `environment/0-bootstrap`
 - Copy the `terraform.tfvars.tmpl` file to `terraform.tfvars`
 - Modify the `terraform.tfvars` file to reflect your environment
   - Set `project_id` to your project ID
@@ -98,7 +98,7 @@ gcloud iam service-accounts add-iam-policy-binding $AUTOMATION_SERVICE_ACCOUNT -
 
 Once the automation service account and the automation bucket are configured, you can utilize Terraform to provision the base environment.
 
-The Terraform configuration in the `environment/base_environment` folder creates and configures all the necessary components for deploying and serving Saxml models, including a VPC, a GKE cluster, service accounts, CPU and TPU node pools, and storage buckets.
+The Terraform configuration in the `environment/1-base_environment` folder creates and configures all the necessary components for deploying and serving Saxml models, including a VPC, a GKE cluster, service accounts, CPU and TPU node pools, and storage buckets.
 
 ##### Configure the Terraform providers and state
 
@@ -123,11 +123,11 @@ terraform apply
 
 This stage is optional. If you wish to conduct  performance tests using the process and tools described in the [Examples section](/ai-infrastructure/saxml-on-gke/examples/README.md) section of this repository, you need to configure the Pubsub and BigQuery services required by the load generation and metrics tracking tooling.
 
-The Terraform configuration for the performance testing environment is in the `environment/load_generation` folder.
+The Terraform configuration for the performance testing environment is in the `environment/2-load_generation` folder.
 
 ##### Configure the Terraform providers and state
 
-Follow the process outlined in the previous section to configure the backend.tf and providers.tf files.
+Follow the process outlined in the previous section to configure the `backend.tf` and `providers.tf` files.
 
 ##### Configure varialbles
 
@@ -144,9 +144,9 @@ terraform apply
 
 #### Saxml inference system
 
-After the base infrastructure has been provisioned you can deploy Saxml components to your GKE cluster. The deployment process has been automated with Kustomize. You can find the Kustomize configuration in the `environment/applications/saxml/manifests` folder. To deploy Saxml:
-- Update the `environment/applications/saxml/parameters.env` to reflect your desired configuration
-- Deploy the components using the `kubectl apply -k manifests`
+After the base infrastructure has been provisioned you can deploy Saxml components to your GKE cluster. The deployment process has been automated with **Kustomize**. You can find the Kustomize configuration in the `environment/3-saxml/manifests` folder. To deploy Saxml:
+- Update the `parameters.env` to reflect your desired configuration
+- Deploy the components using the `kubectl apply -k .` 
 
 *TBD. The detailed instructions for  Saxml configuration and monitoring to follow.* 
 

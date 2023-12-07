@@ -52,7 +52,7 @@ locals {
   )
 
   node_pool_sa_email = (
-    var.node_pool_sa.email != "" && var.node_pool_sa != null
+    var.node_pool_sa.email != ""
     ? var.node_pool_sa.email
     : module.service_accounts[local.node_pool_sa_name].email
   )
