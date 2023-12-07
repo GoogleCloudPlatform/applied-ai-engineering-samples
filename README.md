@@ -1,13 +1,19 @@
 # Google Cloud Applied AI Engineering
 
-This repo contains Generative AI / GenAI code examples, demos, educational and training content, notebooks, and other technical materials built by the Google Cloud Applied AI Engineering team. 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
-* **[Tuning Foundational Models with Vertex AI](./assets/vertex_foundation_tuning/README.md)**: A comprehensive Jupyter notebook illustrating the step-by-step procedure for tuning foundational models (PaLM 2) with Google Cloud's Vertex AI. Guides users through the entire setup and integration process – starting from environment setup, foundational model selection, to tuning it with Vertex AI.
-* **[Langchain Observability Code Snippet](./assets/langchain_observability_snippet/README.md)**: A [Langchain callback](https://python.langchain.com/docs/modules/callbacks/) to aid with understanding/observing the exact LLM calls made by a Langchain agent. The callback is provided in a Jupyter notebook, which also includes a demonstration of the code snippet.
-* **[Advanced Prompting Training](./assets/advanced_prompting_training/README.md)**: A detailed notebook on prompt engineering, demonstrating and explaining chain of thought and ReAct (reasoning + acting) prompting. Chain of thought is a very low-effort way to improve prompt performance, and ReAct is the state-of-the-art for using LLMs to interact with external systems.
-* **[Vertex AI LLM Evaluation Services](./assets/vertex_evaluation_services/README.md)**: We offer a comprehensive set of notebooks that demonstrate how to use Vertex AI LLM Evaluation Services in conjunction with other Vertex AI services. Additionally, we have provided notebooks that delve into the theory behind evaluation metrics.
-* **[Developer Productivity with GenAI](./assets/developer_productivity_with_genai/README.md)**: A collection of code samples to show builders and partners how to solve different developer tasks such as code generation, code explanation, unit test generation, comment generation, code debugging, code migration and talk to code and doc in software development life cycles to increase developer productivity with Codey APIs and other GCP services.
+Welcome to the Google Cloud Applied AI Engineering repository. This repository contains reference guides, blueprints, code samples, and hands-on labs developed by the Google Cloud Applied AI Engineering team.
+
+
+## Repository structure 
+
+* **[Generative AI on Vertex AI](./genai-on-vertex-ai/README.md)**: This section contains code samples and hands-on labs demonstrating the use of [Generative AI models and tools in Vertex AI](https://cloud.google.com/vertex-ai/docs/generative-ai/learn/overview).
+* **[Google Cloud AI/ML infrastructure](./ai-infrastructure/README.md)**: Reference guides and blueprints that compile best practices, and prescriptive guidance for running large-scale AI/ML workloads on Google Cloud AI/ML infrastructure.
 
 ## Getting help
 
 If you have any questions or if you found any problems with this repository, please report through GitHub issues.
+
+## Disclaimer
+
+This is not an officially supported Google product. The code in this repository is for demonstrative purposes only.
