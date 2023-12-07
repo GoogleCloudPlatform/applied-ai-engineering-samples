@@ -1,0 +1,76 @@
+# Copyright 2023 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: convert-checkpoint- 
+spec:
+  backoffLimit: 0
+  completions: 1
+  parallelism: 1
+  template:
+    spec:
+      restartPolicy: Never
+      volumes:
+      - name: staging
+        emptyDir: {}
+      serviceAccountName: saxml-sa
+      containers:
+      - name: convert-job
+        image: checkpoint-converter-image  
+        command:
+        - bash 
+        - -c
+        - |
+            echo Starting checkpoint download 
+            mkdir /checkpoints/base
+            mkdir /checkpoints/pax
+            gsutil -m cp -r ${GS_BASE_CHECKPOINT_PATH}/* /checkpoints/base
+
+            if [ $? -ne 0 ]; then
+                echo ERROR downloading the checkpoint
+                exit 
+            fi
+
+            echo Checkpoint download completed 
+
+            echo Starting checkpoint conversion 
+            python3 -m ${CONV_MODULE} --base /checkpoints/base --pax /checkpoints/pax ${ARGS}
+            if [ $? -ne 0 ]; then
+                echo ERROR converting checkpoints 
+                exit 
+            fi 
+            echo Checkpoint conversion completed 
+            
+            echo Starting checkpoint upload 
+            GS_CHECKPOINT_PATH=${GS_PAX_CHECKPOINT_PATH}/${CHECKPOINT_FOLDER_NAME}
+            gsutil -m cp -r /checkpoints/pax/${CHECKPOINT_FOLDER_NAME}/* ${GS_CHECKPOINT_PATH}/
+            touch commit_success.txt
+            gsutil cp commit_success.txt ${GS_CHECKPOINT_PATH}/
+            gsutil cp commit_success.txt ${GS_CHECKPOINT_PATH}/metadata/
+            gsutil cp commit_success.txt ${GS_CHECKPOINT_PATH}/state/
+            echo Checkpoint upload completed
+
+        volumeMounts:
+        - name: staging
+          mountPath: /checkpoints
+        envFrom:
+        - configMapRef:
+            name: converter-parameters
+        resources:
+          requests:
+            memory: 112G 
+          limits:
+            memory: 112G

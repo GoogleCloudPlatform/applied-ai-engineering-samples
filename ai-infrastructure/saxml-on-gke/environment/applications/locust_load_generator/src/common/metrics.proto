@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+message Metrics {
+  string test_id=1;
+  string request_type = 2;
+  string request_name=3;
+  int32 response_length=4;
+  float response_time=5;
+  string start_time=6;
+  string exception=7;
+  optional string request=8;
+  optional string response=9;
+  optional string model_name=10;
+  optional string model_method=11;
+  optional string tokenizer=12;
+  optional int32 num_output_tokens=13;
+  optional int32 num_input_tokens=14;
+  optional int32 model_response_time=15;
+}

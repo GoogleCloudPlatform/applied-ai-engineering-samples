@@ -1,0 +1,57 @@
+# Copyright 2023 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sax-model-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sax-model-server
+  template:
+    metadata:
+      labels:
+        app: sax-model-server
+    spec:
+      serviceAccountName: sax-sa
+      nodeSelector:
+        cloud.google.com/gke-tpu-topology: TPU_TOPOLOGY 
+        cloud.google.com/gke-tpu-accelerator: TPU_TYPE
+      hostNetwork: false
+      restartPolicy: Always
+      containers:
+      - name: sax-model-server
+        image: saxml-model-server-image 
+        args: 
+        - "--port=10001"
+        - "--sax_cell=$(SAX_CELL)"
+        - "--platform_chip=$(TPU_CHIP)"
+        - "--platform_topology=$(TPU_TOPOLOGY)"
+        - "--jax_platforms=tpu"
+        ports:
+        - containerPort: 10001 
+        securityContext:
+          privileged: true
+        envFrom:
+          - configMapRef:
+              name: saxml-parameters
+        resources:
+          requests:
+            google.com/tpu: NUM_CHIPS 
+          limits:
+            google.com/tpu: NUM_CHIPS
+
