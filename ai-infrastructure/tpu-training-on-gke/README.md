@@ -16,7 +16,7 @@ We also include Terraform configuration for provisioning the training environmen
 The diagram below depicts a high-level architecture of the training environment.
 
 
-![arch](/images/training-cluster.png)
+![arch](images/training-cluster.png)
 
 The foundation of the environment is a regional, VPC-native GKE cluster. The cluster has two types of node pools: 
 - A single node pool with CPU-only nodes and 
@@ -38,7 +38,7 @@ Following are the components supporting the environment:
 
 The following diagram illustrates the process of submitting and processing training workloads in the training environment.
 
-![training workloads](/images/workload-processing.png)
+![training workloads](images/workload-processing.png)
 
 In this guide we advocate using the [Kubernetes JobSet API](https://github.com/kubernetes-sigs/jobset) as the preferred method of coordinating large-scale distributed machine learning training workloads on Kubernetes. When combined with the [Kubernetes Kueue](https://github.com/kubernetes-sigs/kueue) job queuing API, it provides flexible and comprehensive training job orchestration.
 
