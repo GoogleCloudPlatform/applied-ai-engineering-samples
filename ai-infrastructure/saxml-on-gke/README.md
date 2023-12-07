@@ -1,24 +1,42 @@
 # Saxml on Google Kubernetes Engine 
 
-This reference guide compiles prescriptive guidance for deploying and operating the [Saxml inference system](https://github.com/google/saxml) on [Google Kubernetes Engine](https://cloud.google.com/kubernetes-engine). It also provides comprehensive examples of serving large Generative AI models, such as the Llama2 series, on Google Cloud TPUs.
+This reference guide compiles prescriptive guidance for deploying and operating the [Saxml inference system](https://github.com/google/saxml) on [Google Kubernetes Engine](https://cloud.google.com/kubernetes-engine). It also provides comprehensive examples of serving large Generative AI models, such as the Llama2 series.
 
 ## High level architecture  
 
 The diagram below illustrates the high-level architecture of the Saxml system on Google Kubernetes Engine.
 
-![arch](/images/saxml-gke.png)
+*NOTE. Diagram and the architecture description to be updated*
+
+![arch](images/saxml-gke.png)
 
 
 ## Environment setup
-### Prerequisites
+The deployment process has been automated using Terraform, Kustomize, and Cloud Build, and it is divided into four stages:
 
-Provisioning of the Saxml system has been automated with Terraform. Before executing the Terraform configurations, you need to:
+1. Bootstrap: During this stage, an automation service account and an automation storage bucket are created within the selected GCP project. The automation service account is configured with a limited set of permissions necessary for resource provisioning in subsequent stages and can be used by automation tools for impersonation. The automation bucket is used to manage Terraform state and other deployment artifacts. Project ownership is required to complete the bootstrap stage.
 
-- Create or select an existing Google Cloud project.
-- Enable the required services.
+2. Base Environment: In this stage, the core infrastructure components are configured, including a VPC, a GKE cluster, service accounts, and storage buckets. The deployment process allows for the use of existing VPCs and/or service accounts to align with common IT governance structures in enterprises.
+
+3. Performance Testing Environment: This is an optional phase where GCP services required to support load generation and performance metrics tracking are configured, including Pubsub and BigQuery.
+
+4. Saxml Deployment: In this stage, Saxml servers and utilities are deployed to the GKE cluster.
+
+You can execute each stage separately, or with the necessary permissions, perform a one-click deployment of all components using the provided Cloud Build configuration.
+
+### Step by step deployment
+
+This section offers step-by-step instructions for executing each stage
+
+#### Bootstrap 
+
+Before proceeding with other deployment stages, you must:
+
+- Create a new Google Cloud project or select an existing one.
+- Enable the necessary services.
 - Configure an automation service account and a Google Cloud storage bucket.
 
-If you are the project owner, you can utilize the Terraform scripts in the `bootstrap` folder to enable the necessary services, as well as to create the automation service account and the automation storage bucket. Refer to the *Configuring the prerequisites using the bootstrap Terraform* section for instructions on how to use the bootstrat Terraform configuration.
+If you are the project owner, you can utilize the Terraform scripts in the `environment/bootstrap` folder to enable the necessary services, as well as to create the automation service account and the automation storage bucket. Refer to the *Configuring the prerequisites using the bootstrap Terraform* section for instructions on how to use the bootstrat Terraform configuration.
 
 If you are not the project owner request that the following services are enabled in your project:
 
@@ -39,7 +57,7 @@ If you are not the project owner request that the following services are enabled
 - `storage.googleapis.com`
 - `sts.googleapis.com`
 
-You also need a GCS bucket that will be used for managing Terraform state and other Terraform artifacts and a service account that will be imporsonated by Terraform when provisioning the environment. The service account should have the following project level roles:
+You also need a GCS bucket that will be used for managing Terraform state and other Terraform artifacts and a service account that will be impersonated by Terraform when provisioning the environment. The service account should have the following project level roles:
 
 - `iam.securityAdmin`
 - `iam.serviceAccountAdmin`
@@ -50,11 +68,11 @@ You also need a GCS bucket that will be used for managing Terraform state and ot
 - `pubsub.editor`
 - `bigquery.admin`
 
-#### Configuring the prerequisites using the bootstrap Terraform 
+##### Configuring the prerequisites using the bootstrap Terraform 
 
 From [Cloud Shell](https://cloud.google.com/shell):
 - Clone this repo
-- Change the current folder to `environment/infrastructure/bootstrap`
+- Change the current folder to `environment/bootstrap`
 - Copy the `terraform.tfvars.tmpl` file to `terraform.tfvars`
 - Modify the `terraform.tfvars` file to reflect your environment
   - Set `project_id` to your project ID
@@ -65,9 +83,9 @@ From [Cloud Shell](https://cloud.google.com/shell):
 - Execute the `terraform apply` command
 
 
-#### Impersonating the automation service account
+##### Impersonating the automation service account
 
-To be able to use the automation service account, the account that will be used to run Terraform commands needs to  have the `iam.serviceAccountTokenCreator` rights on the automation service account. You can grant this permission using the following command. Make sure to set the AUTOMATION_SERVICE_ACCOUNT and TERRAFORM_USER_ACCOUNT variables to the email addresses of the accounts in your environment.
+To be able to use the automation service account, the account that will be used to run Terraform commands in the other deployment stages needs to  have the `iam.serviceAccountTokenCreator` rights on the automation service account. You can grant this permission using the following command. Make sure to set the AUTOMATION_SERVICE_ACCOUNT and TERRAFORM_USER_ACCOUNT variables to the email addresses of the accounts in your environment.
 
 ```
 AUTOMATION_SERVICE_ACCOUNT=you-automation-service-account-name@jk-mlops-dev.iam.gserviceaccount.com
@@ -76,21 +94,13 @@ TERRAFORM_USER_ACCOUNT=your-terraform-user@foo.com
 gcloud iam service-accounts add-iam-policy-binding $AUTOMATION_SERVICE_ACCOUNT --member="user:$TERRAFORM_USER_ACCOUNT" --role='roles/iam.serviceAccountTokenCreator'
 ```
 
-### Provisionining the Saxml system
+#### Base environment
 
-Once the automation service account and the automation bucket are configured, you can utilize Terraform to provision the Saxml system.
+Once the automation service account and the automation bucket are configured, you can utilize Terraform to provision the base environment.
 
-The provisioning of the Saxml system consists of two steps:
+The Terraform configuration in the `environment/base_environment` folder creates and configures all the necessary components for deploying and serving Saxml models, including a VPC, a GKE cluster, service accounts, CPU and TPU node pools, and storage buckets.
 
-1. Provisioning the base system, which includes all the components necessary to deploy and serve Saxml models.
-2. Optionally, provisioning a load generation and performance tracking components.
-
-
-#### Provisionning the base system
-
-The Terraform configuration in the `base_environment` folder creates and configures all the necessary components for deploying and serving Saxml models, including a VPC, a GKE cluster, service accounts, CPU and TPU node pools, and storage buckets.
-
-##### Configure providers and state
+##### Configure the Terraform providers and state
 
 If you used the `bootstrap` configuration to configure the prerequisites, copy the `providers\providers.tf` and `providers\backend.tf` files from the `providers` folder in your automation bucket to the `base_environment` folder in the cloned repo. Modify the `backend.tf` by setting the `prefix` field to the name of a folder in the automation bucket where you want to store your Terraform configuration's state. For example, if you want to manage the Terraform state in the `tf_state/saxml` subfolder of the automation bucket set the `prefix` field to `tf_state/saxml`.
 
@@ -109,10 +119,40 @@ terraform init
 terraform apply
 ```
 
-#### Provisioning the load generation components
+#### Performance testing environment
 
-TBD
+This stage is optional. If you wish to conduct  performance tests using the process and tools described in the [Examples section](/ai-infrastructure/saxml-on-gke/examples/README.md) section of this repository, you need to configure the Pubsub and BigQuery services required by the load generation and metrics tracking tooling.
 
+The Terraform configuration for the performance testing environment is in the `environment/load_generation` folder.
+
+##### Configure the Terraform providers and state
+
+Follow the process outlined in the previous section to configure the backend.tf and providers.tf files.
+
+##### Configure varialbles
+
+Rename the `terraform.tfvars.tmpl` file to `terraform.tfvars` make the necessary updates to align with your environment settings
+
+*TBD. The detailed instruction to follow. For now refer to the variables.tf for more information on the configurable settings.*
+
+##### Apply the configuration
+
+```
+terraform init
+terraform apply
+```
+
+#### Saxml inference system
+
+After the base infrastructure has been provisioned you can deploy Saxml components to your GKE cluster. The deployment process has been automated with Kustomize. You can find the Kustomize configuration in the `environment/applications/saxml/manifests` folder. To deploy Saxml:
+- Update the `environment/applications/saxml/parameters.env` to reflect your desired configuration
+- Deploy the components using the `kubectl apply -k manifests`
+
+*TBD. The detailed instructions for  Saxml configuration and monitoring to follow.* 
+
+### Deploying Saxml models
+
+This repository contains comprehensive examples for deploying and performance testing various Generative AI models, including Llama2, 7B, 13B, and 70B. For detailed instructions, please refer to the [Examples section](/ai-infrastructure/saxml-on-gke/examples/README.md) of the repository.
 
 ### Destroying the environment
 
@@ -139,12 +179,10 @@ Show the state:
 terraform state list
 ```
 
-Copy the identifier of the namespace state. E.g. ``
-
 Remove the state:
 
 ```
-terraform state rm lll``
+terraform state rm kubernetes_namespace.namespace
 ```
 
 
