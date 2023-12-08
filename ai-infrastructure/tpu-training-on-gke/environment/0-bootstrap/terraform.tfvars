@@ -12,14 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-resource "google_service_account" "gke_service_account" {
-    account_id = var.gke_sa_name
-    display_name = "GKE node pool service account" 
+project_id = "jk-mlops-dev"
+automation_bucket = {
+  name     = "jk-automation-bucket-1"
+  location = "US"
 }
-
-resource "google_project_iam_member" "gke_sa_role_bindings" {
-  for_each = toset(var.gke_sa_roles)
-  project  = data.google_project.project.project_id
-  member   = "serviceAccount:${google_service_account.gke_service_account.email}"
-  role     = "roles/${each.value}"
-}
+automation_sa_name = "jk-automation-sa-1"

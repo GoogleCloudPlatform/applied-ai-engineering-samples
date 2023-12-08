@@ -12,12 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-resource "google_vertex_ai_tensorboard" "tensorboard" {
-  display_name = var.tensorboard_name 
-  description  = "Vertex Tensorboard to track TPU training experiments"
-  labels       = {
-    "environment" : "gke_tpu",
+project_id          = "jk-mlops-dev"
+region              = "us-central2"
+prefix              = "jk1"
+deletion_protection = true
+cpu_node_pools = {
+  default-cpu-node-pool = {
+    zones = ["us-central2-a"]
   }
-  region       = var.tensorboard_region 
+}
+tpu_node_pools = {
+  tpu-v4-16-node-pool = {
+    zones          = ["us-central2-b"]
+    min_node_count = 1
+    max_node_count = 1
+    tpu_type       = "v4-16"
+  }
+}
+tensorboard_config = {
+  region = "us-central1"
 }
