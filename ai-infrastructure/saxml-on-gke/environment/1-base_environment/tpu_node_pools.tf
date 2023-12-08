@@ -131,7 +131,7 @@ resource "google_container_node_pool" "tpu_node_pools" {
     for_each = each.value.multihost ? [] : [1]
     content {
       type         = "COMPACT"
-      tpu_topology = each.value.topology
+      tpu_topology = each.value.tpu_topology
     }
   }
 }
