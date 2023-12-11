@@ -69,4 +69,7 @@ For talk to code and doc use cases/notebook:
 - Step 5: (Optional - only if you want to use Google Meet Bot): Deploy Cloud Functions Code which Uses MultiRetrievalQAChain to Retrieve Information (Embedding Spaces + RAG + Codey) from 3 Different Retriever Embedding Spaces
 - Step 6: (Optional - only if you want to use Google Meet Bot): Call Cloud Function in Webhook in a Dialogflow Project and deploy the project to Google Meet
 
+## Demo Guides
+demo_guides folder include detailed setup guides.
+
 * If you find anything missing, please let us know.
