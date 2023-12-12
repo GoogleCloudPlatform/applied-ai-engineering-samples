@@ -26,15 +26,26 @@ import config
 
 class AttributesTest(unittest.TestCase):
 
-  def test_join_attributes(self):
-    res = attributes.join_attributes([config.TEST_PRODUCT_ID])
-    logging.info(res)
+  def test_join_attributes_desc(self):
+    res = attributes.join_attributes_desc([config.TEST_PRODUCT_ID])
     self.assertIsNotNone(res)
     self.assertIsInstance(res,dict)
     for k,v in res.items():
       self.assertIsInstance(k,str)
       self.assertIsInstance(v,dict)
+      self.assertEqual(set(v.keys()), {'attributes','description'})
+    logging.info(res[config.TEST_PRODUCT_ID]['attributes'])
+    logging.info(res[config.TEST_PRODUCT_ID]['description'])
 
+  def test_generate_prompt(self):
+    desc = 'This is an orange'
+    candidates = [
+      {'description': 'Apple', 'attributes': {'Color':'green', 'Taste':'sweet'}},
+      {'description': 'Banana', 'attributes': {'Color': 'yellow'}},
+    ]
+    res = attributes.generate_prompt(desc, candidates)
+    logging.info(res)
+    self.assertIsInstance(res, str)
 
   def test_retrieve_no_category(self):
     res = attributes.retrieve(
@@ -45,11 +56,28 @@ class AttributesTest(unittest.TestCase):
     logging.info(res)
     self.assertIsInstance(res, list)
     self.assertEqual(len(res), config.NUM_NEIGHBORS*2)
-    self.assertEqual(set(res[0].keys()), {'id','attributes','distance'})
+    self.assertEqual(set(res[0].keys()), {'id','attributes','description','distance'})
 
-  def test_generate_no_category(self):
+  def test_generate_attributes_no_category(self):
+    candidates = [
+      {'description': 'Apple', 'attributes': {'Color':'green', 'Taste':'sweet'}},
+      {'description': 'Banana', 'attributes': {'Color': 'yellow'}},
+    ]
     res = attributes.generate_attributes(
-        'This is a test description',
+        'Orange',
+        candidates
+    )
+    logging.info(res)
+    self.assertIsInstance(res, dict)
+    self.assertGreater(len(res),0)
+
+  def test_parse_answer(self):
+    res = attributes.parse_answer(' color: deep red |size:large')
+    self.assertDictEqual(res, {'color':'deep red','size':'large'})
+
+  def test_retrieve_and_generate_attributes(self):
+    res = attributes.retrieve_and_generate_attributes(
+        'Fleece Jacket',
         None,
         config.TEST_GCS_IMAGE
     )
