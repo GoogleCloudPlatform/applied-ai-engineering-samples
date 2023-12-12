@@ -129,7 +129,7 @@ The Terraform configuration for the performance testing environment is in the `e
 
 Follow the process outlined in the previous section to configure the `backend.tf` and `providers.tf` files.
 
-##### Configure varialbles
+##### Configure variables
 
 Rename the `terraform.tfvars.tmpl` file to `terraform.tfvars` make the necessary updates to align with your environment settings
 
@@ -148,14 +148,16 @@ After the base infrastructure has been provisioned you can deploy Saxml componen
 1. Update the `kustomization.yaml` with your namespace 
 
 ```
+cd environment/3-saxml/manifests
 NAMESPACE="your-namespace"
 kustomize edit set namespace $NAMESPACE
 ```
 
 2. Update the `kustomization.yaml` with the URI of the `saxml-proxy` image
 ```
-SAXML_PROXY_IMAGE_URI="gcr.io/your-project/your-image-name:tag"
-
+PROJECT_ID="your-project-id"
+DEFAULT_REPO="gcr.io/$PROJECT_ID"
+SAXML_PROXY_IMAGE_URI="$DEFAULT_REPO/saxml-proxy:latest"
 kustomize edit set image saxml-proxy=$SAXML_PROXY_IMAGE_URI
 
 ```
@@ -164,7 +166,8 @@ kustomize edit set image saxml-proxy=$SAXML_PROXY_IMAGE_URI
 4. Deploy the Saxml components:
 
 ```
-skaffold run
+cd environment/3-saxml
+skaffold run --default-repo $DEFAULT_REPO 
 ```
 
 *TBD. The detailed instructions for  Saxml configuration and monitoring to follow.* 
