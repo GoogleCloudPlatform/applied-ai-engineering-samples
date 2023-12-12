@@ -35,6 +35,7 @@ COLUMN_CATEGORIES = [ # List of category column names from root to leaf
     'c3_name'
 ]
 COLUMN_ATTRIBUTES = 'attributes'
+COLUMN_DESCRIPTION = 'description'
 ALLOW_TRAILING_NULLS = True # whether to allow trailing category levels to be 
                             # unspecified e.g (only top-level category is specified)
 
