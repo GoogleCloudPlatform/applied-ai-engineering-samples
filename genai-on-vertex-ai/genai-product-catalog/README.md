@@ -20,7 +20,7 @@ The notebooks listed below were developed to explain the concepts exposed in thi
 - [Generate Embeddings](/notebooks/1_generate_embeddings.ipynb) (1_generate_embeddings.ipynb): Use the Vertex Embedding API to generate multimodal embeddings based on product description and image.
 - [Create Vector DB](/notebooks/2_create_vector_db.ipynb) (2_create_vector_db.ipynb): Store embeddings in low latency Vector DB powered by Vertex Vector Search.
 - [Product Categorization](/notebooks/3_product_categorization.ipynb) (3_product_categorization.ipynb): Demonstrate RAG approach to categorizing new products.
-- [Attribute Generation](/notebooks/3_product_categorization.ipynb) (3_product_categorization.ipynb): Demonstrate RAG approach to generating product attributes.
+- [Attribute Generation](/notebooks/4_attribute_generation.ipynb) (4_attribute_generation.ipynb): Demonstrate RAG approach to generating product attributes.
 - [Marketing Desription](/notebooks/5_marketing_description.ipynb) (5_marketing_description.ipynb): Utilize Vertex LLM to generate marketing copy for products.
 
 
