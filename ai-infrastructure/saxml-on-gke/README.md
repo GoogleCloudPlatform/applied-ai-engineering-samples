@@ -144,9 +144,28 @@ terraform apply
 
 #### Saxml inference system
 
-After the base infrastructure has been provisioned you can deploy Saxml components to your GKE cluster. The deployment process has been automated with **Kustomize**. You can find the Kustomize configuration in the `environment/3-saxml/manifests` folder. To deploy Saxml:
-- Update the `parameters.env` to reflect your desired configuration
-- Deploy the components using the `kubectl apply -k .` 
+After the base infrastructure has been provisioned you can deploy Saxml components to your GKE cluster. The deployment process has been automated with **Skaffold** and **Kustomize**. You can find the Kustomize configuration in the `environment/3-saxml/manifests` folder. To deploy Saxml:
+1. Update the `kustomization.yaml` with your namespace 
+
+```
+NAMESPACE="your-namespace"
+kustomize edit set namespace $NAMESPACE
+```
+
+2. Update the `kustomization.yaml` with the URI of the `saxml-proxy` image
+```
+SAXML_PROXY_IMAGE_URI="gcr.io/your-project/your-image-name:tag"
+
+kustomize edit set image saxml-proxy=$SAXML_PROXY_IMAGE_URI
+
+```
+3. Update the `parameters.env` to reflect your desired configuration
+
+4. Deploy the Saxml components:
+
+```
+skaffold run
+```
 
 *TBD. The detailed instructions for  Saxml configuration and monitoring to follow.* 
 

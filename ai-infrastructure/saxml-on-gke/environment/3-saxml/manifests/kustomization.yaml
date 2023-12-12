@@ -15,20 +15,23 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: serving-workloads
+namespace: saxml-workloads
 
 configMapGenerator:
-  - name: saxml-parameters 
-    envs:
-    - parameters.env
+- envs:
+  - parameters.env
+  name: saxml-parameters
 
 images:
 - name: saxml-admin-server-image
   newName: us-docker.pkg.dev/cloud-tpu-images/inference/sax-admin-server
   newTag: v1.1.0
-- name: saxml-model-server-image 
+- name: saxml-model-server-image
   newName: us-docker.pkg.dev/cloud-tpu-images/inference/sax-model-server
   newTag: v1.1.0
+- name: saxml-proxy
+  newName: gcr.io/jk-mlops-dev/saxml-proxy
+  newTag: latest
 - name: saxml-util-image
   newName: us-docker.pkg.dev/cloud-tpu-images/inference/sax-util
   newTag: v1.1.0
@@ -37,12 +40,15 @@ resources:
 - saxml-admin-deployment.yaml
 - saxml-model-server-deployment.yaml
 - saxml-util-deployment.yaml
+- http-utils.yaml
+- saxml-proxy-deployment.yaml
+- saxml-proxy-service.yaml
 
 replacements:
 - source:
     fieldPath: data.KSA
     kind: ConfigMap
-    name: saxml-parameters 
+    name: saxml-parameters
   targets:
   - fieldPaths:
     - spec.template.spec.serviceAccountName
@@ -79,4 +85,3 @@ replacements:
     select:
       kind: Deployment
       name: sax-model-server
-
