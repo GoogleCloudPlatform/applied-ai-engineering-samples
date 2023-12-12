@@ -100,5 +100,5 @@ def suggest_attributes(product: Product) -> dict[str,str]:
     JSON dictionary representing attributes as key value pairs e.g. 
     {'color':'green', 'pattern': 'striped'}
     """
-    return attributes.generate_attributes(
+    return attributes.retrieve_and_generate_attributes(
         product.description, product.category, product.main_image_base64, base64=True)
