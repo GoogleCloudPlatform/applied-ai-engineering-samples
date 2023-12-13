@@ -118,7 +118,7 @@ The Terraform configuration in the `environment/1-base_environment` folder creat
 
 ##### Configure the Terraform providers and state
 
-If you used the `bootstrap` configuration to configure the prerequisites, copy the `providers\providers.tf` and `providers\backend.tf` files from the `providers` folder in your automation bucket to the `base_environment` folder in the cloned repo. Modify the `backend.tf` by setting the `prefix` field to the name of a folder in the automation bucket where you want to store your Terraform configuration's state. For example, if you want to manage the Terraform state in the `tf_state/saxml` subfolder of the automation bucket set the `prefix` field to `tf_state/saxml`.
+If you used the `bootstrap` configuration to configure the prerequisites, copy the `providers\providers.tf` and `providers\backend.tf` files from the `providers` folder in your automation bucket to the `1-base_environment` folder in the cloned repo. Modify the `backend.tf` by setting the `prefix` field to the name of a folder in the automation bucket where you want to store your Terraform configuration's state. For example, if you want to manage the Terraform state in the `tf_state/saxml` subfolder of the automation bucket set the `prefix` field to `tf_state/saxml`.
 
 If the automation bucket and the automation service account were provided to you by your administrator, rename the `backend.tf.tmpl` and the `providers.tf.tmpl` files to `backend.tf` and `providers.tf` and update them with your settings.
 
@@ -161,7 +161,7 @@ terraform apply
 #### Provisioning Saxml inference system
 
 After the base infrastructure has been provisioned you can deploy Saxml components to your GKE cluster. The deployment process has been automated with **Skaffold** and **Kustomize**. You can find the Kustomize configuration in the `environment/3-saxml/manifests` folder. To deploy Saxml:
-1. Update the `kustomization.yaml` with your namespace 
+1. Update the `kustomization.yaml` with the namespace created during the base environment setup. This namespace will be used to deploy Saxml components. 
 
 ```
 cd environment/3-saxml/manifests
@@ -169,7 +169,7 @@ NAMESPACE="your-namespace"
 kustomize edit set namespace $NAMESPACE
 ```
 
-2. Update the `kustomization.yaml` with the URI of the `saxml-proxy` image
+2. Update the `kustomization.yaml` with the URI of the Saxml HTTP Proxy image. The image name should be `saxml-proxy`. The registry URI component of the image URI should be set to your  Artifact Registry.
 ```
 PROJECT_ID="your-project-id"
 DEFAULT_REPO="gcr.io/$PROJECT_ID"
