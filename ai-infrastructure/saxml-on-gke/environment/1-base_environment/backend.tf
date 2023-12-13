@@ -18,6 +18,6 @@ terraform {
     bucket                      = "jk-automation-bucket"
     impersonate_service_account = "jk-automation-sa@jk-mlops-dev.iam.gserviceaccount.com"
     # remove the newline between quotes and set the prefix to the folder for Terraform state
-    prefix = "tf_state/saxml_env"
+    prefix = "tf-state/saxml-on-gke"
   }
 }

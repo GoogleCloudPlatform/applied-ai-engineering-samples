@@ -12,22 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-project_id = "your-project-id"
-automation_bucket = {
-  name = "your-automation-bucket-name"
-  location = "the-location-for-your-bucket"
+
+provider "google" {
+  impersonate_service_account = "your-automation-service-account@your-project-id.iam.gserviceaccount.com"
 }
-
-automation_sa_name = "your-automation-sa-name"
-
-#services = [
-# "bigquery.googleapis.com",
-# "pubsub.googleapis.com"
-#]
-#
-#roles = [
-#  "roles/pubsub.editor",
-#  "roles/bigquery.admin"
-#]
-
+provider "google-beta" {
+  impersonate_service_account = "your-automation-service-account@your-project-id.iam.gserviceaccount.com"
+}
 

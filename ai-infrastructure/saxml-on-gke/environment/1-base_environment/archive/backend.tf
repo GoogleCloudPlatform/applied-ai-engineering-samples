@@ -12,22 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-project_id = "your-project-id"
-automation_bucket = {
-  name = "your-automation-bucket-name"
-  location = "the-location-for-your-bucket"
+
+terraform {
+  backend "gcs" {
+    bucket                      = "jk-automation-bucket"
+    impersonate_service_account = "jk-automation-sa@jk-mlops-dev.iam.gserviceaccount.com"
+    # remove the newline between quotes and set the prefix to the folder for Terraform state
+    prefix = "tf_state/saxml_env"
+  }
 }
-
-automation_sa_name = "your-automation-sa-name"
-
-#services = [
-# "bigquery.googleapis.com",
-# "pubsub.googleapis.com"
-#]
-#
-#roles = [
-#  "roles/pubsub.editor",
-#  "roles/bigquery.admin"
-#]
-
-

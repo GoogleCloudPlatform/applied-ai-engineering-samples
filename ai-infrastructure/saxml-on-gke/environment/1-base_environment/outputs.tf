@@ -13,51 +13,11 @@
 # limitations under the License.
 
 
-output "node_pool_sa_email" {
-  description = "The email of the node pool sa"
-  value       = local.node_pool_sa_email
+output "output_cluster_id" {
+  value = module.base_environment.cluster_name
 }
 
-output "wid_sa_email" {
-  description = "The email of the workload identity sa"
-  value       = local.wid_sa_email
-}
-
-output "wid_ksa" {
-  description = "The name of the workload id k8s service account"
-  value       = local.ksa_name
-}
-
-output "cluster_name" {
-  description = "The name of the GKE cluster"
-  value       = module.cluster.name
-}
-
-output "cluster_endpoint" {
-  description = "The endpoint for the GKE cluster"
-  value       = module.cluster.endpoint
-}
-
-output "cluster_certificate" {
-  description = "The cluster's certificate"
-  sensitive   = true
-  value       = module.cluster.ca_certificate
-}
-
-output "region" {
-  description = "The region of the environment"
-  value       = var.region
-}
-
-output "workloads_namespace" {
-  description = "The default namespace for serving workloads"
-  value       = var.cluster_config.workloads_namespace
-}
-
-output "gcs_buckets" {
-  description = "GCS buckets created for in the environment"
-  value = { for bucket in module.gcs_buckets :
-    bucket.url => bucket.bucket.location
-  }
+output "tensorboard_id" {
+  value = try(google_vertex_ai_tensorboard.tensorboard[0].id, null)
 }
 

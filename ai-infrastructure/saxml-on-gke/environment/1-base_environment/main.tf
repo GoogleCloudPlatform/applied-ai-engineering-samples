@@ -17,55 +17,34 @@ data "google_project" "project" {
   project_id = var.project_id
 }
 
-data "google_client_config" "default" {}
-
 locals {
+  gcs_configs = var.gcs_configs
 
-  cluster_name = (
-    var.prefix != ""
-    ? "${var.prefix}-${var.cluster_config.name}"
-    : var.cluster_config.name
-  )
+  node_pool_sa = {
+    name = var.node_pool_sa_name
+  }
 
-  network_name = (
-    var.prefix != ""
-    ? "${var.prefix}-${var.vpc_config.network_name}"
-    : var.vpc_config.network_name
-  )
+  wid_sa = {
+    name = var.wid_sa_name
+  }
 
-  subnet_name = (
-    var.prefix != ""
-    ? "${var.prefix}-${var.vpc_config.subnet_name}"
-    : var.vpc_config.subnet_name
-  )
+  cluster_config = var.cluster_config
 
-  node_pool_sa_name = (
-    var.prefix != "" && var.node_pool_sa != null
-    ? "${var.prefix}-${var.node_pool_sa.name}"
-    : var.node_pool_sa.name
-  )
+  cpu_node_pools = var.cpu_node_pools
 
-  wid_sa_name = (
-    var.prefix != ""
-    ? "${var.prefix}-${var.wid_sa.name}"
-    : var.wid_sa.name
-  )
+  tpu_node_pools = var.tpu_node_pools
+}
 
-  node_pool_sa_email = (
-    var.node_pool_sa.email != ""
-    ? var.node_pool_sa.email
-    : module.service_accounts[local.node_pool_sa_name].email
-  )
-
-  wid_sa_email = (
-    var.wid_sa.email != ""
-    ? var.wid_sa.email
-    : module.service_accounts[local.wid_sa_name].email
-  )
-
-  network_self_link = try(var.vpc_ref.network_self_link, module.vpc.0.self_link)
-  subnet_self_link  = try(var.vpc_ref.subnet_self_link, module.vpc.0.subnet_self_links["${var.region}/${local.subnet_name}"])
-
-  pods_range_name     = try(var.vpc_ref.pods_ip_range_name, local.pods_ip_range_name)
-  services_range_name = try(var.vpc_ref.services_ip_range_name, local.services_ip_range_name)
+module "base_environment" {
+  source              = "../../../terraform-modules/gke-aiml"
+  project_id          = var.project_id
+  region              = var.region
+  prefix              = var.prefix
+  deletion_protection = var.deletion_protection
+  gcs_configs         = local.gcs_configs
+  node_pool_sa        = local.node_pool_sa
+  wid_sa              = local.wid_sa
+  cluster_config      = local.cluster_config
+  cpu_node_pools      = local.cpu_node_pools
+  tpu_node_pools      = local.tpu_node_pools
 }

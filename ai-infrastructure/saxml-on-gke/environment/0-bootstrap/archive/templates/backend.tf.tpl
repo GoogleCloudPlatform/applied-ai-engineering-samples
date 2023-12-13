@@ -12,22 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-project_id = "your-project-id"
-automation_bucket = {
-  name = "your-automation-bucket-name"
-  location = "the-location-for-your-bucket"
+
+terraform {
+  backend "gcs" {
+    bucket                      = "${bucket}"
+    impersonate_service_account = "${sa}"
+    %{~ if backend_extra != null ~}
+    ${indent(4, backend_extra)}
+    %{~ endif ~}
+  }
 }
-
-automation_sa_name = "your-automation-sa-name"
-
-#services = [
-# "bigquery.googleapis.com",
-# "pubsub.googleapis.com"
-#]
-#
-#roles = [
-#  "roles/pubsub.editor",
-#  "roles/bigquery.admin"
-#]
-
-

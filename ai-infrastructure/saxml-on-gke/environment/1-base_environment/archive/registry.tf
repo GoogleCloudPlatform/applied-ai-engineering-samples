@@ -12,22 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-project_id = "your-project-id"
-automation_bucket = {
-  name = "your-automation-bucket-name"
-  location = "the-location-for-your-bucket"
+module "registry" {
+  source     = "git::https://github.com/GoogleCloudPlatform/cloud-foundation-fabric.git//modules/artifact-registry?ref=v28.0.0&depth=1"
+  count      = var.registry_config == null ? 0 : 1
+  project_id = var.project_id
+  location   = var.region
+  name       = var.registry_config.name
+  format     = { docker = {} }
+  mode       = { remote = true }
 }
-
-automation_sa_name = "your-automation-sa-name"
-
-#services = [
-# "bigquery.googleapis.com",
-# "pubsub.googleapis.com"
-#]
-#
-#roles = [
-#  "roles/pubsub.editor",
-#  "roles/bigquery.admin"
-#]
-
-
