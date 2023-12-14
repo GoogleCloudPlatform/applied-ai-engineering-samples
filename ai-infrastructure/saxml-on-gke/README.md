@@ -13,7 +13,7 @@ The diagram below illustrates the high-level architecture of the Saxml system on
 - TPU node pools host **Saxml Model Servers**.
 - A dedicated fixed size CPU node pool hosts **Saxml Admin Servers**. 
 - A dedicated autoscaling CPU node pool hosts **Saxml HTTP Proxy** instances. **Saxml HTTP Proxy** is a custom API server that encapsulates **Saxml Client API** and exposes it through REST interfaces.
-- Another dedicated autoscaling CPU node pool is used to deploy auxilliary workloads like checkpoint converter jobs and load generation tooling. 
+- A couple of autoscaling CPU node pools that are used to deploy auxilliary workloads like checkpoint converter jobs, load generation tooling, saxutil CLI. 
 - GKE nodes are configured to a use a custom service account
 - The cluster is configured to support [Workload Identity](https://cloud.google.com/kubernetes-engine/docs/concepts/workload-identity).
 - [Cloud Logging](https://cloud.google.com/logging?hl=en) and [Cloud Monitoring](https://cloud.google.com/monitoring?hl=en) are used for logs and metrics management

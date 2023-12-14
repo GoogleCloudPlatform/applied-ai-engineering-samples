@@ -25,7 +25,6 @@ variable "region" {
   nullable    = false
 }
 
-
 variable "deletion_protection" {
   description = "Prevent Terraform from destroying data storage resources (storage buckets, GKE clusters). When this field is set, a terraform destroy or terraform apply that would delete data storage resources will fail."
   type        = bool
@@ -86,7 +85,6 @@ variable "cluster_config" {
   }
 }
 
-
 variable "cpu_node_pools" {
   description = "Configurations for a CPU node pool"
   type = map(object({
@@ -120,7 +118,17 @@ variable "cpu_node_pools" {
       }
     }
 
-    auxiliary-workloads-node-pool = {
+    default-node-pool = {
+      zones          = ["us-central2-a"]
+      min_node_count = 1
+      max_node_count = 3
+      machine_type   = "n1-standard-8"
+      disk_size_gb   = 200
+      taints         = {}
+      labels         = {}
+    }
+
+    large-workloads-node-pool = {
       zones          = ["us-central2-a"]
       min_node_count = 0
       max_node_count = 3

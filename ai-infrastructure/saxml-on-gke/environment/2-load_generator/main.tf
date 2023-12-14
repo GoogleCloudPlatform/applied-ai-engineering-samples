@@ -34,7 +34,7 @@ locals {
     var.prefix != ""
     ? {
       dataset_name = "${var.prefix}_${var.bq_config.dataset_name}"
-      table_name   = "${var.prefix}_${var.bq_config.table_name}"
+      table_name   = var.bq_config.table_name
       location     = var.bq_config.location
     }
     : var.bq_config
