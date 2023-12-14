@@ -28,12 +28,6 @@ spec:
       labels:
         app: http-utils 
     spec:
-      nodeSelector:
-          saxml-proxy-node-pool: "true"
-      tolerations:
-      - key: "saxml-proxy-node-pool"
-        operator: "Exists"
-        effect: "NoSchedule"
       serviceAccountName: sax-sa
       containers:
         - image: python:3.10 
