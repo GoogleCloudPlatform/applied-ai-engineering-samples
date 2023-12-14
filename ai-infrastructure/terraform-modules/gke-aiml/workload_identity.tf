@@ -19,13 +19,13 @@ provider "kubernetes" {
 }
 
 locals {
-  ksa_name                = local.wid_sa_name
-  gcp_sa_name             = local.wid_sa_name
+  ksa_name                = var.wid_sa.name
+  gcp_sa_name             = var.wid_sa.name
   gcp_sa_static_id        = "projects/${var.project_id}/serviceAccounts/${local.wid_sa_email}"
   gcp_sa_email            = local.wid_sa_email
   k8s_sa_gcp_derived_name = "serviceAccount:${var.project_id}.svc.id.goog[${local.namespace}/${local.ksa_name}]"
   namespace = (
-    create_namespace
+    local.create_namespace == true
     ? kubernetes_namespace.namespace[0].metadata[0].name
     : "default"
   )
@@ -48,7 +48,7 @@ resource "kubernetes_service_account" "ksa" {
   automount_service_account_token = false
   metadata {
     name      = local.ksa_name
-    namespace = kubernetes_namespace.namespace.metadata[0].name
+    namespace = local.namespace
     annotations = {
       "iam.gke.io/gcp-service-account" = local.gcp_sa_email
     }

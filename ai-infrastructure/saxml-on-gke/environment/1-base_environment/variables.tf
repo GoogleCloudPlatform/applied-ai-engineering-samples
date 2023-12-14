@@ -40,35 +40,43 @@ variable "prefix" {
   nullable    = false
 }
 
-
-variable "gcs_configs" {
-  description = "Configs for Saxml root and model repository buckets"
-  type = map(object({
-    admin-root       = {}
-    model-repository = {}
-  }))
-}
-
 variable "node_pool_sa_name" {
   description = "The name of the node pool service account"
   type        = string
-  default     = "node-pool-sa"
+  default     = "saxml-node-pool-sa"
   nullable    = false
 }
 
 variable "wid_sa_name" {
   description = "The name of the workload identify sa"
   type        = string
-  default     = "wid-sa"
+  default     = "saxml-wid-sa"
   nullable    = false
+}
+
+variable "artifact_registry_name" {
+  description = "The name of the Artifact Registry"
+  type        = string
+  default     = null
+  nullable    = true
+}
+
+variable "gcs_configs" {
+  description = "GCS storage configs"
+  type        = map(map(any))
+  default = {
+    "saxml-root"             = {}
+    "saxml-model-repository" = {}
+  }
 }
 
 variable "cluster_config" {
   description = "GKE cluster configs"
-  type = object({
-    name                = optional(string, "saxml-gke")
-    workloads_namespace = optional(string, "saxml")
-  })
+  type        = map(any)
+  default = {
+    name                = "saxml-gke-cluster"
+    workloads_namespace = "saxml"
+  }
 }
 
 
@@ -79,14 +87,59 @@ variable "cpu_node_pools" {
     min_node_count = number
     max_node_count = number
     machine_type   = string
-    disk_size_gb   = optional(number, 200)
-    taints = optional(map(object({
+    disk_size_gb   = number
+    taints = map(object({
       value  = string
       effect = string
-    })), {})
-    labels = optional(map(string), {})
+    }))
+    labels = map(string)
   }))
   nullable = false
+  default = {
+    saxml-admin-node-pool = {
+      zones          = ["us-central2-a"]
+      min_node_count = 1
+      max_node_count = 1
+      machine_type   = "n1-standard-8"
+      disk_size_gb   = 100
+      taints = {
+        saxml-admin-node-pool = {
+          value  = true
+          effect = "NO_SCHEDULE"
+        }
+      }
+      labels = {
+        saxml-admin-node-pool = true
+      }
+    }
+
+    auxiliary-workloads-node-pool = {
+      zones          = ["us-central2-a"]
+      min_node_count = 0
+      max_node_count = 3
+      machine_type   = "n2-highmem-32"
+      disk_size_gb   = 500
+      taints         = {}
+      labels         = {}
+    }
+
+    saxml-proxy-node-pool = {
+      zones          = ["us-central2-a"]
+      min_node_count = 1
+      max_node_count = 3
+      machine_type   = "n1-standard-8"
+      disk_size_gb   = 100
+      taints = {
+        saxml-proxy-node-pool = {
+          value  = true
+          effect = "NO_SCHEDULE"
+        }
+      }
+      labels = {
+        saxml-proxy-node-pool = true
+      }
+    }
+  }
 }
 
 variable "tpu_node_pools" {
@@ -98,6 +151,18 @@ variable "tpu_node_pools" {
     tpu_type       = string
   }))
   nullable = false
+}
+
+variable "vpc_config" {
+  description = "VPC configuration"
+  type = object({
+    network_name = string
+    subnet_name  = string
+  })
+  default = {
+    network_name = "saxml-gke-cluster-network"
+    subnet_name  = "saxml-gke-cluster-subnet"
+  }
 }
 
 

@@ -131,7 +131,26 @@ dmypy.json
 # Terraform
 *.tfvars
 *.tfvars.json
+*.
 
-.terraform.lock.hcl
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# Local .terraform directories
 **/.terraform/*
 
+# Crash log files
+crash.log
+crash.*.log
+
+# Ignore CLI configuration files
+.terraformrc
+terraform.rc
+
+# Ignore override files as they are usually used to override resources locally and so
+# are not checked in
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json

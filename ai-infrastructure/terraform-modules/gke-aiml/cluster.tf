@@ -12,14 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-locals {
-
-}
 
 module "cluster" {
   source              = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/gke-cluster-standard?ref=v28.0.0&depth=1"
   project_id          = var.project_id
-  name                = local.cluster_name
+  name                = var.cluster_config.name
   description         = var.cluster_config.description
   location            = var.region
   deletion_protection = var.deletion_protection

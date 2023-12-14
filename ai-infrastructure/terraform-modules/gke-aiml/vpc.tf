@@ -22,12 +22,12 @@ module "vpc" {
   source                   = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/net-vpc?ref=v28.0.0&depth=1"
   count                    = var.vpc_ref == null ? 1 : 0
   project_id               = var.project_id
-  name                     = local.network_name
+  name                     = var.vpc_config.network_name
   routing_mode             = var.vpc_config.routing_mode
   create_googleapis_routes = null
   subnets = [
     {
-      name          = local.subnet_name
+      name          = var.vpc_config.subnet_name
       ip_cidr_range = var.vpc_config.subnet_ip_cidr_range
       region        = var.region
       secondary_ip_ranges = {

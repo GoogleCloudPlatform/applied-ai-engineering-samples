@@ -14,7 +14,7 @@
 
 locals {
   bucket_configs = { for name, config in var.gcs_configs :
-    "${var.prefix}-${name}" => {
+    "${name}" => {
       location      = config.location == "" ? var.region : config.location
       versioning    = config.versioning
       storage_class = config.storage_class

@@ -60,7 +60,7 @@ locals {
       taints               = node_pool.taints
       labels               = node_pool.labels
       oauth_scopes         = node_pool.oauth_scopes
-      reservation_affinity = null
+      reservation_affinity = node_pool.reservation_affinity
     }
   }
 }

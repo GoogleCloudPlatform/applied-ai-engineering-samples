@@ -13,7 +13,7 @@
 # limitations under the License.
 
 module "registry" {
-  source     = "git::https://github.com/GoogleCloudPlatform/cloud-foundation-fabric.git//modules/artifact-registry?ref=v28.0.0&depth=1"
+  source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/artifact-registry?ref=v28.0.0&depth=1"
   count      = var.registry_config == null ? 0 : 1
   project_id = var.project_id
   location   = var.region

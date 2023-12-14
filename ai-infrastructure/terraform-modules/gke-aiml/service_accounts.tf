@@ -18,7 +18,7 @@ locals {
   wid_sa_config = (
     !(var.wid_sa.email != "")
     ? {
-      "${local.wid_sa_name}" = {
+      "${var.wid_sa.name}" = {
         description = var.wid_sa.description
         roles       = var.wid_sa.roles
       }
@@ -29,7 +29,7 @@ locals {
   node_pool_sa_config = (
     !(var.node_pool_sa.email != "")
     ? {
-      "${local.node_pool_sa_name}" = {
+      "${var.node_pool_sa.name}" = {
         description = var.node_pool_sa.description
         roles       = var.node_pool_sa.roles
       }

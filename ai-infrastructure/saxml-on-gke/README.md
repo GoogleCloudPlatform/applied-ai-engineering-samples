@@ -47,6 +47,7 @@ Before proceeding with the deployment stages, you must:
 
 The following services are required by the base environment:
 - `cloudbuild.googleapis.com`
+- `artifactregistry.googleapis.com`
 - `cloudkms.googleapis.com`
 - `cloudresourcemanager.googleapis.com`
 - `container.googleapis.com`
@@ -71,6 +72,7 @@ You also need a GCS bucket that will be used for managing Terraform state and ot
 - `container.admin`
 - `iam.serviceAccountUser`
 - `storage.admin`
+- `artifactregistry.admin`
 
 If the performance testing components are being deployed additional roles are required:
 - `pubsub.editor`

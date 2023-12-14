@@ -17,7 +17,8 @@ output "output_cluster_id" {
   value = module.base_environment.cluster_name
 }
 
-output "tensorboard_id" {
-  value = try(google_vertex_ai_tensorboard.tensorboard[0].id, null)
+output "artifact_registry_image_path" {
+  value = module.base_environment.artifact_registry_image_path
 }
+
 
