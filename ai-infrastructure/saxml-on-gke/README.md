@@ -31,12 +31,12 @@ The deployment process is divided into 3 stages:
 
 3. Saxml Deployment: In this stage, Saxml servers and utilities are deployed to the GKE cluster.
 
-You can execute each stage separately, or perform a one-click deployment of all components using the provided Cloud Build configuration.
+You can execute each stage separately, or perform an automated deployment of all components using the provided Cloud Build configuration.
 
 To run the setup and execute code samples, you will need a workstation with [Google Cloud SDK](https://cloud.google.com/sdk/docs/install-sdk), [Terraform](https://www.terraform.io/), [Kustomize](https://kubectl.docs.kubernetes.io/installation/kustomize), [Skaffold](https://skaffold.dev), and [kubectl](https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-access-for-kubectl) utilities. We recommend using [Cloud Shell](https://cloud.google.com/shell/docs/using-cloud-shell), which has all the utilities pre-installed.
 
 
-### Pre-requisites
+### Set up pre-requisites
 
 Before proceeding with the deployment stages, you must:
 
@@ -95,18 +95,7 @@ The prerequisites may need to be configured by your GCP organization administrat
 
 Besides enabling the necessary services and setting up an automation service account and an automation GCS bucket, the Terraform configuration has generated prepopulated template files for configuring the Terraform backend and providers, which can be utilized in the following setup stages. These template files are stored in the `gs://<YOUR-AUTOMATION-BUCKET/providers` folder.
 
-#### Impersonating the automation service account
-
-To be able to use the automation service account, the account that will be used to run Terraform commands needs to  have the `iam.serviceAccountTokenCreator` rights on the automation service account. You can grant this permission using the following command. Make sure to set the AUTOMATION_SERVICE_ACCOUNT and TERRAFORM_USER_ACCOUNT variables to the email addresses of the accounts in your environment.
-
-```
-AUTOMATION_SERVICE_ACCOUNT=you-automation-service-account-name@jk-mlops-dev.iam.gserviceaccount.com
-TERRAFORM_USER_ACCOUNT=your-terraform-user@foo.com
-
-gcloud iam service-accounts add-iam-policy-binding $AUTOMATION_SERVICE_ACCOUNT --member="user:$TERRAFORM_USER_ACCOUNT" --role='roles/iam.serviceAccountTokenCreator'
-```
-
-### One-click deployment
+### Automated deployment 
 
 TBD
 
@@ -128,7 +117,19 @@ If the automation bucket and the automation service account were provided to you
 
 You need to set the input variables required by the Terraform configuration to reflect your environment. Rename the `terraform.tfvars.tmpl` file to `terraform.tfvars` and update the settings.
 
-*TBD. The detailed instruction to follow. For now refer to the variables.tf for more information on the configurable settings.*
+At a minimum, you need to configure the following settings:
+- `project_id` - your project ID
+- `region` - your region. All components of the base environment will be provisioned in this region
+- `prefix` - the prefix that will be added to the predefined names of resources provisioned by the configuration
+- `artifact_registry_name` - the name of an Artifact Registry to provision. If you want to use an existing Artifact registry delete this variable 
+- `tpu_node_pools` - The `terraform.tfvars.tmpl` template provides an example configuration for a single TPU node pool with one v4-8 node. Modify the `tpu_node_pools` variable to provision different TPU node pool configurations, as described below.
+
+With these minimal settings, the Terraform configuration will provision an environment as described in the High-Level Architecture section. Default settings for the environment's components, such as GCS, VPC and node pool configurations, are defined in the [variables.tf](environment/1-base_environment/variables.tf) file.
+
+If you want to make changes to the default configuration override the default values in the `terraform.tfvars` file.
+
+The Terraform configuration for the base environment utilizes the [gke-aiml](/ai-infrastructure/terraform-modules/gke-aiml/) Terraform module. If you need to make modifications beyond changing variable defaults, please refer to the module's documentation
+
 
 ##### Apply the configuration
 
@@ -149,9 +150,14 @@ Follow the process outlined in the previous section to configure the `backend.tf
 
 ##### Configure Terraform variables
 
-Rename the `terraform.tfvars.tmpl`` file to `terraform.tfvars`` and update it to match your environment settings.
+Rename the `terraform.tfvars.tmpl` file to `terraform.tfvars` and update it to match your environment settings.
 
-*TBD. The detailed instruction to follow. For now refer to the variables.tf for more information on the configurable settings.*
+At a minimum, you need to configure the following settings:
+- `project_id` - your project ID
+- `region` - your region. All load testing components will be provisioned in this region
+- `prefix` - the prefix that will be added to the predefined names of resources provisioned by the configuration
+
+With these settings, the Terraform configuration will use predefined names from the [variables.tf](environment/2-load_generator/variables.tf) file for Pubsub and BigQuery components, with the prefix added to the name of each resource. If you want to change the default names, override them in the `terraform.tfvars` file.
 
 ##### Apply the configuration
 

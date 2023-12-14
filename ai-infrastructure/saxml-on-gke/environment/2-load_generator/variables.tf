@@ -39,11 +39,6 @@ variable "prefix" {
   nullable    = false
 }
 
-#variable "sa_email" {
-#  description = "The email of the service account to have owner rights on BQ dataset"
-#  type        = string
-#  nullable    = false
-#}
 
 variable "pubsub_config" {
   description = "The settings for Pubsub topic and subscription"
