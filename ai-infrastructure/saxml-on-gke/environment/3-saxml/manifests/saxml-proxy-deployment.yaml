@@ -31,6 +31,12 @@ spec:
 #        gke-gcsfuse/volumes: "true"
     spec:
       serviceAccountName: sax-sa
+      nodeSelector:
+          saxml-proxy-node-pool: "true"
+      tolerations:
+      - key: "saxml-proxy-node-pool"
+        operator: "Exists"
+        effect: "NoSchedule"
       containers:
         - image: saxml-proxy 
           name: saxml-proxy 
