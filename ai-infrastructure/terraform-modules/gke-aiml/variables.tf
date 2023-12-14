@@ -47,7 +47,8 @@ variable "gcs_configs" {
 variable "registry_config" {
   description = "The configs for Artifact registry"
   type = object({
-    name = string
+    name     = string
+    location = string
   })
   default  = null
   nullable = true
@@ -62,6 +63,7 @@ variable "node_pool_sa" {
       "storage.objectAdmin",
       "logging.logWriter",
       "pubsub.publisher",
+      "artifactregistry.reader",
     ])
     description = optional(string, "GKE workload identity service account")
   })
@@ -82,6 +84,7 @@ variable "wid_sa" {
       "storage.objectAdmin",
       "logging.logWriter",
       "pubsub.publisher",
+      "artifactregistry.reader",
     ])
     description = optional(string, "GKE node pool service account")
   })

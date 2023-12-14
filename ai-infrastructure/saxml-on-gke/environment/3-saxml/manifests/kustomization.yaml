@@ -15,7 +15,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: saxml-workloads
+namespace: saxml
 
 configMapGenerator:
 - envs:
@@ -30,7 +30,7 @@ images:
   newName: us-docker.pkg.dev/cloud-tpu-images/inference/sax-model-server
   newTag: v1.1.0
 - name: saxml-proxy
-  newName: gcr.io/jk-mlops-dev/saxml-proxy
+  newName: us-docker.pkg.dev/jk-mlops-dev/jk1-ml-images/saxml-proxy
   newTag: latest
 - name: saxml-util-image
   newName: us-docker.pkg.dev/cloud-tpu-images/inference/sax-util

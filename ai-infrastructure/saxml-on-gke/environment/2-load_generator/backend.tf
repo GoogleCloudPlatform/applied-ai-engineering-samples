@@ -17,6 +17,7 @@ terraform {
   backend "gcs" {
     bucket                      = "jk-automation-bucket"
     impersonate_service_account = "jk-automation-sa@jk-mlops-dev.iam.gserviceaccount.com"
-    prefix                      = "tf_state/locust"
+    # remove the newline between quotes and set the prefix to the folder for Terraform state
+    prefix = "tf-state/locust-bq-pubsub"
   }
 }

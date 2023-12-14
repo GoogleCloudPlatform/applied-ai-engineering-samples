@@ -62,6 +62,7 @@ locals {
         ? "${var.prefix}-${var.artifact_registry_name}"
         : var.artifact_registry_name
       )
+      location = var.artifact_registry_location
     }
     : null
   )

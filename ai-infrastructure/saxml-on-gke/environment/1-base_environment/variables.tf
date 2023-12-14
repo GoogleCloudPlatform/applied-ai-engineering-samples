@@ -61,11 +61,18 @@ variable "artifact_registry_name" {
   nullable    = true
 }
 
+variable "artifact_registry_location" {
+  description = "The location of the Artifact Registry"
+  type        = string
+  default     = "us"
+  nullable    = true
+}
+
 variable "gcs_configs" {
   description = "GCS storage configs"
   type        = map(map(any))
   default = {
-    "saxml-root"             = {}
+    "saxml-admin"            = {}
     "saxml-model-repository" = {}
   }
 }

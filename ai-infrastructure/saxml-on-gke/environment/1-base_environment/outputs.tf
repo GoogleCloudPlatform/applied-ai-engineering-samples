@@ -13,12 +13,26 @@
 # limitations under the License.
 
 
-output "output_cluster_id" {
+output "cluster_name" {
   value = module.base_environment.cluster_name
+}
+
+output "region" {
+  value = module.base_environment.region
 }
 
 output "artifact_registry_image_path" {
   value = module.base_environment.artifact_registry_image_path
 }
 
+output "namespace" {
+  value = module.base_environment.workloads_namespace
+}
 
+output "gcs_buckets" {
+  value = module.base_environment.gcs_buckets
+}
+
+output "ksa_name" {
+  value = module.base_environment.wid_ksa
+}

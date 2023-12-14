@@ -35,7 +35,7 @@ spec:
         - image: saxml-proxy 
           name: saxml-proxy 
           command: ["uvicorn", ]
-          args: ["$(UVICORN_APP)", "--host", "0.0.0.0", "--port", "8087", "--reload"]
+          args: ["sax_http_proxy_server:app", "--host", "0.0.0.0", "--port", "8087", "--reload"]
           envFrom:
             - configMapRef:
                 name: saxml-parameters  
