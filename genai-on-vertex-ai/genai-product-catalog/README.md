@@ -10,7 +10,7 @@ It consists of
 
 3. Documentation: In addition to documentation in the source code, the repo contains step-by-step deployment guidance.
 
-4. Example Frontend: Can be used for demonstration purposes or to accelerate deployment of a customer specific frontend
+4. Example Frontend [coming soon]: Can be used for demonstration purposes or to accelerate deployment of a customer specific frontend
 
 
 ## Notebooks
