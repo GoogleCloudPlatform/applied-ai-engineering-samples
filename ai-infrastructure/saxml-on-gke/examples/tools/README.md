@@ -2,4 +2,4 @@
 
 This folder contains utilities and tools used in the examples:
 - [Checkpoint Converter](checkpoint_converter/README.md) 
-- [Load Generator](locol_load_generator/REAME.md)
+- [Load Generator](locust_load_generator/README.md)
