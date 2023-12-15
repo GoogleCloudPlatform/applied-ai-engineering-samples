@@ -187,7 +187,7 @@ skaffold run --default-repo <ARTIFACT_REGISTRY_PATH>
 
 #### Provisioning performance testing components
 
-This stage is optional. If you plan to conduct performance tests using the process and tools described in the [Examples](/ai-infrastructure/saxml-on-gke/examples/README.md) section of this repository, you must configure the Pubsub and BigQuery services required for load generation and metrics tracking tooling
+This stage is optional. If you plan to conduct performance tests using the [Load Generator](examples/tools/locust_load_generator/) tool, you must configure the Pubsub and BigQuery services to enable test metrics tracking and analysis.
 
 The Terraform configuration for the performance testing environment is in the `environment/2-load_generation` folder.
 
