@@ -16,17 +16,10 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: serving-workloads
-
 configMapGenerator:
 - envs:
   - parameters.env
   name: locust-load-generator-parameters
-
-images:
-- name: locust-load-generator
-  newName: gcr.io/jk-mlops-dev/locust-load-generator
-  newTag: latest
 
 resources:
 - locust-master.yaml
@@ -44,9 +37,9 @@ replacements:
     select:
       kind: Deployment
 - source:
-      fieldPath: data.NUM_LOCUST_WORKERS
-      kind: ConfigMap
-      name: locust-load-generator-parameters
+    fieldPath: data.NUM_LOCUST_WORKERS
+    kind: ConfigMap
+    name: locust-load-generator-parameters
   targets:
   - fieldPaths:
     - spec.replicas

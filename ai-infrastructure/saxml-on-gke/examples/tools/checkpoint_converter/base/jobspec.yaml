@@ -29,7 +29,7 @@ spec:
       serviceAccountName: saxml-sa
       containers:
       - name: convert-job
-        image: checkpoint-converter-image  
+        image: checkpoint-converter  
         command:
         - bash 
         - -c
