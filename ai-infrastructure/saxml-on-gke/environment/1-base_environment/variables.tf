@@ -180,5 +180,23 @@ variable "vpc_config" {
   }
 }
 
+variable "credentials_file" { }
 
-
+variable "gpu_node_pools" {
+  description = "Configurations for a GPU node pool"
+  type = map(object({
+    zones          = list(string)
+    min_node_count = number
+    max_node_count = number
+    machine_type   = string
+    disk_size_gb   = number
+    accelerator_type = string
+    accelerator_count = number
+    taints = map(object({
+      value  = string
+      effect = string
+    }))
+    labels = map(string)
+  }))
+  nullable = false
+}

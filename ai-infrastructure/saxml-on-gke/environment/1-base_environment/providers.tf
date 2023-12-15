@@ -14,9 +14,9 @@
 
 
 provider "google" {
-  impersonate_service_account = "jk-automation-sa@jk-mlops-dev.iam.gserviceaccount.com"
+  credentials = file(var.credentials_file)
 }
 provider "google-beta" {
-  impersonate_service_account = "jk-automation-sa@jk-mlops-dev.iam.gserviceaccount.com"
+  credentials = file(var.credentials_file)
 }
 

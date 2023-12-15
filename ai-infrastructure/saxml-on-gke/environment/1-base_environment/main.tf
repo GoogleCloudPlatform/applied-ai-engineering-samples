@@ -79,6 +79,5 @@ module "base_environment" {
   cluster_config      = local.cluster_config
   vpc_config          = local.vpc_config
   registry_config     = local.registry_config
-  cpu_node_pools      = var.cpu_node_pools
-  tpu_node_pools      = var.tpu_node_pools
+  gpu_node_pools      = var.gpu_node_pools
 }
