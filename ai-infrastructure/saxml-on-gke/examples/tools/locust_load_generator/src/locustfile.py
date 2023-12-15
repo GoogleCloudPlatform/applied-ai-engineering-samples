@@ -37,18 +37,6 @@ def get_tokenizer(tokenizer_name: str) -> Callable:
     return tokenizer
 
 
-class FastAPIStressUser(HttpUser):
-    weight = 0
-    wait_time = between(0.1, 0.2)
-
-    @task
-    def test_througput(self):
-        request = {
-            "delay": 0.2
-        }
-        self.client.post("/starlette_test_throughput", json=request)
-
-
 class SaxmlUser(HttpUser):
     weight = 1
     wait_time = between(0.9, 1.1)

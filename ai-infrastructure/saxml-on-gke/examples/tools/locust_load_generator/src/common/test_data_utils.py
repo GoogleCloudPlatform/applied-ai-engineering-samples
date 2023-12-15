@@ -20,6 +20,8 @@ from google.cloud import storage
 
 
 def load_test_prompts(gcs_path: str) -> List[str]:
+    """Loads test prompts from a GCS location."""
+
     gcs_uri_pattern = "^gs:\/\/[a-z0-9.\-_]{3,63}\/(.+\/)*(.+)$"
     if not re.match(gcs_uri_pattern, gcs_path):
         raise ValueError(f"Incorrect GCS URI: {gcs_path}")
