@@ -37,7 +37,7 @@ spec:
             echo Starting checkpoint download 
             mkdir /checkpoints/base
             mkdir /checkpoints/pax
-            gsutil -m cp -r ${GS_BASE_CHECKPOINT_PATH}/* /checkpoints/base
+            gsutil -m cp -r ${GCS_BASE_CHECKPOINT_PATH}/* /checkpoints/base
 
             if [ $? -ne 0 ]; then
                 echo ERROR downloading the checkpoint
@@ -55,12 +55,12 @@ spec:
             echo Checkpoint conversion completed 
             
             echo Starting checkpoint upload 
-            GS_CHECKPOINT_PATH=${GS_PAX_CHECKPOINT_PATH}/${CHECKPOINT_FOLDER_NAME}
-            gsutil -m cp -r /checkpoints/pax/${CHECKPOINT_FOLDER_NAME}/* ${GS_CHECKPOINT_PATH}/
+            GCS_CHECKPOINT_PATH=${GCS_PAX_CHECKPOINT_PATH}/${CHECKPOINT_FOLDER_NAME}
+            gsutil -m cp -r /checkpoints/pax/${CHECKPOINT_FOLDER_NAME}/* ${GCS_CHECKPOINT_PATH}/
             touch commit_success.txt
-            gsutil cp commit_success.txt ${GS_CHECKPOINT_PATH}/
-            gsutil cp commit_success.txt ${GS_CHECKPOINT_PATH}/metadata/
-            gsutil cp commit_success.txt ${GS_CHECKPOINT_PATH}/state/
+            gsutil cp commit_success.txt ${GCS_CHECKPOINT_PATH}/
+            gsutil cp commit_success.txt ${GCS_CHECKPOINT_PATH}/metadata/
+            gsutil cp commit_success.txt ${GCS_CHECKPOINT_PATH}/state/
             echo Checkpoint upload completed
 
         volumeMounts:

@@ -13,7 +13,7 @@ The diagram below illustrates the high-level architecture of the Saxml system on
 - TPU node pools host **Saxml Model Servers**.
 - A dedicated fixed size CPU node pool hosts **Saxml Admin Servers**. 
 - A dedicated autoscaling CPU node pool hosts **Saxml HTTP Proxy** instances. **Saxml HTTP Proxy** is a custom API server that encapsulates **Saxml Client API** and exposes it through REST interfaces.
-- A couple of autoscaling CPU node pools that are used to deploy auxilliary workloads like checkpoint converter jobs, load generation tooling, saxutil CLI. 
+- A couple of autoscaling CPU node pools are used to deploy auxiliary workloads like checkpoint converter jobs, load generation tooling, and saxutil CLI. These node pools have different node hardware configurations to support various workloads.
 - GKE nodes are configured to a use a custom service account
 - The cluster is configured to support [Workload Identity](https://cloud.google.com/kubernetes-engine/docs/concepts/workload-identity).
 - [Cloud Logging](https://cloud.google.com/logging?hl=en) and [Cloud Monitoring](https://cloud.google.com/monitoring?hl=en) are used for logs and metrics management
@@ -22,21 +22,21 @@ The diagram below illustrates the high-level architecture of the Saxml system on
 
  
 
-## Environment setup
+## Setup
 The deployment process is divided into 3 stages:
 
 1. Base Environment: In this stage, the core infrastructure components are configured, including a VPC, a GKE cluster, service accounts, and storage buckets. The deployment process allows for the use of existing VPCs and/or service accounts to align with common IT governance structures in enterprises.
 
-2. Performance Testing Environment: This is an optional phase where GCP services required to support load generation and performance metrics tracking are configured, including Pubsub and BigQuery.
+2. Saxml Deployment: In this stage, Saxml servers and utilities are deployed to the GKE cluster.
 
-3. Saxml Deployment: In this stage, Saxml servers and utilities are deployed to the GKE cluster.
+3. Performance Testing Environment: This is an optional phase where GCP services required to support load generation and performance metrics tracking are configured, including Pubsub and BigQuery.
 
 You can execute each stage separately, or perform an automated deployment of all components using the provided Cloud Build configuration.
 
 To run the setup and execute code samples, you will need a workstation with [Google Cloud SDK](https://cloud.google.com/sdk/docs/install-sdk), [Terraform](https://www.terraform.io/), [Kustomize](https://kubectl.docs.kubernetes.io/installation/kustomize), [Skaffold](https://skaffold.dev), and [kubectl](https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-access-for-kubectl) utilities. We recommend using [Cloud Shell](https://cloud.google.com/shell/docs/using-cloud-shell), which has all the utilities pre-installed.
 
 
-### Set up pre-requisites
+### Setup pre-requisites
 
 Before proceeding with the deployment stages, you must:
 
@@ -103,7 +103,7 @@ TBD
 
 As an alternative to an automated deployment, you can run each stage of the setup individually.
 
-#### Provisioning the base environment
+#### Provision the base environment
 
 The Terraform configuration in the `environment/1-base_environment` folder creates and configures all the necessary components for deploying and serving Saxml models, including a VPC, a GKE cluster, service accounts, CPU and TPU node pools, and storage buckets.
 
@@ -138,6 +138,53 @@ terraform init
 terraform apply
 ```
 
+#### Deploy the Saxml inference system
+
+After the base infrastructure has been provisioned you can deploy Saxml components to your GKE cluster. The deployment process has been automated with **Skaffold** and **Kustomize**. You can find the Kustomize configuration in the `environment/3-saxml/manifests` folder. 
+
+ Update the `kustomization.yaml` with the namespace created during the base environment setup. This namespace will be used to deploy Saxml components. You can retrieve the namespace name by executing `terraform output namespace` from the `environment\1-base_environment` folder.
+
+From the `environment/3-saxml/manifests` folder run:
+```
+kustomize edit set namespace <SAXML_NAMESPACE> 
+```
+
+Replace `<SAXML_NAMESPACE>` with the name of the namespace created during the base environment setup.
+
+
+Update the `kustomization.yaml` with the URI of the Saxml HTTP Proxy image. The image name should be `saxml-proxy`. The registry URI component of the image URI should be set to your  Artifact Registry path. If you created an Artifact Registry during the base environment setup you can retrieve the path by executing `terraform output artifact_registry_image_path` from the `environment\1-base_environment` folder.
+
+```
+kustomize edit set image saxml-proxy=<ARTIFACT_REGISTRY_PATH>/saxml-proxy:latest>
+```
+
+Replace `<ARTIFACT_REGISTRY_PATH>` with the path to your Artifact Registry.
+
+Update the `parameters.env` to reflect your desired configuration
+
+- `GSBUCKET` - the name of the Saxml admint bucket. You can retrieve the name of the bucket by executing `terraform output gcs_buckets` from the `environment\1-base_environment` folder. 
+- `KSA` - the Kubernetes service account to use for Workload Identity. You can retrieve the name of the account by executing `terraform output ksa_name` from the `environment\1-base_environment` folder.  
+- `SAX_CELL` - the name of the Sax cell. Currently, it is hardcoded to `/sax/test`.
+- `SAX_ROOT` - the path in the Saxml admin bucket to the root folder. Update the bucket name with the name of your admin bucket - `GSBUCKET`
+- `TPU_CHIP` - the TPU chip type  
+- `TPU_TYPE` - the TPU pod slice type
+- `TPU_TOPOLOGY` - the topology of the TPU slice
+- `CHIPS_PER_NODE` - the number of TPU chips on the host node
+
+Set credentials to access your GKE cluster. You can retrieve the cluster name and the cluster region by executing `terraform output cluster_name` and `terraform output region` from the `environment\1-base_environment` folder.
+
+```
+gcloud container clusters get-credentials <CLUSTER_NAME> --region <REGION>
+```
+
+Replace `<CLUSTER_NAME>` with the name of your GKE cluster and `<REGION>` with the region of your GKE cluster.
+
+To deploy the Saxml components run the following command from the `environment/3-saxml/` folder:
+
+```
+skaffold run --default-repo <ARTIFACT_REGISTRY_PATH>
+```
+
 #### Provisioning performance testing components
 
 This stage is optional. If you plan to conduct performance tests using the process and tools described in the [Examples](/ai-infrastructure/saxml-on-gke/examples/README.md) section of this repository, you must configure the Pubsub and BigQuery services required for load generation and metrics tracking tooling
@@ -166,50 +213,28 @@ terraform init
 terraform apply
 ```
 
-#### Provisioning Saxml inference system
+#### Build deployment and load testing tools container images
 
-After the base infrastructure has been provisioned you can deploy Saxml components to your GKE cluster. The deployment process has been automated with **Skaffold** and **Kustomize**. You can find the Kustomize configuration in the `environment/3-saxml/manifests` folder. To deploy Saxml:
-1. Update the `kustomization.yaml` with the namespace created during the base environment setup. This namespace will be used to deploy Saxml components. You can retrieve the namespace name by executing `terraform output namespace` from the `environment\1-base_environment` folder.
+In most of the examples, you will utilize the [Checkpoint Converter](examples/tools/checkpoint_converter/) and [Load Generator](examples/tools/load_generator/) tools. The Checkpoint Converter tool is used to convert original model checkpoints to the format required by Saxml. The Load Generator is a [Locust.io](https://locust.io/) based system designed to stress test a model with user-provided test prompts and capture test metrics in Big Query. Both tools run as workloads on your GKE cluster. Before proceeding with the examples, you need to build container images that package these tools.
 
-```
-cd environment/3-saxml/manifests
-NAMESPACE="your-namespace"
-kustomize edit set namespace $NAMESPACE
-```
+You can build the container images with Cloud Build.
 
-2. Update the `kustomization.yaml` with the URI of the Saxml HTTP Proxy image. The image name should be `saxml-proxy`. The registry URI component of the image URI should be set to your  Artifact Registry path. If you created an Artifact Registry during the base environment setup you can retrieve the path by executing `terraform output artifact_registry_image_path` from the `environment\1-base_environment` folder.
-```
-DEFAULT_REPO="your-artifact-registry-path"
-SAXML_PROXY_IMAGE_URI="$DEFAULT_REPO/saxml-proxy:latest"
-kustomize edit set image saxml-proxy=$SAXML_PROXY_IMAGE_URI
+Set the ARTIFACT_REGISTRY variable to your Artifact Registry path. If you created an Artifact Registry during the base environment setup you can retrieve the path by executing `terraform output artifact_registry_image_path` from the `environment\1-base_environment` folder
 
 ```
-3. Update the `parameters.env` to reflect your desired configuration
-
-- `GSBUCKET` - the name of the Saxml admint bucket. You can retrieve the name of the bucket by executing `terraform output gcs_buckets` from the `environment\1-base_environment` folder. 
-- `KSA` - the Kubernetes service account to use for Workload Identity. You can retrieve the name of the account by executing `terraform output ksa_name` from the `environment\1-base_environment` folder.  
-- `SAX_CELL` - the name of the Sax cell. Currently, it is hardcoded to `/sax/test`.
-- `SAX_ROOT` - the path in the Saxml admin bucket to the root folder. Update the bucket name with the name of your admin bucket - `GSBUCKET`
-- `TPU_CHIP` - the TPU chip type  
-- `TPU_TYPE` - the TPU pod slice type
-- `TPU_TOPOLOGY` - the topology of the TPU slice
-- `CHIPS_PER_NODE` - the number of TPU chips on the host node
-
-4. Set credentials to access your GKE cluster. You can retrieve the cluster name and the cluster region by executing `terraform output cluster_name` and `terraform output region` from the `environment\1-base_environment` folder.
-
-```
-CLUSTER_NAME="your-cluster-name
-REGION="your-region"
-
-gcloud container clusters get-credentials $CLUSTER_NAME --region $REGION
+ARTIFACT_REGISTRY_PATH=<ARTIFACT_REGISTRY_PATH>
+CHECKPOINT_CONVERTER_IMAGE_URI="$ARTIFACT_REGISTRY_PATH/checkpoint-converter:latest"
+LOAD_GENERATOR_IMAGE_URI="$ARTIFACT_REGISTRY_PATH/load-generator:latest"
 ```
 
-4. Deploy the Saxml components:
+Execute the following command from the `examples/tools/` folder to build the container images:
 
 ```
-cd environment/3-saxml
-skaffold run --default-repo $DEFAULT_REPO 
+gcloud builds submit \
+--config build.yaml \
+--substitutions _CHECKPOINT_CONVERTER_IMAGE_URI=$CHECKPOINT_CONVERTER_IMAGE_URI,_LOAD_GENERATOR_IMAGE_URI=$LOAD_GENERATOR_IMAGE_URI
 ```
+
 
 ### Deploying Saxml models
 
