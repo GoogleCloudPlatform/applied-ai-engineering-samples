@@ -111,6 +111,8 @@ def _rank(desc: str, candidates: list[list[str]]) -> list[list[str]]:
 
   Rank the following categories from most relevant to least:
   {(chr(10)+'  ').join(['->'.join(cat) for cat in candidates])}
+
+  Do not include any commentary in the result.
   """
   # chr(10) == \n. workaround since backslash not allowed in f-string in python < 3.12
 
@@ -126,14 +128,14 @@ def _rank(desc: str, candidates: list[list[str]]) -> list[list[str]]:
   if not res:
     raise ValueError('ERROR: No LLM response returned. This seems to be an intermittent bug')
   
-  logging.info(f'Query:\n{query}')
-  formatted_res = [re.sub(r"^\d+\.\s+", "", line.lstrip()).split('->') for line in res]
-  
-  if len(formatted_res[0]) != len(candidates[0]):
-    raise ValueError(f'ERROR: length of response - {formatted_res} and candidate - {candidates[0]} must match.')
+  logging.info(f'Response:\n{res}')
+  formatted_res = [re.sub(r"^\s*(\d+\.|\*|-)\s+", "", line.strip()).split('->') for line in res]
+  formatted_res = [res for res in formatted_res if len(res) == len(candidates[0])] #remove answers that don't match expected length
   
   unique_res = list(dict.fromkeys([tuple(l) for l in formatted_res]))
   logging.info(f'Formatted Response:\n {unique_res}')
+  if not unique_res:
+    raise ValueError('ERROR: No responses returned in expected format')
   return unique_res
 
 def rank(desc: str, candidates: list[list[str]]) -> list[list[str]]:
