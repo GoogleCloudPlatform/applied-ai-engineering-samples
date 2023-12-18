@@ -33,9 +33,9 @@ The notebooks listed below were developed to explain the concepts exposed in thi
 ## REST API Deployment
 
 Prior to deploying you must:
-1. Create Product Reference Table in BigQuery 
-2. Create Embeddings and Vector DB
-3. Update configuration variables in [/backend/config.py](/backend/config.py) as needed
+1. Create Product Reference Table in BigQuery ([0_EDA_flipkart_dataset.ipynb](/notebooks/0_EDA_flipkart_dataset.ipynb))
+2. Create Embeddings and Vector DB ([1_generate_embeddings.ipynb](/notebooks/1_generate_embeddings.ipynb) and [2_create_vector_db.ipynb](/notebooks/2_create_vector_db.ipynb))
+3. Update configuration variables in [/backend/config.py](/backend/config.py)
 
 THEN
 
