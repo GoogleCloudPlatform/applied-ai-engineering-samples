@@ -19,131 +19,96 @@ steps:
     args:
       - -c
       - |
-          echo ENVIRONMENT SETTINGS:
-          echo state_gcs_location=$_TF_STATE_BUCKET/$_TF_STATE_PREFIX
-          echo project_id=$PROJECT_ID
-          echo region=$_REGION
-          echo tensorboard_region=$_TENSORBOARD_REGION
-          echo zone=$_ZONE
-          echo network_name=$_NETWORK_NAME
-          echo subnet_name=$_SUBNET_NAME
-          echo repository_bucket_name=$_ARTIFACT_REPOSITORY_BUCKET_NAME
-          echo cluster_name=$_CLUSTER_NAME
-          echo tpu_namespace=$_NAMESPACE
-          echo tpu_type=$_TPU_TYPE
-          echo num_tpu_pools=$_NUM_TPU_POOLS
-          echo num_of_chips=$_NUM_OF_CHIPS
-          echo jobset_api_version=$_JOBSET_API_VERSION
-          echo kueue_api_version=$_KUEUE_API_VERSION
-  - id: create tf state bucket
-    name: 'gcr.io/cloud-builders/gcloud'
-    entrypoint: 'sh'
-    args:
-      - -c
-      - |
-          if ! [ $(gsutil ls | grep "gs://$_TF_STATE_BUCKET/") ]; then 
-            gsutil mb -p ${PROJECT_ID} gs://$_TF_STATE_BUCKET
-          fi
+          echo BUILD SETTINGS:
+          cat 1-base-infrastructure/terraform.tfvars 
   - id: 'tf init'
     name: 'hashicorp/terraform'
     entrypoint: 'sh'
-    dir: terraform
+    dir: 1-base-infrastructure
     args: 
     - '-c'
     - |
-        terraform init -backend-config="bucket=$_TF_STATE_BUCKET" -backend-config="prefix=$_TF_STATE_PREFIX"
+        terraform init 
 
   - id: 'tf plan'
     name: 'hashicorp/terraform'
     entrypoint: 'sh'
-    dir: terraform
+    dir: 1-base-infrastructure 
     args: 
     - '-c'
     - |
-        terraform plan \
-        -var=project_id=$PROJECT_ID \
-        -var=region=$_REGION \
-        -var=tensorboard_region=$_TENSORBOARD_REGION \
-        -var=network_name=$_NETWORK_NAME \
-        -var=subnet_name=$_SUBNET_NAME \
-        -var=cluster_name=$_CLUSTER_NAME \
-        -var=tpu_namespace=$_NAMESPACE \
-        -var=artifact_repository_bucket_name=$_ARTIFACT_REPOSITORY_BUCKET_NAME \
-        -var=tpu_type=$_TPU_TYPE \
-        -var=num_tpu_pools=$_NUM_TPU_POOLS \
-        -var=zone=$_ZONE \
-        -var=gke_sa_name=rt-gke-sa
-
-  - id: 'tf apply'
-    name: 'hashicorp/terraform'
-    entrypoint: 'sh'
-    dir: terraform
-    args: 
-    - '-c'
-    - |
-        terraform apply -auto-approve \
-        -var=project_id=$PROJECT_ID \
-        -var=region=$_REGION \
-        -var=tensorboard_region=$_TENSORBOARD_REGION \
-        -var=network_name=$_NETWORK_NAME \
-        -var=subnet_name=$_SUBNET_NAME \
-        -var=cluster_name=$_CLUSTER_NAME \
-        -var=tpu_namespace=$_NAMESPACE \
-        -var=artifact_repository_bucket_name=$_ARTIFACT_REPOSITORY_BUCKET_NAME \
-        -var=tpu_type=$_TPU_TYPE \
-        -var=num_tpu_pools=$_NUM_TPU_POOLS \
-        -var=zone=$_ZONE \
-        -var=gke_sa_name=rt-gke-sa
-
-  - id: 'Deploy JobSet'
-    name: gcr.io/google.com/cloudsdktool/cloud-sdk 
-    entrypoint: /bin/bash
-    args:
-      - -c
-      - |
-        gcloud container clusters get-credentials $_CLUSTER_NAME --region $_REGION
-        kubectl apply --server-side -f "https://github.com/kubernetes-sigs/jobset/releases/download/$_JOBSET_API_VERSION/manifests.yaml" 
-
-  - id: 'Deploy Kueue'
-    name: gcr.io/google.com/cloudsdktool/cloud-sdk 
-    entrypoint: /bin/bash
-    args:
-      - -c
-      - |
-        kubectl apply -f "https://github.com/kubernetes-sigs/kueue/releases/download/$_KUEUE_API_VERSION/manifests.yaml"
-
-  - id: 'Config Kueue'
-    name: gcr.io/google.com/cloudsdktool/cloud-sdk 
-    entrypoint: /bin/bash
-    args:
-      - -c
-      - |
-        curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
-        mv kustomize /usr/local/bin
-        cd kueue
-        kustomize edit set namespace $_NAMESPACE
-        kustomize edit remove configmap tpu-config
-        kustomize edit add configmap tpu-config --from-literal=NAME=$_TPU_TYPE --from-literal=NUM_OF_CHIPS=$_NUM_OF_CHIPS
-        
-        max_attempts=5
-        attempt_num=1
-        success=false
-
-        while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
-          echo Sleep for a few seconds to avoid timeouts from Kueue
-          sleep 10
-          echo Attempting deployment of Kueue CRDs
-          kubectl apply -k .
-          if [ $? -eq 0 ]; then
-            success=true
-            echo Deployment of CRDs successful
-          else
-            echo "Deployment of CRDs faile"
-            attempt_num=$(( attempt_num + 1 ))
-          fi
-        done
-
-
-
-
- 
+        terraform plan
+#
+#  - id: 'tf apply'
+#    name: 'hashicorp/terraform'
+#    entrypoint: 'sh'
+#    dir: terraform
+#    args: 
+#    - '-c'
+#    - |
+#        terraform apply -auto-approve \
+#        -var=project_id=$PROJECT_ID \
+#        -var=region=$_REGION \
+#        -var=tensorboard_region=$_TENSORBOARD_REGION \
+#        -var=network_name=$_NETWORK_NAME \
+#        -var=subnet_name=$_SUBNET_NAME \
+#        -var=cluster_name=$_CLUSTER_NAME \
+#        -var=tpu_namespace=$_NAMESPACE \
+#        -var=artifact_repository_bucket_name=$_ARTIFACT_REPOSITORY_BUCKET_NAME \
+#        -var=tpu_type=$_TPU_TYPE \
+#        -var=num_tpu_pools=$_NUM_TPU_POOLS \
+#        -var=zone=$_ZONE \
+#        -var=gke_sa_name=rt-gke-sa
+#
+#  - id: 'Deploy JobSet'
+#    name: gcr.io/google.com/cloudsdktool/cloud-sdk 
+#    entrypoint: /bin/bash
+#    args:
+#      - -c
+#      - |
+#        gcloud container clusters get-credentials $_CLUSTER_NAME --region $_REGION
+#        kubectl apply --server-side -f "https://github.com/kubernetes-sigs/jobset/releases/download/$_JOBSET_API_VERSION/manifests.yaml" 
+#
+#  - id: 'Deploy Kueue'
+#    name: gcr.io/google.com/cloudsdktool/cloud-sdk 
+#    entrypoint: /bin/bash
+#    args:
+#      - -c
+#      - |
+#        kubectl apply -f "https://github.com/kubernetes-sigs/kueue/releases/download/$_KUEUE_API_VERSION/manifests.yaml"
+#
+#  - id: 'Config Kueue'
+#    name: gcr.io/google.com/cloudsdktool/cloud-sdk 
+#    entrypoint: /bin/bash
+#    args:
+#      - -c
+#      - |
+#        curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
+#        mv kustomize /usr/local/bin
+#        cd kueue
+#        kustomize edit set namespace $_NAMESPACE
+#        kustomize edit remove configmap tpu-config
+#        kustomize edit add configmap tpu-config --from-literal=NAME=$_TPU_TYPE --from-literal=NUM_OF_CHIPS=$_NUM_OF_CHIPS
+#        
+#        max_attempts=5
+#        attempt_num=1
+#        success=false
+#
+#        while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+#          echo Sleep for a few seconds to avoid timeouts from Kueue
+#          sleep 10
+#          echo Attempting deployment of Kueue CRDs
+#          kubectl apply -k .
+#          if [ $? -eq 0 ]; then
+#            success=true
+#            echo Deployment of CRDs successful
+#          else
+#            echo "Deployment of CRDs faile"
+#            attempt_num=$(( attempt_num + 1 ))
+#          fi
+#        done
+#
+#
+#
+#
+# 

@@ -61,3 +61,12 @@ output "gcs_buckets" {
   }
 }
 
+output "artifact_registry_id" {
+  description = "The URI of an Artifact Registry if created"
+  value       = try(module.registry[0].id, null)
+}
+
+output "artifact_registry_image_path" {
+  description = "The URI of an Artifact Registry if created"
+  value       = try(module.registry[0].image_path, null)
+}

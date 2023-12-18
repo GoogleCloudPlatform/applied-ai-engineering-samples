@@ -25,33 +25,6 @@ variable "region" {
   nullable    = false
 }
 
-variable "tensorboard_region" {
-  description = "The region for a Vertex Tensorboard instance "
-  default     = "us-central1"
-}
-
-variable "tensorboard_config" {
-  description = "Tensorboard instance configuration"
-  type = object({
-    name        = optional(string, "LLM Training")
-    description = optional(string, "TPU on GKE training monitoring")
-    region      = string
-  })
-  nullable = true
-  default  = null
-}
-variable "tensorboard_name" {
-  description = "The Tensorboard instance display name"
-  default     = "TPU on GKE training experiments"
-  nullable    = false
-}
-
-variable "tensorboard_description" {
-  description = "The Tensorboard instance display name"
-  default     = "TPU on GKE training experiments"
-  nullable    = false
-}
-
 variable "deletion_protection" {
   description = "Prevent Terraform from destroying data storage resources (storage buckets, GKE clusters). When this field is set, a terraform destroy or terraform apply that would delete data storage resources will fail."
   type        = bool
@@ -66,58 +39,95 @@ variable "prefix" {
   nullable    = false
 }
 
-variable "artifact_repository_name" {
-  description = "The name of the artifact repository bucket"
-  type        = string
-  default     = "artifact-repository"
-  nullable    = false
-}
 
-variable "node_pool_sa_name" {
-  description = "The name of the node pool service account"
-  type        = string
-  default     = "node-pool-sa"
-  nullable    = false
-}
-
-variable "wid_sa_name" {
-  description = "The name of the workload identify sa"
-  type        = string
-  default     = "wid-sa"
-  nullable    = false
-}
-
-variable "cluster_name" {
-  description = "The name of the cluster"
-  type        = string
-  default     = "tpu-training-cluster"
-  nullable    = false
-}
-
-variable "vpc_config" {
-  description = "VPC configuration"
+variable "node_pool_sa" {
+  description = "The config for a node pool service account"
   type = object({
-    network_name = optional(string, "training-gke-network")
-    subnet_name  = optional(string, "training-gke-subnetwork")
+    name  = string
+    roles = list(string)
   })
-  nullable = false
-  default  = {}
+  default = {
+    name = gke-node-pool-sa
+    roles = [
+      "storage.objectAdmin",
+      "logging.logWriter",
+      "aiplatform.user",
+      "artifactregistry.reader",
+    ]
+  }
+}
+
+variable "wid_sa" {
+  description = "The config for a workload identity service account"
+  type = object({
+    name  = string
+    roles = list(string)
+  })
+  default = {
+    name = gke-wid-sa
+    roles = [
+      "storage.objectAdmin",
+      "logging.logWriter",
+      "aiplatform.user",
+      "artifactregistry.reader",
+    ]
+  }
+}
+
+variable "create_artifact_registry" {
+  description = "Whether to create an Artifact Registry"
+  type        = bool
+  default     = true
+}
+
+variable "registry_config" {
+  description = "The configs for Artifact registry"
+  type = object({
+    name     = string
+    location = string
+  })
+  default = {
+    name     = "training-images"
+    location = "us"
+  }
+}
+
+variable "gcs_configs" {
+  description = "GCS storage configs"
+  type        = map(map(any))
+  default = {
+    "artifact-repository" = {}
+  }
+}
+
+variable "cluster_config" {
+  description = "GKE cluster configs"
+  type        = map(any)
+  default = {
+    name                = "gke-ml-cluster"
+    workloads_namespace = "training"
+  }
 }
 
 variable "cpu_node_pools" {
-  description = "The configuration parameters for a CPU node pool"
+  description = "Configurations for a CPU node pool"
   type = map(object({
     zones          = list(string)
-    min_node_count = optional(number, 1)
-    max_node_count = optional(number, 3)
-    machine_type   = optional(string, "n1-standard-8")
-    gcfs           = optional(string, true)
+    min_node_count = number
+    max_node_count = number
+    machine_type   = string
+    disk_size_gb   = number
+    taints = map(object({
+      value  = string
+      effect = string
+    }))
+    labels = map(string)
   }))
   nullable = false
 }
 
 variable "tpu_node_pools" {
-  description = "Configurations for TPU node pools"
+  description = "Configurations for a TPU node pools"
   type = map(object({
     zones          = list(string)
     min_node_count = number
@@ -127,5 +137,25 @@ variable "tpu_node_pools" {
   nullable = false
 }
 
+variable "vpc_config" {
+  description = "VPC configuration"
+  type = object({
+    network_name = string
+    subnet_name  = string
+  })
+  default = {
+    network_name = "gke-cluster-network"
+    subnet_name  = "gke-cluster-subnet"
+  }
+}
 
-
+variable "tensorboard_config" {
+  description = "Tensorboard instance configuration"
+  type = object({
+    name        = optional(string, "TPU Training")
+    description = optional(string, "TPU on GKE training monitoring")
+    region      = string
+  })
+  nullable = true
+  default  = null
+}

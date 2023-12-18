@@ -15,9 +15,9 @@
 
 terraform {
   backend "gcs" {
-    bucket                      = "jk-automation-bucket-1"
-    impersonate_service_account = "jk-automation-sa-1@jk-mlops-dev.iam.gserviceaccount.com"
+    bucket                      = "jk-automation-bucket-10"
+    impersonate_service_account = "jk-automation-sa-10@jk-mlops-dev.iam.gserviceaccount.com"
     # remove the newline between quotes and set the prefix to the folder for Terraform state
-    prefix = "tf_state/tpu-training-gke"
+    prefix = "tpu-gke-env"
   }
 }

@@ -14,7 +14,8 @@
 
 project_id = "jk-mlops-dev"
 automation_bucket = {
-  name     = "jk-automation-bucket-1"
+  name     = "jk-automation-bucket-10"
   location = "US"
 }
-automation_sa_name = "jk-automation-sa-1"
+automation_sa_name  = "jk-automation-sa-10"
+deletion_protection = false

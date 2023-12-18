@@ -12,6 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+variable "deletion_protection" {
+  description = "Prevent Terraform from destroying data storage resources (storage buckets, GKE clusters). When this field is set, a terraform destroy or terraform apply that would delete data storage resources will fail."
+  type        = bool
+  default     = true
+  nullable    = false
+}
+
 variable "automation_bucket" {
   description = "The parameters of the bucket to be used by automation tools including Terraform backend"
   type = object({

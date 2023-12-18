@@ -34,6 +34,7 @@ locals {
       nodepool_config = merge(
         {
           gvnic       = node_pool.gvnic
+          gcfs        = node_pool.gcfs
           gke_version = var.cluster_config.version
         },
         {

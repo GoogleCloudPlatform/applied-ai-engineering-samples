@@ -63,45 +63,110 @@ To submit a JobSet-defined workload, you need to create a YAML JobSet resource d
 - Using  [xpk](https://github.com/google/maxtext/tree/main/xpk), which provides an easy-to-use Python-based CLI.
 
 
-## Provision infrastructure
+## Setup 
 
-The provisioning of the environment described in the previous section has been automated with [Terraform](https://cloud.google.com/docs/terraform) and [Cloud Build](https://cloud.google.com/build). The following are the tasks performed by the Terraform configuration:
+The deployment process is automated using [Cloud Build](https://cloud.google.com/build), [Terraform](https://cloud.google.com/docs/terraform), and [Kustomize](https://kustomize.io/). The deployment script performs the following tasks:
 
-- [ ] Creates a network and a subnet for a VPC-native GKE cluster.
+- [ ] If the existing network settings are not provided, creates a network, a subnet, and IP ranges for GKE pods and services.
 - [ ] Creates a VPC-native cluster.
 - [ ] Creates a node pool with nodes equipped with CPUs only.
-- [ ] Creates a specified number of multi-host TPU node pools.
-- [ ] Creates an IAM service account for Workload Identity and an IAM service account to be used as a custom node pool service account.
-- [ ] Assigns a specified set of roles to these service accounts.
+- [ ] Creates a specified number of TPU node pools.
+- [ ] If the existing services accounts are not provided, creates an IAM service account for Workload Identity and an IAM service account to be used as a custom node pool service account.
+- [ ] Assigns the required set of roles to these service accounts.
 - [ ] Configures the cluster for Workload Identity.
 - [ ] Creates a Google Cloud Storage bucket.
 - [ ] Adds the service accounts to `roles/storage.legacyBucketReader` bucket level permissions.
+- [ ] Creates a Vertex TensorBoard instance
+
 
 > [!WARNING]
->  A few things to note:
->
->  1. You need to be a project owner to set up the environment.
->  2. Your project must have sufficient [quota to provision TPU resources](https://cloud.google.com/tpu/docs/quota). Else, you can [request for a higher quota limit](https://cloud.google.com/docs/quota/view-manage#requesting_higher_quota).
+>  Your project must have sufficient [quota to provision TPU resources](https://cloud.google.com/tpu/docs/quota). Else, you can [request for a higher quota limit](https://cloud.google.com/docs/quota/view-manage#requesting_higher_quota).
 
 
-You can use [Cloud Shell](https://cloud.google.com/shell/docs/using-cloud-shell) to start and monitor the setup process. Click on the link below to navigate to Cloud Shell and clone the repo.
+### Configure pre-requisites
 
-<a href="https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/jarokaz/tpu-gke-sandbox&cloudshell_git_branch=main&tutorial=README.md">
+Before proceeding with the deployment, you must:
+
+- [ ] Create a new Google Cloud project or select an existing one.
+- [ ] Enable the necessary services.
+- [ ] Configure an automation service account and an automation Google Cloud storage bucket.
+
+
+The following services are required by the base environment:
+- `cloudbuild.googleapis.com`
+- `artifactregistry.googleapis.com`
+- `cloudkms.googleapis.com`
+- `cloudresourcemanager.googleapis.com`
+- `container.googleapis.com`
+- `compute.googleapis.com`
+- `container.googleapis.com`
+- `iam.googleapis.com`
+- `iamcredentials.googleapis.com`
+- `serviceusage.googleapis.com`
+- `stackdriver.googleapis.com`
+- `storage-component.googleapis.com`
+- `storage.googleapis.com`
+- `sts.googleapis.com`
+- `aiplatform.googleapis.com`
+
+You also need a GCS bucket that will be used for managing Terraform state and other Terraform artifacts and a service account that will be impersonated by Terraform when provisioning the environment. The service account should have the following project level roles:
+- `iam.securityAdmin`
+- `iam.serviceAccountAdmin`
+- `compute.networkAdmin`
+- `container.admin`
+- `iam.serviceAccountUser`
+- `storage.admin`
+- `artifactregistry.admin`
+- `aiplatform.user`
+
+To be able to use the automation service account, the account that will be used to run Terraform commands in the other deployment stages needs to have the `iam.serviceAccountTokenCreator` rights on the automation service account. 
+
+
+#### Configuring the prerequisites using the bootstrap Terraform 
+
+The prerequisites may need to be configured by your GCP organization administrator. If you have access to a project where you are a project owner, you can configure the prerequisites using the Terraform configuration in the `environment/0-bootstrap` folder.
+
+1. Clone this repo
+2. Change the current folder to `ai-infrastructureenvironment/tpu-training-on-gke/environment/0-bootstrap`
+3. Copy the `terraform.tfvars.tmpl` file to `terraform.tfvars`
+4. Modify the `terraform.tfvars` file to reflect your environment
+  - Set `project_id` to your project ID
+  - Set `automation_bucket` to the name of a bucket you want to create in your project
+  - Set `location` to your location
+  - Set `automation_sa_name` to the automation service account name in your environment
+5. Execute the `terraform init` command
+6. Execute the `terraform apply` command
+
+Besides enabling the necessary services and setting up an automation service account and an automation GCS bucket, the Terraform configuration has generated prepopulated template files for configuring the Terraform backend and providers, which can be utilized in the following setup stages. These template files are stored in the `gs://<YOUR-AUTOMATION-BUCKET/providers` folder.
+
+To grant the `iam.serviceAccountTokenCreator` rights on the automation service account follow the [instructions for the bootstrap module](../terraform-modules/bootstrap/README.md).
+
+
+### Deploy 
+
+#### Clone the GitHub repo. 
+
+If you use [Cloud Shell](https://cloud.google.com/shell/docs/using-cloud-shell) click the link below to navigate to Cloud Shell and clone the repo.
+
+<a href="https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples/&cloudshell_git_branch=tpu-training-on-gke&tutorial=README.md">
     <img alt="Open in Cloud Shell" src="http://gstatic.com/cloudssh/images/open-btn.png">
 </a>
 
-To set up the environment execute the following steps.
-
-### Select a Google Cloud project
-
- - In the Google Cloud Console, on the project selector page, [select or create a Google Cloud project](https://console.cloud.google.com/projectselector2/home/dashboard?_ga=2.77230869.1295546877.1635788229-285875547.1607983197&_gac=1.82770276.1635972813.Cj0KCQjw5oiMBhDtARIsAJi0qk2ZfY-XhuwG8p2raIfWLnuYahsUElT08GH1-tZa28e230L3XSfYewYaAlEMEALw_wcB). 
-
-
-- Clone the GitHub repo. Skip this step if you have launched through Cloud Shell link.
 
 ```bash
-git clone https://github.com/jarokaz/tpu-gke-sandbox.git
+git clone https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples.git
 ```
+
+
+#### Submit the build
+
+```
+gcloud builds submit \
+  --config cloudbuild.provision.yaml \
+  --timeout "2h" \
+  --machine-type=e2-highcpu-32 
+```
+
 
 ### Configure environment
 

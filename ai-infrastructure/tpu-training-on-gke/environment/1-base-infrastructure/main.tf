@@ -18,40 +18,61 @@ data "google_project" "project" {
 }
 
 locals {
-  gcs_configs = {
-    "${var.artifact_repository_name}" = {}
-  }
+  node_pool_sa = (
+    var.prefix != ""
+    ? merge(var.node_pool_sa, { name = "${var.prefix}-${var.node_pool_sa.name}" })
+    : var.node_pool_sa
+  )
 
-  node_pool_sa = {
-    name = var.node_pool_sa_name
-  }
+  wid_sa = (
+    var.prefix != ""
+    ? merge(var.wid_sa, { name = "${var.prefix}-${var.wid_sa.name}" })
+    : var.wid_sa
+  )
 
-  wid_sa = {
-    name = var.wid_sa_name
-  }
+  gcs_configs = (
+    var.prefix != ""
+    ? { for name, config in var.gcs_configs :
+    "${var.prefix}-${name}" => config }
+    : var.gcs_configs
+  )
 
-  vpc_config = var.vpc_config
+  cluster_config = (
+    var.prefix != ""
+    ? merge(var.cluster_config, { name = "${var.prefix}-${var.cluster_config.name}" })
+    : var.cluster_config
+  )
 
-  cluster_config = {
-    name        = var.cluster_name
-    description = "GKE TPU training cluster"
-  }
+  vpc_config = (
+    var.prefix != ""
+    ? merge(var.cluster_config, {
+      network_name = "${var.prefix}-${var.vpc_config.network_name}"
+    subnet_name = "${var.prefix}-${var.vpc_config.subnet_name}" })
+    : var.vpc_config
+  )
 
-  cpu_node_pools = var.cpu_node_pools
-
-  tpu_node_pools = var.tpu_node_pools
+  registry_config = (
+    var.create_artifact_registry == true
+    ? (
+      var.prefix != ""
+      ? merge(var.registry_config, { name = "${var.prefix}-${var.registry_config.name}" })
+      : var.registry_config
+    )
+    : null
+  )
 }
 
 module "base_environment" {
-  source         = "../../../terraform-modules/gke-aiml"
-  project_id     = var.project_id
-  region         = var.region
-  prefix         = var.prefix
-  gcs_configs    = local.gcs_configs
-  node_pool_sa   = local.node_pool_sa
-  wid_sa         = local.wid_sa
-  vpc_config     = local.vpc_config
-  cluster_config = local.cluster_config
-  cpu_node_pools = local.cpu_node_pools
-  tpu_node_pools = local.tpu_node_pools
+  source              = "../../../terraform-modules/gke-aiml"
+  project_id          = var.project_id
+  region              = var.region
+  deletion_protection = var.deletion_protection
+  gcs_configs         = local.gcs_configs
+  node_pool_sa        = local.node_pool_sa
+  wid_sa              = local.wid_sa
+  cluster_config      = local.cluster_config
+  vpc_config          = local.vpc_config
+  registry_config     = local.registry_config
+  cpu_node_pools      = var.cpu_node_pools
+  tpu_node_pools      = var.tpu_node_pools
 }

@@ -14,9 +14,9 @@
 
 
 provider "google" {
-  impersonate_service_account = "jk-automation-sa-1@jk-mlops-dev.iam.gserviceaccount.com"
+  impersonate_service_account = "jk-automation-sa-10@jk-mlops-dev.iam.gserviceaccount.com"
 }
 provider "google-beta" {
-  impersonate_service_account = "jk-automation-sa-1@jk-mlops-dev.iam.gserviceaccount.com"
+  impersonate_service_account = "jk-automation-sa-10@jk-mlops-dev.iam.gserviceaccount.com"
 }
 

@@ -13,12 +13,12 @@
 # limitations under the License.
 
 
-
 module "automation_bootstrap" {
-  source             = "../../../terraform-modules/bootstrap"
-  project_id         = var.project_id
-  automation_bucket  = var.automation_bucket
-  automation_sa_name = var.automation_sa_name
-  services           = var.services
-  roles              = var.roles
+  source              = "../../../terraform-modules/bootstrap"
+  deletion_protection = var.deletion_protection
+  project_id          = var.project_id
+  automation_bucket   = var.automation_bucket
+  automation_sa_name  = var.automation_sa_name
+  services            = var.services
+  roles               = var.roles
 }

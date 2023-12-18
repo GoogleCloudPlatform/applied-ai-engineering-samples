@@ -21,6 +21,7 @@ locals {
 
   default_services = [
     "accesscontextmanager.googleapis.com",
+    "artifactregistry.googleapis.com",
     "cloudbuild.googleapis.com",
     "cloudkms.googleapis.com",
     "cloudresourcemanager.googleapis.com",
@@ -29,7 +30,6 @@ locals {
     "container.googleapis.com",
     "iam.googleapis.com",
     "iamcredentials.googleapis.com",
-    "servicenetworking.googleapis.com",
     "serviceusage.googleapis.com",
     "sourcerepo.googleapis.com",
     "stackdriver.googleapis.com",
@@ -46,6 +46,7 @@ locals {
     "roles/container.admin",
     "roles/iam.serviceAccountUser",
     "roles/storage.admin",
+    "roles/artifactregistry.admin",
   ]
   roles = concat(local.default_roles, var.roles)
 }
