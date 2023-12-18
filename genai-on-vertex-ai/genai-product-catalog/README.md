@@ -33,7 +33,24 @@ The notebooks listed below were developed to explain the concepts exposed in thi
 ## REST API Deployment
 
 Prior to deploying you must:
-1. Create Product Reference Table in BigQuery ([0_EDA_flipkart_dataset.ipynb](/notebooks/0_EDA_flipkart_dataset.ipynb))
+1. Create Product Reference Table in BigQuery 
+
+The table should conform to the following schema, although the column names can differ as we will provide a name mapping mechanism in `config.py`. The notebook [0_EDA_flipkart_dataset.ipynb](/notebooks/0_EDA_flipkart_dataset.ipynb) demonstrates the creation of a solution compatible table, feel free to use it as reference. 
+
+
+| Field | Description | Required? | Type |
+|---|---|---|---|
+| id | Unique product ID | yes | string |
+| description | Prose description | yes | string |
+| category_l1 | Top level (L1) category | yes | string |
+| category_l2 | L2 category | no | string |
+| category_l3 | L3 category | no | string |
+| category_… | And so on for the remaining category levels… | no | string |
+| attributes | List of attributes key value pairs e.g {color: ‘green’, material: ‘polyester’} | yes | JSON |
+| main_image | gcs uri of product image to be used for embedding | yes | string |
+| last_updated | When this row was created or last modified | yes | timestamp |
+
+
 2. Create Embeddings and Vector DB ([1_generate_embeddings.ipynb](/notebooks/1_generate_embeddings.ipynb) and [2_create_vector_db.ipynb](/notebooks/2_create_vector_db.ipynb))
 3. Update configuration variables in [/backend/config.py](/backend/config.py)
 
@@ -58,8 +75,12 @@ Open the [`app.yaml`](/backend/app.yaml) configuration file and include your ser
  service_account: <REPLACE WITH YOUR SERVICE ACCOUNT ADDRESS>
  ```
 
-You can check the available service accounts in your project by running the following command:  
-> gcloud iam service-accounts list
+The service account will require the following IAM roles:
+- Vertex AI Service Agent
+- BigQuery Data Viewer
+- App Engine Deployer
+- Logs Writer
+- Storage Object Viewer
 
 Deploy the solution to AppEngine
 
