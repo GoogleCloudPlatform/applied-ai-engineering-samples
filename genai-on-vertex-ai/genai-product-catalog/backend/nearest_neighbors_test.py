@@ -25,15 +25,26 @@ https://cloud.google.com/vertex-ai/docs/vector-search/overview
 import logging; logging.basicConfig(level=logging.INFO)
 import unittest
 import nearest_neighbors
+import config
 
 class NearestNeighborsTest(unittest.TestCase):
 
-  def test_nn(self):
+  def test_nn_no_filter(self):
     emb1 = [0] * 1408
     emb2 = [0] * 1408
     embeds = [emb1, emb2]
     num_neigbhors = 3
-    res = nearest_neighbors.get_nn(embeds, num_neigbhors)
+    res = nearest_neighbors.get_nn(embeds, [], num_neigbhors)
+    logging.info(res)
+    self.assertEqual(len(res), len(embeds) * num_neigbhors)
+    self.assertEqual(res[0]._fields, ('id','distance'))
+  
+  def test_nn_with_filter(self):
+    emb1 = [0] * 1408
+    emb2 = [0] * 1408
+    embeds = [emb1, emb2]
+    num_neigbhors = 3
+    res = nearest_neighbors.get_nn(embeds, [config.TEST_CATEGORY_L0], num_neigbhors)
     logging.info(res)
     self.assertEqual(len(res), len(embeds) * num_neigbhors)
     self.assertEqual(res[0]._fields, ('id','distance'))

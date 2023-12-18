@@ -57,6 +57,27 @@ class CategoryTest(unittest.TestCase):
         'This is a test description',
         config.TEST_GCS_IMAGE
     )
+    logging.info(res)
+    self.assertIsInstance(res, list)
+    self.assertGreater(len(res),0)
+
+  def test_retrieve_and_rank_with_filter(self):
+    res = category.retrieve_and_rank(
+        'This is a test description',
+        config.TEST_GCS_IMAGE,
+        filters=[config.TEST_CATEGORY_L0]
+    )
+    logging.info(res)
+    self.assertIsInstance(res, list)
+    self.assertGreater(len(res),0)
+
+  def test_retrieve_and_rank_with_bad_filter(self):
+    res = category.retrieve_and_rank(
+        'This is a test description',
+        config.TEST_GCS_IMAGE,
+        filters=['XYZunknowncategory']
+    )
+    logging.info(res)
     self.assertIsInstance(res, list)
     self.assertGreater(len(res),0)
 

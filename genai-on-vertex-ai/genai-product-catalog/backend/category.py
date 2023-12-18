@@ -71,7 +71,8 @@ def retrieve(
     desc: str, 
     image: Optional[str] = None, 
     base64: bool = False,
-    num_neighbors: int = config.NUM_NEIGHBORS) -> list[dict]:
+    num_neighbors: int = config.NUM_NEIGHBORS,
+    filters: list[str] = []) -> list[dict]:
     """Returns list of categories based on nearest neighbors.
 
     This is a 'greedy' retrieval approach that embeds the provided desc and
@@ -84,6 +85,7 @@ def retrieve(
         base64: True indicates image is base64. False (default) will be 
           interpreted as image path (either local or GCS)
         num_neigbhors: number of nearest neighbors to return for EACH embedding
+        filters: category prefix to restrict results to
 
     Returns:
         List of candidates sorted by embedding distance. Each candidate is a
@@ -94,7 +96,9 @@ def retrieve(
     """
     res = embeddings.embed(desc,image, base64)
     embeds = [res.text_embedding, res.image_embedding] if res.image_embedding else [res.text_embedding]
-    neighbors = nearest_neighbors.get_nn(embeds)
+    neighbors = nearest_neighbors.get_nn(embeds,filters)
+    if not neighbors:
+      return []
     ids = [n.id[:-2] for n in neighbors] # last 3 chars are not part of product ID
     categories = join_categories(ids)
     candidates = [{'category':categories[n.id[:-2]],'id':n.id, 'distance':n.distance}
@@ -104,6 +108,8 @@ def retrieve(
 def _rank(desc: str, candidates: list[list[str]]) -> list[list[str]]:
   """See rank() for docstring."""
   logging.info(f'Candidates:\n{candidates}')
+  if not candidates:
+    return []
 
   query = f"""
   Given the following product description:
@@ -161,7 +167,8 @@ def retrieve_and_rank(
     desc: str, 
     image: Optional[str] = None, 
     base64: bool = False,
-    num_neighbors: int = config.NUM_NEIGHBORS) -> list[list[str]]:
+    num_neighbors: int = config.NUM_NEIGHBORS,
+    filters: list[str] = []) -> list[list[str]]:
     """Wrapper function to sequence retrieve and rank functions.
     
     Args:
@@ -170,10 +177,13 @@ def retrieve_and_rank(
         base64: True indicates image is base64. False (default) will be 
           interpreted as image path (either local or GCS)
         num_neigbhors: number of nearest neighbors to return for EACH embedding
+        filters: category prefix to restrict results to
 
     Returns:
       The candidates ranked by the LLM from most to least relevant. If there are
       duplicate candidates the list is deduped prior to returning
     """
-    candidates = retrieve(desc, image, base64, num_neighbors)
+    candidates = retrieve(desc, image, base64, num_neighbors, filters)
+    if filters and not candidates:
+      return [['ERROR: No existing products match that category']]
     return rank(desc, [candidate['category'] for candidate in candidates])

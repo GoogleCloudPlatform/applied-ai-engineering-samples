@@ -85,5 +85,27 @@ class AttributesTest(unittest.TestCase):
     self.assertIsInstance(res, dict)
     self.assertGreater(len(res),0)
 
+  def test_retrieve_and_generate_attributes_with_filter(self):
+    res = attributes.retrieve_and_generate_attributes(
+        'Fleece Jacket',
+        None,
+        config.TEST_GCS_IMAGE,
+        filters=[config.TEST_CATEGORY_L0],
+    )
+    logging.info(res)
+    self.assertIsInstance(res, dict)
+    self.assertGreater(len(res),0)
+
+  def test_retrieve_and_generate_attributes_with_bad_filter(self):
+    res = attributes.retrieve_and_generate_attributes(
+        'Fleece Jacket',
+        None,
+        config.TEST_GCS_IMAGE,
+        filters=['XYZunknowncategory'],
+    )
+    logging.info(res)
+    self.assertIsInstance(res, dict)
+    self.assertGreater(len(res),0)
+
 if __name__ == '__main__':
   unittest.main()

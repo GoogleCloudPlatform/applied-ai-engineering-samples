@@ -25,8 +25,7 @@ import config
 from google.auth.transport.requests import Request
 from google.oauth2 import id_token
 
-ENDPOINT = 'http://localhost:8080/v1/'
-#ENDPOINT = 'https://vijay-sandbox-335018.uc.r.appspot.com/v1/'
+ENDPOINT = 'http://localhost:8080/v1/' # UPDATE AS NEEDED
 
 open_id_connect_token = id_token.fetch_id_token(Request(), 'client_id')
 headers = {
@@ -59,6 +58,18 @@ class APITest(unittest.TestCase):
     self.assertIsInstance(res.json()[0][0],str)
     logging.info(res.json())
 
+  def test_category_with_filter(self):
+    res = requests.post(
+      ENDPOINT+'categories/', 
+      json={'description':'test description', 'category':[config.TEST_CATEGORY_L0]},
+      headers=headers
+      )
+    self.assertEqual(res.status_code, 200)
+    self.assertIsInstance(res.json(),list)
+    self.assertIsInstance(res.json()[0],list)
+    self.assertIsInstance(res.json()[0][0],str)
+    logging.info(res.json())
+
   def test_generate_marketing_copy(self):
     res = requests.post(
       ENDPOINT+'marketing/', 
@@ -75,6 +86,18 @@ class APITest(unittest.TestCase):
     res = requests.post(
       ENDPOINT+'attributes/', 
       json={'description':'test description', 'image':image_base64},
+      headers=headers
+      )
+    self.assertEqual(res.status_code, 200)
+    self.assertIsInstance(res.json(),dict)
+    self.assertGreater(len(res.json()),0)
+    logging.info(res.json())
+
+  def test_attributes_with_filter(self):
+    image_base64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII='
+    res = requests.post(
+      ENDPOINT+'attributes/', 
+      json={'description':'test description', 'image':image_base64, 'category':[config.TEST_CATEGORY_L0]},
       headers=headers
       )
     self.assertEqual(res.status_code, 200)

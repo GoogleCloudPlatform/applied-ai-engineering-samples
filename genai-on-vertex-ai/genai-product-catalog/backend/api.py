@@ -25,7 +25,7 @@ import marketing
 
 class Product(BaseModel):
     description: str
-    category: Optional[list[str]] = None
+    category: Optional[list[str]] = []
     main_image_base64: Optional[str] = None
 
 app = FastAPI()
@@ -33,6 +33,7 @@ app = FastAPI()
 origins = [
     "http://localhost:4000",
     "http://localhost:8080",
+    "https://retail-shared-demos.uc.r.appspot.com",
 ]
 
 app.add_middleware(
@@ -50,7 +51,7 @@ def suggest_categories(product: Product) -> list[list[str]]:
     Args:
     - description: Sparse description of product
     - category (optional): If one or more category levels is known
-        include this to restrict the suggestions space. NOT YET IMPLEMENTED
+        include this to restrict the suggestions space. 
         - example 1: ['Mens']
             will only return suggestiongs with top level category 'Mens'
         - example 2: ['Mens', 'Pants']
@@ -67,7 +68,10 @@ def suggest_categories(product: Product) -> list[list[str]]:
     ['Mens', 'Pants', 'Jeans']
     """
     return category.retrieve_and_rank(
-        product.description, product.main_image_base64, base64=True)
+        product.description, 
+        product.main_image_base64, 
+        base64=True, 
+        filters=product.category)
 
 @app.post("/v1/marketing/")
 def generate_marketing_copy(
@@ -90,8 +94,10 @@ def suggest_attributes(product: Product) -> dict[str,str]:
 
     Args:
     - description: Sparse description of product
-    - category (optional): If category is known this will be considered in
-        generating relevant attributes. NOT YET IMPLEMENTED
+    - category (optional): If provided will only consider products in the same
+        category for attributes grounding. Supports partial categories as well.
+        Experiment with passing different levels of categories for exploration vs.
+        exploitation trade-off.
     - main_image_base64 (optional): base64 encoded string representing product
             image.
 
@@ -101,4 +107,8 @@ def suggest_attributes(product: Product) -> dict[str,str]:
     {'color':'green', 'pattern': 'striped'}
     """
     return attributes.retrieve_and_generate_attributes(
-        product.description, product.category, product.main_image_base64, base64=True)
+        product.description, 
+        product.category, 
+        product.main_image_base64, 
+        base64=True,
+        filters=product.category)

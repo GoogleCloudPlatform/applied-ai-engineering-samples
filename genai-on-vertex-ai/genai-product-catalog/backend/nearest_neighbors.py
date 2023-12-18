@@ -15,7 +15,10 @@
 """Functions for Vertex Vector Search."""
 from collections import namedtuple
 from google.cloud import aiplatform
+from google.cloud.aiplatform.matching_engine.matching_engine_index_endpoint import Namespace
+
 import config
+import logging
 
 Neighbor = namedtuple('Neighbor',['id', 'distance'])
 index_endpoint = aiplatform.MatchingEngineIndexEndpoint(
@@ -24,13 +27,22 @@ index_endpoint = aiplatform.MatchingEngineIndexEndpoint(
     location=config.LOCATION
 )
 
-def get_nn(embeds: list[list[float]], num_neighbors: int = config.NUM_NEIGHBORS) -> list[Neighbor]:
+def get_nn(
+    embeds: list[list[float]], 
+    filters: list[str] = [], 
+    num_neighbors: int = config.NUM_NEIGHBORS) -> list[Neighbor]:
     """Fetch nearest neigbhors in vector store.
 
     Neighbors are fetched independently for each embedding then unioned.
 
     Args:
         embeds: list of embeddings to find neareast neighbors
+        filters: category prefix to restrict results to
+        - example 1: ['Mens']
+            will only return suggestiongs with top level category 'Mens'
+        - example 2: ['Mens', 'Pants']
+            will only return suggestions with top level category 'Mens'
+            and second level category 'Pants'
         num_neigbhors: number of nearest neighbors to return for EACH embedding
 
     Returns:
@@ -38,9 +50,16 @@ def get_nn(embeds: list[list[float]], num_neighbors: int = config.NUM_NEIGHBORS)
             id: unique item identifier, usually used to join to a reference DB
             distance: the embedding distance
     """
+    if len(filters) > config.CATEGORY_DEPTH:
+        logging.warning(f'''Number of category filters {len(filters)} is greater
+         than supported category depth {config.CATEGORY_DEPTH}. Truncating''')
+        filters = filters[:config.CATEGORY_DEPTH]
+
+    filters = [Namespace(config.FILTER_CATEGORIES[i],[f]) for i,f in enumerate(filters)]
     response = index_endpoint.find_neighbors(
         deployed_index_id=config.DEPLOYED_INDEX,
         queries=embeds,
         num_neighbors=num_neighbors,
+        filter=filters
     )
     return [Neighbor(r.id, r.distance) for neighbor in response for r in neighbor]

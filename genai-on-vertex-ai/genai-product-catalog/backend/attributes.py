@@ -62,15 +62,13 @@ def retrieve(
     category: Optional[str] = None,
     image: Optional[str] = None, 
     base64: bool = False,
-    num_neighbors: int = config.NUM_NEIGHBORS) -> list[dict]:
+    num_neighbors: int = config.NUM_NEIGHBORS,
+    filters: list[str] = []) -> list[dict]:
     """Returns list of attributes based on nearest neighbors.
 
     Embeds the provided desc and (optionally) image and returns the attributes
     corresponding to the closest products in embedding space. 
     
-    TODO: If category is provided the retrieval is restricted to products in
-     the same category.
-
     Args:
         desc: user provided description of product
         category: category of the product
@@ -78,6 +76,7 @@ def retrieve(
         base64: True indicates image is base64. False (default) will be 
           interpreted as image path (either local or GCS)
         num_neigbhors: number of nearest neighbors to return for EACH embedding
+        filters: category prefix to restrict results to
 
     Returns:
         List of candidates sorted by embedding distance. Each candidate is a
@@ -89,7 +88,9 @@ def retrieve(
     """
     res = embeddings.embed(desc,image, base64)
     embeds = [res.text_embedding, res.image_embedding] if res.image_embedding else [res.text_embedding]
-    neighbors = nearest_neighbors.get_nn(embeds)
+    neighbors = nearest_neighbors.get_nn(embeds,filters)
+    if not neighbors:
+      return []
     ids = [n.id[:-2] for n in neighbors] # last 3 chars are not part of product ID
     attributes_desc = join_attributes_desc(ids)
     candidates = [
@@ -183,15 +184,13 @@ def retrieve_and_generate_attributes(
     category: Optional[str] = None,
     image: Optional[str] = None,
     base64: bool = False,
-    num_neighbors: int = config.NUM_NEIGHBORS
+    num_neighbors: int = config.NUM_NEIGHBORS,
+    filters: list[str] = []
 ) -> dict[str,str]:
     """RAG approach to generating product attributes.
 
     Since LLM answers are not always well formatted, if we fail to parse the
     LLM answer we fallback to a greedy retrieval approach.
-    
-    TODO: If category is provided the retrieval is restricted to products in
-     the same category.
 
     Args:
         desc: user provided description of product
@@ -200,10 +199,13 @@ def retrieve_and_generate_attributes(
         base64: True indicates image is base64. False (default) will be 
           interpreted as image path (either local or GCS)
         num_neigbhors: number of nearest neighbors to return for EACH embedding
+        filters: category prefix to restrict results to
 
     Returns: attributes in dict form e.g. {'color':'green', 'pattern': 'striped'}
     """
-    candidates = retrieve(desc, category, image, base64, num_neighbors)
+    candidates = retrieve(desc, category, image, base64, num_neighbors, filters)
+    if filters and not candidates:
+        return {'error':'ERROR: no existing products match that category'}
     try:
         return generate_attributes(desc, candidates)
     except ValueError as e:
