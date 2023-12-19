@@ -21,7 +21,7 @@ terraform {
       version = ">= 5.6.0, < 6.0.0"
     }
     google-beta = {
-      source  = "hashicorp/google"
+      source  = "hashicorp/google-beta"
       version = ">= 5.6.0, < 6.0.0"
     }
   }
@@ -84,7 +84,6 @@ module "base_environment" {
   deletion_protection = var.deletion_protection
   gcs_configs         = local.gcs_configs
   node_pool_sa        = local.node_pool_sa
-  wid_sa              = local.wid_sa
   cluster_config      = local.cluster_config
   vpc_config          = local.vpc_config
   registry_config     = local.registry_config

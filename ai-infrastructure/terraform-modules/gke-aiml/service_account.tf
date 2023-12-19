@@ -15,17 +15,6 @@
 
 locals {
 
-  wid_sa_config = (
-    !(var.wid_sa.email != "")
-    ? {
-      "${var.wid_sa.name}" = {
-        description = var.wid_sa.description
-        roles       = var.wid_sa.roles
-      }
-    }
-    : {}
-  )
-
   node_pool_sa_config = (
     !(var.node_pool_sa.email != "")
     ? {
@@ -37,7 +26,7 @@ locals {
     : {}
   )
 
-  service_accounts = merge(local.node_pool_sa_config, local.wid_sa_config)
+  service_accounts = merge(local.node_pool_sa_config, {})
 }
 
 

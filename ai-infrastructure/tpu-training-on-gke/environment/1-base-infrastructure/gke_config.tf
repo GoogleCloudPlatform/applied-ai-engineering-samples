@@ -12,28 +12,46 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
+data "google_client_config" "default" {
+  depends_on = [module.base_environment]
+}
+
+data "google_container_cluster" "default" {
+  name       = local.cluster_config.name
+  depends_on = [module.base_environment]
+}
+
 provider "kubernetes" {
-  host                   = "https://${module.cluster.endpoint}"
+  host                   = data.google_container_cluster.default.endpoint
   token                  = data.google_client_config.default.access_token
-  cluster_ca_certificate = base64decode(module.cluster.ca_certificate)
+  cluster_ca_certificate = base64decode(data.google_container_cluster.default.master_auth[0].cluster_ca_certificate)
 }
 
 locals {
-  ksa_name                = var.wid_sa.name
-  gcp_sa_name             = var.wid_sa.name
-  gcp_sa_static_id        = "projects/${var.project_id}/serviceAccounts/${local.wid_sa_email}"
-  gcp_sa_email            = local.wid_sa_email
-  k8s_sa_gcp_derived_name = "serviceAccount:${var.project_id}.svc.id.goog[${local.namespace}/${local.ksa_name}]"
-  namespace = (
-    local.create_namespace == true
-    ? kubernetes_namespace.namespace[0].metadata[0].name
-    : "default"
-  )
+  gcp_sa_static_id        = "projects/${var.project_id}/serviceAccounts/${module.wid_service_account.email}"
+  k8s_sa_gcp_derived_name = "serviceAccount:${var.project_id}.svc.id.goog[${local.namespace}/${local.wid_sa.name}]"
   create_namespace = (
     var.cluster_config.workloads_namespace != "default" && var.cluster_config.workloads_namespace != "" && var.cluster_config.workloads_namespace != null
     ? true
     : false
   )
+  namespace = (
+    local.create_namespace == true
+    ? kubernetes_namespace.namespace[0].metadata[0].name
+    : "default"
+  )
+
+}
+
+module "wid_service_account" {
+  source       = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v28.0.0&depth=1"
+  project_id   = var.project_id
+  name         = local.wid_sa.name
+  display_name = local.wid_sa.description
+  iam_project_roles = {
+    "${var.project_id}" = [for role in local.wid_sa.roles : "roles/${role}"]
+  }
 }
 
 resource "kubernetes_namespace" "namespace" {
@@ -47,10 +65,10 @@ resource "kubernetes_service_account" "ksa" {
 
   automount_service_account_token = false
   metadata {
-    name      = local.ksa_name
+    name      = local.wid_sa.name
     namespace = local.namespace
     annotations = {
-      "iam.gke.io/gcp-service-account" = local.gcp_sa_email
+      "iam.gke.io/gcp-service-account" = module.wid_service_account.email
     }
   }
 }

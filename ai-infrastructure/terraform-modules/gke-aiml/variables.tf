@@ -113,7 +113,6 @@ variable "cluster_config" {
     gcs_fuse_csi_driver            = optional(bool, true)
     gce_persistent_disk_csi_driver = optional(bool, true)
     workload_identity              = optional(bool, true)
-    workloads_namespace            = optional(string, "default")
     enable_workload_logs           = optional(bool, true)
     enable_scheduler_logs          = optional(bool, true)
     enable_controller_manager_logs = optional(bool, true)
