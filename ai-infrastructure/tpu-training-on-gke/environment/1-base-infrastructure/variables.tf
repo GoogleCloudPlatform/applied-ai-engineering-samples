@@ -43,11 +43,13 @@ variable "prefix" {
 variable "node_pool_sa" {
   description = "The config for a node pool service account"
   type = object({
-    name  = string
-    roles = list(string)
+    name        = string
+    description = string
+    roles       = list(string)
   })
   default = {
-    name = "gke-node-pool-sa"
+    name        = "gke-node-pool-sa"
+    description = "GKE node pool service account"
     roles = [
       "storage.objectAdmin",
       "logging.logWriter",
@@ -60,11 +62,13 @@ variable "node_pool_sa" {
 variable "wid_sa" {
   description = "The config for a workload identity service account"
   type = object({
-    name  = string
-    roles = list(string)
+    name        = string
+    description = string
+    roles       = list(string)
   })
   default = {
-    name = "gke-wid-sa"
+    name        = "gke-wid-sa"
+    description = "GKE Wid service account"
     roles = [
       "storage.objectAdmin",
       "logging.logWriter",

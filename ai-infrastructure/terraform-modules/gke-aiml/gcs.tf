@@ -20,7 +20,7 @@ locals {
       storage_class = config.storage_class
       force_destroy = !var.deletion_protection
       iam = { for role in config.iam :
-        "roles/${role}" => ["serviceAccount:${local.node_pool_sa_email}", "serviceAccount:${local.wid_sa_email}"]
+        "roles/${role}" => ["serviceAccount:${local.node_pool_sa_email}"]
       }
     }
   }
