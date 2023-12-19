@@ -13,6 +13,21 @@
 # limitations under the License.
 
 
+terraform {
+  required_version = ">=1.5.1"
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = ">= 5.6.0, < 6.0.0"
+    }
+    google-beta = {
+      source  = "hashicorp/google"
+      version = ">= 5.6.0, < 6.0.0"
+    }
+  }
+}
+
+
 data "google_project" "project" {
   project_id = var.project_id
 }
@@ -63,7 +78,7 @@ locals {
 }
 
 module "base_environment" {
-  source              = "../../../terraform-modules/gke-aiml"
+  source              = "github.com/GoogleCloudPlatform/applied-ai-engineering-samples//ai-infrastructure/terraform-modules/gke-aiml?ref=tpu-training-on-gke"
   project_id          = var.project_id
   region              = var.region
   deletion_protection = var.deletion_protection

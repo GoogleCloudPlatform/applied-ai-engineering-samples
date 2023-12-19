@@ -39,6 +39,25 @@ variable "prefix" {
   nullable    = false
 }
 
+variable "wid_sa" {
+  description = "The config for a workload identity service account. If email is set the existing service account is used. If name is a new account is created. If roles are null the default roles are used."
+  type = object({
+    name = optional(string, "wid-sa")
+    roles = optional(list(string), [
+      "storage.objectAdmin",
+      "logging.logWriter",
+      "artifactregistry.reader",
+    ])
+    description = optional(string, "GKE node pool service account")
+  })
+  default = {}
+  validation {
+    condition     = !(var.wid_sa.email == "" && var.wid_sa.name == "")
+    error_message = "Either email or name must be set."
+  }
+  nullable = false
+}
+
 
 variable "node_pool_sa" {
   description = "The config for a node pool service account"
@@ -47,7 +66,7 @@ variable "node_pool_sa" {
     roles = list(string)
   })
   default = {
-    name = gke-node-pool-sa
+    name = "gke-node-pool-sa"
     roles = [
       "storage.objectAdmin",
       "logging.logWriter",
@@ -64,7 +83,7 @@ variable "wid_sa" {
     roles = list(string)
   })
   default = {
-    name = gke-wid-sa
+    name = "gke-wid-sa"
     roles = [
       "storage.objectAdmin",
       "logging.logWriter",
@@ -117,11 +136,7 @@ variable "cpu_node_pools" {
     max_node_count = number
     machine_type   = string
     disk_size_gb   = number
-    taints = map(object({
-      value  = string
-      effect = string
-    }))
-    labels = map(string)
+    labels         = optional(map(string), {})
   }))
   nullable = false
 }

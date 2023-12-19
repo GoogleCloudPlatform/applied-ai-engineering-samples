@@ -12,23 +12,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+terraform {
+  required_version = ">=1.5.1"
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = ">= 5.6.0, < 6.0.0"
+    }
+    google-beta = {
+      source  = "hashicorp/google"
+      version = ">= 5.6.0, < 6.0.0"
+    }
+  }
+}
 
 data "google_project" "project" {
   project_id = var.project_id
 }
-
-data "google_client_config" "default" {}
 
 locals {
   node_pool_sa_email = (
     var.node_pool_sa.email != ""
     ? var.node_pool_sa.email
     : module.service_accounts[var.node_pool_sa.name].email
-  )
-  wid_sa_email = (
-    var.wid_sa.email != ""
-    ? var.wid_sa.email
-    : module.service_accounts[var.wid_sa.name].email
   )
   network_self_link   = try(var.vpc_ref.network_self_link, module.vpc.0.self_link)
   subnet_self_link    = try(var.vpc_ref.subnet_self_link, module.vpc.0.subnet_self_links["${var.region}/${var.vpc_config.subnet_name}"])

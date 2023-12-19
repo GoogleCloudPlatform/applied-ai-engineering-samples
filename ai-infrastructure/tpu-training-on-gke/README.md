@@ -139,19 +139,26 @@ The prerequisites may need to be configured by your GCP organization administrat
 
 Besides enabling the necessary services and setting up an automation service account and an automation GCS bucket, the Terraform configuration has generated prepopulated template files for configuring the Terraform backend and providers, which can be utilized in the following setup stages. These template files are stored in the `gs://<YOUR-AUTOMATION-BUCKET/providers` folder.
 
-To grant the `iam.serviceAccountTokenCreator` rights on the automation service account follow the [instructions for the bootstrap module](../terraform-modules/bootstrap/README.md).
+#### Granting Cloud Build impersonating rights
+
+To be able to impersonate the automation service account, the Cloud Build service account needs to have the `iam.serviceAccountTokenCreator` rights on the automation service account.
+
+```shell
+AUTOMATION_SERVICE_ACCOUNT=<AUTOMATTION_SERVICE_ACOUNT_EMAIL>
+CLOUD_BUILD_SERVICE_ACCOUNT=<PROJECT_NUMBER>@cloudbuild.gserviceaccount.com
+
+gcloud iam service-accounts add-iam-policy-binding $AUTOMATION_SERVICE_ACCOUNT --member="serviceAccount:$CLOUD_BUILD_SERVICE_ACCOUNT" --role='roles/iam.serviceAccountTokenCreator'
+```
+
+Replace <PROJECT_NUMBER> with your project number. Replace <AUTOMATION_SERVICE_ACCOUNT_EMAIL> with the email of your automation service account. If you created the automation service account using the bootstrap Terraform you can retrieve its email by executing the `terraform output automation_sa` command from the `environment\0-bootstrap` folder.
 
 
 ### Deploy 
 
+
 #### Clone the GitHub repo. 
 
-If you use [Cloud Shell](https://cloud.google.com/shell/docs/using-cloud-shell) click the link below to navigate to Cloud Shell and clone the repo.
-
-<a href="https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples/&cloudshell_git_branch=tpu-training-on-gke&tutorial=README.md">
-    <img alt="Open in Cloud Shell" src="http://gstatic.com/cloudssh/images/open-btn.png">
-</a>
-
+If you haven't already run the bootstrap stage, please clone this repository now.
 
 ```bash
 git clone https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples.git
@@ -306,12 +313,11 @@ The [`examples`](examples/) folder contains code samples that demonstrate how to
 
 ## Cleanup Environment 
 
-To destroy the environment and clean up all the provisioned resources, run the [Cloud Build job](env_setup/cloudbuild.destroy.yaml) that runs Terraform to clean up the resources. The job refers to the environment variables in [`env_setup/vars.env`](env_setup/vars.env) that was used for provisioning the environment. To start cleaning up the provisioned resources execute the following command:
+To destroy the environment and clean up all the provisioned resources:
 
 ```bash
-./env_setup/destroy.sh
+gcloud builds submit \
+  --config cloudbuild.destroy.yaml \
+  --timeout "2h" \
+  --machine-type=e2-highcpu-32 
 ```
-
-You should see similar page when the environment cleanup job is completed successfully:
-
-![destroy](/images/cloudbuild_destroy.jpg)

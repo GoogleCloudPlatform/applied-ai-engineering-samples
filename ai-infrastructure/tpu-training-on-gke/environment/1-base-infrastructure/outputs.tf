@@ -13,8 +13,12 @@
 # limitations under the License.
 
 
-output "output_cluster_id" {
+output "cluster_name" {
   value = module.base_environment.cluster_name
+}
+
+output "cluster_region" {
+  value = var.region
 }
 
 output "tensorboard_id" {

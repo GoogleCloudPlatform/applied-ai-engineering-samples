@@ -14,49 +14,31 @@
 
 steps:
   - id: log parameters 
-    name: google/cloud-sdk:alpine
-    entrypoint: /bin/bash
+    name: hashicorp/terraform
+    entrypoint: sh 
     args:
       - -c
       - |
-          echo ENVIRONMENT SETTINGS:
-          echo state_gcs_location=$_TF_STATE_BUCKET/$_TF_STATE_PREFIX
-          echo project_id=$PROJECT_ID
-          echo region=$_REGION
-          echo tensorboard_region=$_TENSORBOARD_REGION
-          echo zone=$_ZONE
-          echo network_name=$_NETWORK_NAME
-          echo subnet_name=$_SUBNET_NAME
-          echo repository_bucket_name=$_ARTIFACT_REPOSITORY_BUCKET_NAME
-          echo cluster_name=$_CLUSTER_NAME
-          echo tpu_namespace=$_NAMESPACE
-          echo tpu_type=$_TPU_TYPE
-          echo num_tpu_pools=$_NUM_TPU_POOLS
+          echo DESTROY SETTINGS:
+          cat 1-base-infrastructure/terraform.tfvars
+
   - id: 'tf init'
-    name: 'hashicorp/terraform:1.6.2'
-    entrypoint: 'sh'
-    dir: terraform
+    name: hashicorp/terraform
+    dir: 1-base-infrastructure
     args: 
-    - '-c'
-    - |
-        terraform init -backend-config="bucket=$_TF_STATE_BUCKET" -backend-config="prefix=$_TF_STATE_PREFIX"
+    - init 
+
+  - id: 'tf rm state'
+    name: hashicorp/terraform
+    dir: 1-base-infrastructure
+    args:
+    - state
+    - rm
+    - module.base_environment.kubernetes_namespace.namespace[0]
 
   - id: 'tf destroy'
-    name: 'hashicorp/terraform'
-    entrypoint: 'sh'
-    dir: terraform
+    name: hashicorp/terraform
+    dir: 1-base-infrastructure
     args: 
-    - '-c'
-    - |
-        terraform destroy -auto-approve \
-        -var=project_id=$PROJECT_ID \
-        -var=region=$_REGION \
-        -var=tensorboard_region=$_TENSORBOARD_REGION \
-        -var=network_name=$_NETWORK_NAME \
-        -var=subnet_name=$_SUBNET_NAME \
-        -var=cluster_name=$_CLUSTER_NAME \
-        -var=tpu_namespace=$_NAMESPACE \
-        -var=artifact_repository_bucket_name=$_ARTIFACT_REPOSITORY_BUCKET_NAME \
-        -var=tpu_type=$_TPU_TYPE \
-        -var=num_tpu_pools=$_NUM_TPU_POOLS \
-        -var=zone=$_ZONE
+    - destroy 
+    - -auto-approve 

@@ -14,58 +14,59 @@
 
 steps:
   - id: log parameters 
-    name: 'hashicorp/terraform'
-    entrypoint: 'sh' 
+    name: gcr.io/cloud-builders/gcloud
+    entrypoint: /bin/bash 
     args:
       - -c
       - |
           echo BUILD SETTINGS:
           cat 1-base-infrastructure/terraform.tfvars 
-  - id: 'tf init'
-    name: 'hashicorp/terraform'
-    entrypoint: 'sh'
+  - id: tf init
+    name: hashicorp/terraform
     dir: 1-base-infrastructure
     args: 
-    - '-c'
-    - |
-        terraform init 
+    - init 
 
-  - id: 'tf plan'
-    name: 'hashicorp/terraform'
-    entrypoint: 'sh'
+  - id: tf plan
+    name: hashicorp/terraform
     dir: 1-base-infrastructure 
     args: 
-    - '-c'
+    - plan 
+    - -out=tfplan
+
+  - id: tf apply
+    name: hashicorp/terraform
+    dir: 1-base-infrastructure 
+    args: 
+    - apply
+    - -auto-approve
+    - tfplan 
+
+  - id: tf output
+    name: hashicorp/terraform
+    dir: 1-base-infrastructure  
+    entrypoint: sh
+    args:
+    - -c
     - |
-        terraform plan
-#
-#  - id: 'tf apply'
-#    name: 'hashicorp/terraform'
-#    entrypoint: 'sh'
-#    dir: terraform
-#    args: 
-#    - '-c'
-#    - |
-#        terraform apply -auto-approve \
-#        -var=project_id=$PROJECT_ID \
-#        -var=region=$_REGION \
-#        -var=tensorboard_region=$_TENSORBOARD_REGION \
-#        -var=network_name=$_NETWORK_NAME \
-#        -var=subnet_name=$_SUBNET_NAME \
-#        -var=cluster_name=$_CLUSTER_NAME \
-#        -var=tpu_namespace=$_NAMESPACE \
-#        -var=artifact_repository_bucket_name=$_ARTIFACT_REPOSITORY_BUCKET_NAME \
-#        -var=tpu_type=$_TPU_TYPE \
-#        -var=num_tpu_pools=$_NUM_TPU_POOLS \
-#        -var=zone=$_ZONE \
-#        -var=gke_sa_name=rt-gke-sa
-#
-#  - id: 'Deploy JobSet'
+      touch params.env
+      echo "CLUSTER_NAME=$(terraform output cluster_name)" >> params.env 
+      echo "CLUSTER_REGION=$(terraform output cluster_region)" >> params.env
+      cat params.env 
+
+
+  - id: 'Deploy JobSet'
+    name: gcr.io/cloud-builders/gcloud
 #    name: gcr.io/google.com/cloudsdktool/cloud-sdk 
-#    entrypoint: /bin/bash
-#    args:
-#      - -c
-#      - |
+    dir: 1-base-infrastructure 
+    entrypoint: /bin/bash
+    args:
+      - -c
+      - |
+        set -o  allexport; source params.env; set +o allexport
+        echo $$CLUSTER_NAME
+        echo $$CLUSTER_REGION
+#        CLUSTER_NAME=
 #        gcloud container clusters get-credentials $_CLUSTER_NAME --region $_REGION
 #        kubectl apply --server-side -f "https://github.com/kubernetes-sigs/jobset/releases/download/$_JOBSET_API_VERSION/manifests.yaml" 
 #

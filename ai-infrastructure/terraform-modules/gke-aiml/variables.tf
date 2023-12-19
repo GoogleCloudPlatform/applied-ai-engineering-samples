@@ -74,25 +74,6 @@ variable "node_pool_sa" {
   nullable = false
 }
 
-variable "wid_sa" {
-  description = "The config for a workload identity service account. If email is set the existing service account is used. If name is a new account is created. If roles are null the default roles are used."
-  type = object({
-    name  = optional(string, "wid-sa")
-    email = optional(string, "")
-    roles = optional(list(string), [
-      "storage.objectAdmin",
-      "logging.logWriter",
-      "artifactregistry.reader",
-    ])
-    description = optional(string, "GKE node pool service account")
-  })
-  default = {}
-  validation {
-    condition     = !(var.wid_sa.email == "" && var.wid_sa.name == "")
-    error_message = "Either email or name must be set."
-  }
-  nullable = false
-}
 
 variable "vpc_ref" {
   description = "Network configurations of an existing VPC to use for the environment. If null a new VPC based on the provided network_config will be created"
