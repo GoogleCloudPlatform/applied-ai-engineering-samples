@@ -65,18 +65,21 @@ To submit a JobSet-defined workload, you need to create a YAML JobSet resource d
 
 ## Setup 
 
-The deployment process is automated using [Cloud Build](https://cloud.google.com/build), [Terraform](https://cloud.google.com/docs/terraform), and [Kustomize](https://kustomize.io/). The deployment script performs the following tasks:
+The deployment process is automated using [Cloud Build](https://cloud.google.com/build), [Terraform](https://cloud.google.com/docs/terraform), and [Kustomize](https://kustomize.io/). The Cloud Build configuration file  defines two deployment stages:
 
-- [ ] If the existing network settings are not provided, creates a network, a subnet, and IP ranges for GKE pods and services.
+
+In the first stage a Terraform configuration is applied, which:
+
+- [ ] Creates a network, a subnet, and IP ranges for GKE pods and services.
 - [ ] Creates a VPC-native cluster.
 - [ ] Creates a node pool with nodes equipped with CPUs only.
 - [ ] Creates a specified number of TPU node pools.
-- [ ] If the existing services accounts are not provided, creates an IAM service account for Workload Identity and an IAM service account to be used as a custom node pool service account.
-- [ ] Assigns the required set of roles to these service accounts.
+- [ ] Creates an IAM service account for Workload Identity and an IAM service account to be used as a custom node pool service account.
 - [ ] Configures the cluster for Workload Identity.
 - [ ] Creates a Google Cloud Storage bucket.
-- [ ] Adds the service accounts to `roles/storage.legacyBucketReader` bucket level permissions.
-- [ ] Creates a Vertex TensorBoard instance
+- [ ] Creates a Vertex TensorBoard instanc
+
+In the second stage, the [JobSet](https://github.com/kubernetes-sigs/jobset) and [Kueue](https://kueue.sigs.k8s.io/docs/concepts/cluster_queue/) custom resources are installed and Kueue is configured as described in the previous section. 
 
 
 > [!WARNING]
@@ -85,7 +88,7 @@ The deployment process is automated using [Cloud Build](https://cloud.google.com
 
 ### Configure pre-requisites
 
-Before proceeding with the deployment, you must:
+Before submitting the Cloud Build build, you need to:
 
 - [ ] Create a new Google Cloud project or select an existing one.
 - [ ] Enable the necessary services.
@@ -155,7 +158,6 @@ Replace <PROJECT_NUMBER> with your project number. Replace <AUTOMATION_SERVICE_A
 
 ### Deploy 
 
-
 #### Clone the GitHub repo. 
 
 If you haven't already run the bootstrap stage, please clone this repository now.
@@ -164,120 +166,34 @@ If you haven't already run the bootstrap stage, please clone this repository now
 git clone https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples.git
 ```
 
+Change the current directory, to `ai-infrastructure/tpu-training-on-gke/environment`.
 
-#### Submit the build
+#### Configure build parameters=
+If you used the `bootstrap` configuration to configure the prerequisites, copy the `providers\providers.tf` and `providers\backend.tf` files from the `providers` folder in your automation bucket to the `1-base_environment`. Modify the `backend.tf` by setting the `prefix` field to the name of a folder in the automation bucket where you want to store your Terraform configuration's state. For example, if you want to manage the Terraform state in the `tf_state/gke_tpu_training` subfolder of the automation bucket set the `prefix` field to `tf_state/gke_tpu_training`.
 
-```
-gcloud builds submit \
-  --config cloudbuild.provision.yaml \
-  --timeout "2h" \
-  --machine-type=e2-highcpu-32 
-```
+If the automation bucket and the automation service account were provided to you by your administrator, rename the `backend.tf.tmpl` and the `providers.tf.tmpl` files to `backend.tf` and `providers.tf` and update them with your settings.
 
+To configure the Terraform steps in the build, rename the `terraform.tfvars.tmpl` file the `1-base-infrastructure` folder to `terraform.tfvars`. Make modifications to the `terraform.tfvars` file to align it with your specific environment. At the very least, you should set the following variables:
 
-### Configure environment
+At a minimum, you need to configure the following settings:
+- `project_id` - your project ID
+- `region` - your region for a VPC and a GKE cluster
+- `prefix` - the prefix that will be added to the default names of resources provisioned by the configuration
+- `tensorboard_region` - the region of a TensorBoard instance
+- `tensorboard_name` - the name of your TensorbBoard instance. The prefix is not added to the TensorBoard name.
+- `cpu_node_pools` - The `terraform.tfvars.tmpl` template provides an example configuration for a single autoscaling node pool.  
+- `tpu_node_pools` - The  template shows an example configuration for a single TPU node pool with one v4-16 pod slice. Modify the `tpu_node_pools` variable to provision different TPU node pool configurations, as described below.
 
-As mentioned earlier, environment provisioning is done using a Cloud Build job that runs Terraform manifests and environment setup steps. The Terraform configuration can be found in the [`env_setup/terraform`](env_setup/terraform) folder. The Terraform configuration supports a number of configurable inputs which are set using the included [`env_setup/vars.env`](env_setup/vars.env) file. Cloud Build provides Terraform the values set in this file to configure Terraform variables in [`env_setup/terraform/variables.tf`](env_setup/terraform/variables.tf). The configuration uses Google Cloud Storage as the backend for maintaining Terraform state.
+If you wish to modify other default settings, such as the default name suffixes for a cluster or GCS bucket names, you can override the defaults specified in the `variables.tf` file within your `terraform.tfvars` file.
 
-> [!IMPORTANT] 
-> To proceed, set the below environment variables in [`env_setup/vars.env`](main/env_setup/vars.env) to reflect your environment. By default, you will only need to provide your `PROJECT_ID`; replace "YOUR_PROJECT_ID" with the project ID of your Google Cloud project.
+When configuring TPU node pools, ensure that you set the TPU type to one of the following values:
 
-```bash
-export PROJECT_ID=YOUR_PROJECT_ID
-export RESOURCE_PREFIX=${PROJECT_ID}
-export REGION=us-central2
-export ZONE=us-central2-b
-export NETWORK_NAME=${RESOURCE_PREFIX}-network
-export SUBNET_NAME=${RESOURCE_PREFIX}-subnet
-export CLUSTER_NAME=gke-tpu-training-cluster
-export NAMESPACE=tpu-training
-export TPU_TYPE=v4-16
-export NUM_TPU_POOLS=1
-export NUM_OF_CHIPS=8
-
-export TENSORBOARD_REGION=us-central1
-export ARTIFACT_REGISTRY_NAME=gke-tpu-training
-export ARTIFACT_REPOSITORY_BUCKET_NAME=${RESOURCE_PREFIX}-aiml-repository
-
-export JOBSET_API_VERSION="v0.2.3"
-export KUEUE_API_VERSION="v0.4.2"
-
-export TF_STATE_BUCKET=${PROJECT_ID}-tf-state
-export TF_STATE_PREFIX=gke-tpu-training-environment
-```
-
-- `PROJECT_ID` - your project ID
-- `REGION` - the region for a GKE cluster network (default: `us-central2`) based on [Cloud TPU region and zones](https://cloud.google.com/tpu/docs/regions-zones)
-- `ZONE` - the zone for your GKE cluster (default: `us-central2-b`)
-- `NETWORK_NAME` - the name for the network 
-- `SUBNET_NAME` - the name for the subnet
-- `CLUSTER_NAME` - the name of your GKE cluster (default: `gke-tpu-training-cluster`)
-- `NAMESPACE` - the kubernetes namespace for TPU workloads (default: `tpu-training`)
-- `TPU_TYPE` - the TPU type for the Triton GPU node pool (default: `v4-16`)
-- `NUM_TPU_POOLS` - the number of TPU slices to create (default: `1`)
-- `NUM_OF_CHIPS` - Number of chips based on the [selected TPU type](https://cloud.google.com/tpu/docs/supported-tpu-configurations) and number of TPU pools
-- `TENSORBOARD_REGION` - The region for a Vertex TensorBoard instance (default: `us-central1`)
-- `ARTIFACT_REPOSITORY_BUCKET_NAME` - the name of the model artifacts repository Cloud Storage bucket
-- `ARTIFACT_REGISTRY_NAME` - the name of Artifact Registry repository to manage docker images
-- `JOBSET_API_VERSION` - the version of the [JobSet API](https://github.com/kubernetes-sigs/jobset/releases) to download and setup
-- `KUEUE_API_VERSION` - the version of the [Kueue API](https://github.com/kubernetes-sigs/kueue/releases) to download and setup
-- `TF_STATE_BUCKET` - the name of Cloud Storage bucket for Terraform to maintains configuration state
-- `TF_STATE_PREFIX` - the object prefix for Terraform to maintains configuration state in Cloud Storage bucket
-
-
-### Run environment provisioning job
-
-Start provisioning by using [Cloud Build job](env_setup/cloudbuild.provision.yaml) to run Terraform and provision resources, installs the **JobSet** and **Kueue** APIs and configures Kueue resources and finalizes the setup. To start provisioning execute the following command:
-
-```bash
-export PROJECT_ID=YOUR_PROJECT_ID
-./env_setup/build.sh
-```
-
-Navigate to the Cloud Build logs using the link displayed on Cloud Shell or go to the [Cloud Build page on the Cloud console](https://console.cloud.google.com/cloud-build). You should see similar page when the environment provision job is completed successfully:
-
-![provision](/images/cloudbuild_provision.jpg)
-
-
-#### Input variables in the Terraform configuration 
-
-Note that we only set a subset of variables in [`env_setup/vars.env`](env_setup/vars.env) exposed by the Terraform configuration. For the other ones we use the defaults. If you want to change the default values of other variables you need to update the [`env_setup/cloudbuild.provision.yaml`](env_setup/cloudbuild.provision.yaml) file and the `gcloud builds submit` command in [`env_setup/build.sh`](env_setup/build.sh) file. 
-
-The Terraform configuration supports the following input variables:
-
-| Variable | Description | Default |
-| -------- | ------------|---------|
-| region | The compute region for the Cluster | NA|
-| tensorboard_region | The compute region for Vertex AI TensorBoard  | NA|
-| artifact_repository_bucket_name|The name of the GCS bucket|NA|
-| zone | The zone for the TPU node pools. Make sure that the zone supports the required TPU resources| NA |
-| network_name | The name of the network for the cluster | NA |
-| subnet_name | The name of the subnet  for the cluster | NA |
-| subnet_ip_range | The IP address range for the subnet | 10.129.0.0/20 |
-| pods_ip_range | A secondary IP range for pods | 192.168.64.0/20 |
-| services_ip_range | A secondary IP range for services | 192.168.80.0/20 |
-| cluster_name | The name of the cluster. | NA |
-| gke_version | The version of GKE to deploy | 1.27.3-gke.100 |
-| cluster_description | The cluster's description | GKE cluster for running TPU training workloads |
-| cpu_pool_node_count | The number of nodes in a CPU node pool | 3 |
-| cpu_pool_machine_type | The machine type for the CPU node pool | n1-standard-4 |
-| cpu_pool_disk_type | The disk type for nodes in the CPU node pool | pd-standard|
-| cpu_pool_disk_size | The disk size for nodes in the CPU node pool | 200GB |
-| tpu_sa_name | The name of the service account that will be provisioned and used for Workload Identity | cloud-tpu-sa |
-| tpu_sa_roles | The roles to assign to the service account | roles/storage.objectAdmin, roles/logging.logWriter |
-| gke_sa_name | The name of the custom service account for node pools | gke-sa |
-| gke_sa_roles | The roles to assigne to the custom service account for node pools | roles/storage.objectAdmin, roles/logging.logWriter |
-| tpu_namespace | The K8s namespace for TPU workloads | tpu-training |
-| tpu_type | The TPU slice type for TPU node pools. See below for more info | v4-16 |
-| num_tpu_pools | The number of multi-host TPU node pools to provision | 1 |
-| enable_tpu_autoscaling | Whether to enable outoscaling of TPU node pools | false |
-| tpu_node_pool_name_prefix | A prefix that will be used to name TPU node pools. An index starting with 0 will be appended to the prefix to form a TPU node pool name | tpu-node-pool |
-| multislice_group_name | A name that will be used to label a TPU node pools to support multislice jobs | multi-slice-group |
-
-The `tpu_type` variable is a name of a TPU slice configuration as defined in the following table.
 
 | TPU type name | Slice type | Slice topology | TPU VM type | Number of VMs in a slice | Number of chips in a VM |
 | ------------- | -----------|----------------|-------------|--------------------------| ------------------------|
+| v5litepod-1 | tpu-v5-lite-podslice | 1x1 | ct5lp-hightpu-1t | 1 | 1 |
+| v5litepod-4 | tpu-v5-lite-podslice | 2x2 | ct5lp-hightpu-4t | 1 | 4 |
+| v5litepod-8  | tpu-v5-lite-podslice | 2x4 | ct5lp-hightpu-8t | 1 | 8 |
 | v5litepod-16 | tpu-v5-lite-podslice | 4x4 | ct5lp-hightpu-4t | 4 | 4 |
 | v5litepod-32 | tpu-v5-lite-podslice | 4x8 | ct5lp-hightpu-4t | 8 | 4 |
 | v5litepod-64 | tpu-v5-lite-podslice | 8x8 | ct5lp-hightpu-4t | 16 | 4 |
@@ -294,6 +210,37 @@ The `tpu_type` variable is a name of a TPU slice configuration as defined in the
 | v4-1536| tpu-v4-podslice | 8x8x12 | ct4p-hightpu-4t | 192 | 4 |
 | v4-2048| tpu-v4-podslice | 8x8x16 | ct4p-hightpu-4t | 256 | 4 |
 | v4-4096| tpu-v4-podslice | 8x16x16 | ct4p-hightpu-4t | 512 | 4 |
+
+
+When you specify the TPU types as `v5litepod-1`, `v5litepod-4`, `v5litepod-8`, or `v4-8`, a [single-host node pool](https://cloud.google.com/kubernetes-engine/docs/concepts/tpus#node_pool) will be provisioned.  For other TPU types, a [multi-host TPU node pool](https://cloud.google.com/kubernetes-engine/docs/concepts/tpus#node_pool) is created. 
+
+When  `min_node_count` in the node pool configuration is smaller than `max_node_count` autoscaling is enabled. If `min_node_count` equals to `max_node_count` a fixed sized node pool is created.  For single-host node pools, the `min_node_count` and `max_node_count` fields, specify the minum number of nodes and the maximum number of nodes respectively. For multi-host node pools, the only supported combinations are `[min_node_count=0, max_node_count=1]` for autoscaling, or `[min_node_count=1, max_node_count=1]` for fixed size. When GKE scales a multi-host TPU slice node pool, it atomically scales up the node pool from zero to the maximum size. 
+
+
+You also need to set a couple of parameters that configure the installation and configuration of **JobSet** and **Kueue** APIs.
+
+These parameters are passed to Cloud Build through [Cloud Build substitutions](https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values). 
+
+- `JOBSET_API_VERSION` - the version of the [JobSet API](https://github.com/kubernetes-sigs/jobset/releases))to install. The examples in this repo have been tested with `v0.3.0`
+- `KUEUE_API_VERSION` - the version of the [Kueue API](https://github.com/kubernetes-sigs/kueue/releases) to install. The examples have been test with `v0.5.1`
+
+
+#### Submit the build
+
+To initiate the build, execute the following command:
+
+```
+export JOBSET_API_VERSION=v0.3.0
+export KUEUE_API_VERSION=v0.5.1 
+
+gcloud builds submit \
+  --config cloudbuild.provision.yaml \
+  --substitutions _JOBSET_API_VERSION=$JOBSET_API_VERSION,_KUEUE_API_VERSION=$KUEUE_API_VERSION
+  --timeout "2h" \
+  --machine-type=e2-highcpu-32 
+```
+
+To track the progress of the build, you can either follow the link displayed in Cloud Shell or visit the Cloud Build page on the [Google Cloud Console](https://console.cloud.google.com/cloud-build).
 
 
 ## Training workloads examples

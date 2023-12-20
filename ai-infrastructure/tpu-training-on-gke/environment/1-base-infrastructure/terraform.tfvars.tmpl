@@ -21,6 +21,14 @@ deletion_protection = true
 cpu_node_pools = {
   your-cpu-node-pool-name = {
     zones = ["your-zone-1"]
+    min_node_count = 1
+    max_node_count = 3
+    machine_type = "n1-standard-16"
+    disk_size_gb = 200
+    labels = {
+      default-node-pool = true
+    }
+  }
 }
 tpu_node_pools = {
   your-tpu-node-pool-name = {
