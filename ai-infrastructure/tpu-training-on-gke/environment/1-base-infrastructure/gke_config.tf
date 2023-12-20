@@ -19,7 +19,6 @@ data "google_container_cluster" "default" {
   project  = var.project_id
 }
 
-
 provider "kubernetes" {
   host                   = data.google_container_cluster.default.endpoint
   token                  = data.google_client_config.default.access_token
@@ -55,7 +54,7 @@ module "wid_service_account" {
 resource "kubernetes_namespace" "namespace" {
   count = local.create_namespace ? 1 : 0
   metadata {
-    name = var.cluster_config.workloads_namespace
+    name = local.namespace
   }
 }
 
@@ -71,7 +70,7 @@ resource "kubernetes_service_account" "ksa" {
   }
 }
 
-resource "google_service_account_iam_member" "main" {
+resource "google_service_account_iam_member" "wid_role" {
   service_account_id = local.gcp_sa_static_id
   role               = "roles/iam.workloadIdentityUser"
   member             = local.k8s_sa_gcp_derived_name
