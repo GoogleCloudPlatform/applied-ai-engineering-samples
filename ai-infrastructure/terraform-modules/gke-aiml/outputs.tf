@@ -23,19 +23,8 @@ output "cluster_name" {
   value       = module.cluster.name
 }
 
-output "cluster_endpoint" {
-  description = "The endpoint for the GKE cluster"
-  value       = module.cluster.endpoint
-}
-
-output "cluster_certificate" {
-  description = "The cluster's certificate"
-  sensitive   = true
-  value       = module.cluster.ca_certificate
-}
-
-output "region" {
-  description = "The region of the environment"
+output "cluster_region" {
+  description = "The region of the GKE cluster"
   value       = var.region
 }
 

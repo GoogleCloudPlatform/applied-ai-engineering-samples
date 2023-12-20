@@ -235,7 +235,7 @@ export KUEUE_API_VERSION=v0.5.1
 
 gcloud builds submit \
   --config cloudbuild.provision.yaml \
-  --substitutions _JOBSET_API_VERSION=$JOBSET_API_VERSION,_KUEUE_API_VERSION=$KUEUE_API_VERSION
+  --substitutions _JOBSET_API_VERSION=$JOBSET_API_VERSION,_KUEUE_API_VERSION=$KUEUE_API_VERSION \
   --timeout "2h" \
   --machine-type=e2-highcpu-32 
 ```

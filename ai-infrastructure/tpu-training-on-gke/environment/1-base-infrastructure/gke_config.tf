@@ -13,14 +13,12 @@
 # limitations under the License.
 
 
-data "google_client_config" "default" {
-  depends_on = [module.base_environment]
+data "google_container_cluster" "default" {
+  name     = module.base_environment.cluster_name
+  location = module.base_environment.cluster_region
+  project  = var.project_id
 }
 
-data "google_container_cluster" "default" {
-  name       = local.cluster_config.name
-  depends_on = [module.base_environment]
-}
 
 provider "kubernetes" {
   host                   = data.google_container_cluster.default.endpoint

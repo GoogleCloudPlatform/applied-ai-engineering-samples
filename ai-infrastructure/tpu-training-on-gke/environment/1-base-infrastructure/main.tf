@@ -32,6 +32,11 @@ data "google_project" "project" {
   project_id = var.project_id
 }
 
+data "google_client_config" "default" {
+  depends_on = [module.base_environment]
+}
+
+
 locals {
   node_pool_sa = (
     var.prefix != ""
