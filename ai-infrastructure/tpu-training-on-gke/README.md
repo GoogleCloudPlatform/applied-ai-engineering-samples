@@ -8,8 +8,6 @@ The guide covers two main topics:
 - **Defining, Submitting, and Monitoring Training Jobs**
   - This section provides guidance on how to define, submit, and manage training jobs using the Kubernetes [JobSet](https://github.com/kubernetes-sigs/jobset) and [Kueue](https://github.com/kubernetes-sigs/kueue) APIs.
 
-We also include Terraform configuration for provisioning the training environment and code samples for a variety of training workloads.
-
 
 ## Architecture of the training environment
 
@@ -20,7 +18,7 @@ The diagram below depicts a high-level architecture of the training environment.
 
 The foundation of the environment is a regional, VPC-native GKE cluster. The cluster has two types of node pools: 
 - A single node pool with CPU-only nodes and 
-- Several [Multi-host TPU node pools](https://cloud.google.com/kubernetes-engine/docs/concepts/tpus)
+- Several [TPU node pools](https://cloud.google.com/kubernetes-engine/docs/concepts/tpus)
 
 This cluster topology supports running both [single-slice and multislice TPU](https://cloud.google.com/tpu/docs/multislice-introduction) training jobs.
 
@@ -77,7 +75,7 @@ In the first stage a Terraform configuration is applied, which:
 - [ ] Creates an IAM service account for Workload Identity and an IAM service account to be used as a custom node pool service account.
 - [ ] Configures the cluster for Workload Identity.
 - [ ] Creates a Google Cloud Storage bucket.
-- [ ] Creates a Vertex TensorBoard instanc
+- [ ] Creates a Vertex TensorBoard instance
 
 In the second stage, the [JobSet](https://github.com/kubernetes-sigs/jobset) and [Kueue](https://kueue.sigs.k8s.io/docs/concepts/cluster_queue/) custom resources are installed and Kueue is configured as described in the previous section. 
 
@@ -121,8 +119,6 @@ You also need a GCS bucket that will be used for managing Terraform state and ot
 - `storage.admin`
 - `artifactregistry.admin`
 - `aiplatform.user`
-
-To be able to use the automation service account, the account that will be used to run Terraform commands in the other deployment stages needs to have the `iam.serviceAccountTokenCreator` rights on the automation service account. 
 
 
 #### Configuring the prerequisites using the bootstrap Terraform 
@@ -168,14 +164,14 @@ git clone https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples.
 
 Change the current directory, to `ai-infrastructure/tpu-training-on-gke/environment`.
 
-#### Configure build parameters=
-If you used the `bootstrap` configuration to configure the prerequisites, copy the `providers\providers.tf` and `providers\backend.tf` files from the `providers` folder in your automation bucket to the `1-base_environment`. Modify the `backend.tf` by setting the `prefix` field to the name of a folder in the automation bucket where you want to store your Terraform configuration's state. For example, if you want to manage the Terraform state in the `tf_state/gke_tpu_training` subfolder of the automation bucket set the `prefix` field to `tf_state/gke_tpu_training`.
+#### Configure build parameters
+
+If you used the `bootstrap` configuration to configure the prerequisites, copy the `providers\providers.tf` and `providers\backend.tf` files from the `providers` folder in your automation bucket to the `1-base-environment` folder. Modify the `backend.tf` by setting the `prefix` field to the name of a folder in the automation bucket where you want to store your Terraform configuration's state. For example, if you want to manage the Terraform state in the `tf_state/gke_tpu_training` subfolder of the automation bucket set the `prefix` field to `tf_state/gke_tpu_training`.
 
 If the automation bucket and the automation service account were provided to you by your administrator, rename the `backend.tf.tmpl` and the `providers.tf.tmpl` files to `backend.tf` and `providers.tf` and update them with your settings.
 
 To configure the Terraform steps in the build, rename the `terraform.tfvars.tmpl` file the `1-base-infrastructure` folder to `terraform.tfvars`. Make modifications to the `terraform.tfvars` file to align it with your specific environment. At the very least, you should set the following variables:
 
-At a minimum, you need to configure the following settings:
 - `project_id` - your project ID
 - `region` - your region for a VPC and a GKE cluster
 - `prefix` - the prefix that will be added to the default names of resources provisioned by the configuration
@@ -214,7 +210,11 @@ When configuring TPU node pools, ensure that you set the TPU type to one of the 
 
 When you specify the TPU types as `v5litepod-1`, `v5litepod-4`, `v5litepod-8`, or `v4-8`, a [single-host node pool](https://cloud.google.com/kubernetes-engine/docs/concepts/tpus#node_pool) will be provisioned.  For other TPU types, a [multi-host TPU node pool](https://cloud.google.com/kubernetes-engine/docs/concepts/tpus#node_pool) is created. 
 
-When  `min_node_count` in the node pool configuration is smaller than `max_node_count` autoscaling is enabled. If `min_node_count` equals to `max_node_count` a fixed sized node pool is created.  For single-host node pools, the `min_node_count` and `max_node_count` fields, specify the minum number of nodes and the maximum number of nodes respectively. For multi-host node pools, the only supported combinations are `[min_node_count=0, max_node_count=1]` for autoscaling, or `[min_node_count=1, max_node_count=1]` for fixed size. When GKE scales a multi-host TPU slice node pool, it atomically scales up the node pool from zero to the maximum size. 
+When  `min_node_count` in the node pool configuration is smaller than `max_node_count` autoscaling is enabled. If `min_node_count` equals to `max_node_count` a fixed sized node pool is created.  
+
+For single-host node pools, the `min_node_count` and `max_node_count` fields, specify the minum number of nodes and the maximum number of nodes respectively. 
+
+For multi-host node pools, the only supported combinations are `[min_node_count=0, max_node_count=1]` for autoscaling, or `[min_node_count=1, max_node_count=1]` for fixed size. When GKE scales a multi-host TPU slice node pool, it atomically scales up the node pool from zero to the maximum size. 
 
 
 You also need to set a couple of parameters that configure the installation and configuration of **JobSet** and **Kueue** APIs.

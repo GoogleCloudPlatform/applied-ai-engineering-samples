@@ -134,5 +134,10 @@ resource "google_container_node_pool" "tpu_node_pools" {
       tpu_topology = each.value.tpu_topology
     }
   }
+
+  timeouts {
+    create = "120m"
+    update = "60m"
+  }
 }
 
