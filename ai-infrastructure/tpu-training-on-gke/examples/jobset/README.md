@@ -9,13 +9,6 @@ There are two set of examples in this folder showing how to configure and run tr
 
 The examples in this folder show how to configure and run JobSet workloads using Kustomize. The [`base_jobset`](base_jobset) folder contains the base JobSet configuration that is referenced in overlays in the `tpu_hello_world` and `maxtext` folders.
 
-> [!IMPORTANT]
-> Before running the examples, modify the [`base_jobset/jobset.yaml`](jobset/base_jobset/jobset.yaml) file to reflect the topology of TPU slices provisioned in your environment. 
-> For example, if you provisioned `v4-64` based node pools:
-> - Update the node selector settings in  `spec.replicatedJobs.template.spec.template.spec.nodeSelector` with `tpu-v4-podslice` and `2x4x4` values and 
-> - Update the `parallelism` and `completions` fields in the `spec.replicatedJobs.template.spec` with 4 - a v4-64 slice comprises 4 TPU VMs. 
-> You can refer to the [table](../../main/README.md#input-variables-in-the-terraform-configuration) in Terraform configuration for TPU slice configuration. 
-
 
 ## TPU Hello World examples
 
