@@ -15,11 +15,13 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: tpu-training
-
+namespace: kueue-namespace 
 
 resources:
 - cluster_queue.yaml
+- namespace.yaml
+- ksa.yaml
+- resource_flavor_v4-8.yaml
 - resource_flavor_v4-16.yaml
 - resource_flavor_v4-32.yaml
 - resource_flavor_v4-64.yaml
@@ -42,30 +44,46 @@ resources:
 - priority_class_low.yaml
 - priority_class_very_low.yaml
 
-configMapGenerator:
-- name: tpu-config
-  literals:
-  - NAME=v4-32
-  - NUM_OF_CHIPS=32 
 
 replacements:
 - source:
+    fieldPath: data.ksa_name
     kind: ConfigMap
-    name: tpu-config 
-    fieldPath: data.NAME
+    name: wid-config
   targets:
-    - select:
-        kind: ClusterQueue 
-        version: v1beta1
-      fieldPaths:
-        - spec.resourceGroups.0.flavors.0.name
+  - fieldPaths:
+    - metadata.name
+    select:
+      kind: ServiceAccount
+      version: v1
 - source:
+    fieldPath: data.gsa_email
     kind: ConfigMap
-    name: tpu-config 
-    fieldPath: data.NUM_OF_CHIPS
+    name: wid-config
   targets:
-    - select:
-        kind: ClusterQueue 
-        version: v1beta1
-      fieldPaths:
-        - spec.resourceGroups.0.flavors.0.resources.0.nominalQuota
+  - fieldPaths:
+    - metadata.annotations.[iam.gke.io/gcp-service-account]
+    select:
+      kind: ServiceAccount
+      version: v1
+- source:
+    fieldPath: data.cluster_queue
+    kind: ConfigMap
+    name: wid-config
+  targets:
+  - fieldPaths:
+    - metadata.name
+    select:
+      kind: ClusterQueue 
+      version: v1beta1
+  - fieldPaths:
+    - spec.clusterQueue
+    select:
+      kind: LocalQueue
+      version: v1beta1
+
+#configMapGenerator:
+#- literals:
+#  - ksa_name=ksa_name
+#  - gsa_email=ksa_name@project_id.iam.gserviceaccount.com
+#  name: wid-config

@@ -62,13 +62,17 @@ variable "node_pool_sa" {
 variable "wid_sa" {
   description = "The config for a workload identity service account"
   type = object({
-    name        = string
-    description = string
-    roles       = list(string)
+    name          = string
+    description   = string
+    roles         = list(string)
+    ksa_namespace = string
+    ksa_name      = string
   })
   default = {
-    name        = "gke-wid-sa"
-    description = "GKE Wid service account"
+    name          = "gke-wid-sa"
+    description   = "GKE Wid service account"
+    ksa_namespace = "tpu-training"
+    ksa_name      = "wid_sa"
     roles = [
       "storage.objectAdmin",
       "logging.logWriter",
@@ -117,10 +121,10 @@ variable "cpu_node_pools" {
   description = "Configurations for a CPU node pool"
   type = map(object({
     zones          = list(string)
-    min_node_count = number
-    max_node_count = number
-    machine_type   = string
-    disk_size_gb   = number
+    min_node_count = optional(number, 1)
+    max_node_count = optional(number, 3)
+    machine_type   = optional(string, "n1-standard-16")
+    disk_size_gb   = optional(number, 200)
     labels         = optional(map(string), {})
   }))
   nullable = false
@@ -129,13 +133,40 @@ variable "cpu_node_pools" {
 variable "tpu_node_pools" {
   description = "Configurations for a TPU node pools"
   type = map(object({
-    zones          = list(string)
-    min_node_count = number
-    max_node_count = number
-    tpu_type       = string
+    zones        = list(string)
+    tpu_type     = string
+    disk_size_gb = optional(number, 200)
+    autoscaling  = optional(bool, false)
   }))
+  validation {
+    condition = alltrue([
+      for tpu_type in [for name, node_pool in var.tpu_node_pools : node_pool.tpu_type] :
+      contains(
+        [
+          "v5litepod-16",
+          "v5litepod-32",
+          "v5litepod-64",
+          "v5litepod-128",
+          "v5litepod-256",
+          "v4-8",
+          "v4-16",
+          "v4-32",
+          "v4-64",
+          "v4-128",
+          "v4-256",
+          "v4-512",
+          "v4-1024",
+          "v4-1536",
+          "v4-2048",
+          "v4-4096"
+        ],
+        tpu_type
+    )])
+    error_message = "Unsupported TPU type"
+  }
   nullable = false
 }
+
 
 variable "vpc_config" {
   description = "VPC configuration"

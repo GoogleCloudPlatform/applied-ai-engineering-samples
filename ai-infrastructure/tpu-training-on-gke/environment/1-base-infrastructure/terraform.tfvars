@@ -19,11 +19,7 @@ deletion_protection = false
 
 cpu_node_pools = {
   cpu-node-pool = {
-    zones          = ["us-central2-a"]
-    min_node_count = 1
-    max_node_count = 3
-    machine_type   = "n1-standard-16"
-    disk_size_gb   = 200
+    zones = ["us-central2-a"]
     labels = {
       default-node-pool = true
     }
@@ -31,21 +27,14 @@ cpu_node_pools = {
 }
 
 tpu_node_pools = {
-  tpu-v4-16-node-pool-1 = {
-    zones          = ["us-central2-b"]
-    min_node_count = 1
-    max_node_count = 1
-    tpu_type       = "v4-16"
+  tpu-v4-8-node-pool-1 = {
+    zones    = ["us-central2-b"]
+    tpu_type = "v4-8"
   }
 
-  tpu-v4-16-node-pool-2 = {
-    zones          = ["us-central2-b"]
-    min_node_count = 1
-    max_node_count = 1
-    tpu_type       = "v4-16"
-  }
+  #  tpu-v4-16-node-pool-2 = {
+  #    zones    = ["us-central2-b"]
+  #    tpu_type = "v4-16"
+  #  }
 }
 
-tensorboard_config = {
-  region = "us-central1"
-}

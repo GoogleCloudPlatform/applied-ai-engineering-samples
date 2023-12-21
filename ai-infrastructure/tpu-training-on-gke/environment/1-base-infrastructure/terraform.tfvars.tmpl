@@ -12,28 +12,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-project_id = "your-project-id"
-region = "your-region"
-prefix = "your-prefix"
-tensorboard_region = "your-tensorboard-region"
-tensorboard_name = "your-tensorboard-name"
+project_id          = "your-project-id"
+region              = "us-central2-b"
+prefix              = "prefix"
 deletion_protection = true
+
 cpu_node_pools = {
-  your-cpu-node-pool-name = {
-    zones = ["your-zone-1"]
-    min_node_count = 1
-    max_node_count = 3
-    machine_type = "n1-standard-16"
-    disk_size_gb = 200
+  cpu-node-pool = {
+    zones = ["us-central2-a"]
     labels = {
       default-node-pool = true
     }
   }
 }
+
 tpu_node_pools = {
-  your-tpu-node-pool-name = {
-    zones = ["your_zone_1"]
-    min_node_count = 1
-    max_node_count = 1
+  tpu-v4-16-node-pool-1 = {
+    zones    = ["us-central2-b"]
     tpu_type = "v4-16"
+  }
+
+  tpu-v4-16-node-pool-2 = {
+    zones    = ["us-central2-b"]
+    tpu_type = "v4-16"
+  }
+}
+
+tensorboard_config = {
+  region = "us-central1"
 }

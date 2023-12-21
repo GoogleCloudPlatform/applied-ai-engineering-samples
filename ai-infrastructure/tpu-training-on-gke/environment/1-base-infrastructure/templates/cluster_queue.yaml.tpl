@@ -12,25 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-steps:
-  - id: log parameters 
-    name: hashicorp/terraform
-    entrypoint: sh 
-    args:
-      - -c
-      - |
-          echo DESTROY SETTINGS:
-          cat 1-base-infrastructure/terraform.tfvars
 
-  - id: 'tf init'
-    name: hashicorp/terraform
-    dir: 1-base-infrastructure
-    args: 
-    - init 
-
-  - id: 'tf destroy'
-    name: hashicorp/terraform
-    dir: 1-base-infrastructure
-    args: 
-    - destroy 
-    - -auto-approve 
+apiVersion: kueue.x-k8s.io/v1beta1
+kind: ClusterQueue
+metadata:
+  name: "${cluster_queue_name}"
+spec:
+  namespaceSelector: {} # match all.
+  resourceGroups:
+  - coveredResources: ["google.com/tpu"]
+    flavors:

@@ -80,6 +80,16 @@ locals {
     )
     : null
   )
+
+  tpu_node_pools = { for node_pool_name, node_pool in var.tpu_node_pools :
+    node_pool_name => {
+      tpu_type       = node_pool.tpu_type
+      disk_size_gb   = node_pool.disk_size_gb
+      zones          = node_pool.zones
+      max_node_count = 1
+      min_node_count = node_pool.autoscaling ? 0 : 1
+    }
+  }
 }
 
 module "base_environment" {
@@ -93,5 +103,5 @@ module "base_environment" {
   vpc_config          = local.vpc_config
   registry_config     = local.registry_config
   cpu_node_pools      = var.cpu_node_pools
-  tpu_node_pools      = var.tpu_node_pools
+  tpu_node_pools      = local.tpu_node_pools
 }

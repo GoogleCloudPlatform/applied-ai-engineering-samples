@@ -12,25 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-steps:
-  - id: log parameters 
-    name: hashicorp/terraform
-    entrypoint: sh 
-    args:
-      - -c
-      - |
-          echo DESTROY SETTINGS:
-          cat 1-base-infrastructure/terraform.tfvars
-
-  - id: 'tf init'
-    name: hashicorp/terraform
-    dir: 1-base-infrastructure
-    args: 
-    - init 
-
-  - id: 'tf destroy'
-    name: hashicorp/terraform
-    dir: 1-base-infrastructure
-    args: 
-    - destroy 
-    - -auto-approve 
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tpu-training 

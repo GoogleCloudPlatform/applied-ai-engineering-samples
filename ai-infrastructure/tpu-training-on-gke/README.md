@@ -178,7 +178,7 @@ To configure the Terraform steps in the build, rename the `terraform.tfvars.tmpl
 - `tensorboard_region` - the region of a TensorBoard instance
 - `tensorboard_name` - the name of your TensorbBoard instance. The prefix is not added to the TensorBoard name.
 - `cpu_node_pools` - The `terraform.tfvars.tmpl` template provides an example configuration for a single autoscaling node pool.  
-- `tpu_node_pools` - The  template shows an example configuration for a single TPU node pool with one v4-16 pod slice. Modify the `tpu_node_pools` variable to provision different TPU node pool configurations, as described below.
+- `tpu_node_pools` - The  template shows an example configuration for two TPU node pools with  v4-16 pod slices. Modify the `tpu_node_pools` variable to provision different TPU node pool configurations, as described below.
 
 If you wish to modify other default settings, such as the default name suffixes for a cluster or GCS bucket names, you can override the defaults specified in the `variables.tf` file within your `terraform.tfvars` file.
 
@@ -187,9 +187,6 @@ When configuring TPU node pools, ensure that you set the TPU type to one of the 
 
 | TPU type name | Slice type | Slice topology | TPU VM type | Number of VMs in a slice | Number of chips in a VM |
 | ------------- | -----------|----------------|-------------|--------------------------| ------------------------|
-| v5litepod-1 | tpu-v5-lite-podslice | 1x1 | ct5lp-hightpu-1t | 1 | 1 |
-| v5litepod-4 | tpu-v5-lite-podslice | 2x2 | ct5lp-hightpu-4t | 1 | 4 |
-| v5litepod-8  | tpu-v5-lite-podslice | 2x4 | ct5lp-hightpu-8t | 1 | 8 |
 | v5litepod-16 | tpu-v5-lite-podslice | 4x4 | ct5lp-hightpu-4t | 4 | 4 |
 | v5litepod-32 | tpu-v5-lite-podslice | 4x8 | ct5lp-hightpu-4t | 8 | 4 |
 | v5litepod-64 | tpu-v5-lite-podslice | 8x8 | ct5lp-hightpu-4t | 16 | 4 |
@@ -206,15 +203,6 @@ When configuring TPU node pools, ensure that you set the TPU type to one of the 
 | v4-1536| tpu-v4-podslice | 8x8x12 | ct4p-hightpu-4t | 192 | 4 |
 | v4-2048| tpu-v4-podslice | 8x8x16 | ct4p-hightpu-4t | 256 | 4 |
 | v4-4096| tpu-v4-podslice | 8x16x16 | ct4p-hightpu-4t | 512 | 4 |
-
-
-When you specify the TPU types as `v5litepod-1`, `v5litepod-4`, `v5litepod-8`, or `v4-8`, a [single-host node pool](https://cloud.google.com/kubernetes-engine/docs/concepts/tpus#node_pool) will be provisioned.  For other TPU types, a [multi-host TPU node pool](https://cloud.google.com/kubernetes-engine/docs/concepts/tpus#node_pool) is created. 
-
-When  `min_node_count` in the node pool configuration is smaller than `max_node_count` autoscaling is enabled. If `min_node_count` equals to `max_node_count` a fixed sized node pool is created.  
-
-For single-host node pools, the `min_node_count` and `max_node_count` fields, specify the minum number of nodes and the maximum number of nodes respectively. 
-
-For multi-host node pools, the only supported combinations are `[min_node_count=0, max_node_count=1]` for autoscaling, or `[min_node_count=1, max_node_count=1]` for fixed size. When GKE scales a multi-host TPU slice node pool, it atomically scales up the node pool from zero to the maximum size. 
 
 
 You also need to set a couple of parameters that configure the installation and configuration of **JobSet** and **Kueue** APIs.
@@ -267,4 +255,13 @@ gcloud builds submit \
   --config cloudbuild.destroy.yaml \
   --timeout "2h" \
   --machine-type=e2-highcpu-32 
+```
+
+
+## Scratchpad
+
+```
+kustomize edit set namespace tpu-training-1
+
+kustomize edit set configmap wid-config --from-literal=ksa_name=wid_sa_1 --from-literal=gsa_email=wid_sa_1@jk-mlops-dev.iam.gserviceaccount.com
 ```
