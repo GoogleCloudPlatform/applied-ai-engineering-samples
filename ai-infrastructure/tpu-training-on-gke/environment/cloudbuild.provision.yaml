@@ -87,11 +87,14 @@ steps:
     args:
       - -c
       - |
+        ### Install new version of Kustomize
+        curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
+
         set -o  allexport; source ../1-base-infrastructure/params.env; set +o allexport
         cp ../1-base-infrastructure/templates/cluster_queue.yaml . 
-        kustomize edit set namespace $$KSA_NAMESPACE 
-        kustomize edit remove configmap tpu-config
-        kustomize edit add configmap wid-config --from-literal=ksa_name=$$KSA_NAME --from-literal=gsa_email=$$GSA_EMAIL --from-literal=cluster_queue=$_CLUSTER_QUEUE_NAME
+        ./kustomize edit set namespace $$KSA_NAMESPACE 
+        ./kustomize edit remove configmap wid-config
+        ./kustomize edit add configmap wid-config --from-literal=ksa_name=$$KSA_NAME --from-literal=gsa_email=$$GSA_EMAIL --from-literal=cluster_queue=$_CLUSTER_QUEUE_NAME
 
         max_attempts=5
         attempt_num=1
@@ -99,7 +102,7 @@ steps:
 
         while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
           echo Sleep for a few seconds to avoid timeouts from Kueue
-          sleep 10
+          sleep 45 
           echo Attempting deployment of Kueue CRDs
           kubectl apply -k .
           if [ $? -eq 0 ]; then
@@ -111,12 +114,7 @@ steps:
           fi
         done
 
-
-
-
- 
-
 substitutions:
   _JOBSET_API_VERSION: v0.3.0
   _KUEUE_API_VERSION: v0.5.1
-  _CLUSTER_QUEUE_NAME: cluster-queue-1
+  _CLUSTER_QUEUE_NAME: cluster-queue

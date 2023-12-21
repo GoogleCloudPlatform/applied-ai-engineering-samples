@@ -72,7 +72,7 @@ variable "wid_sa" {
     name          = "gke-wid-sa"
     description   = "GKE Wid service account"
     ksa_namespace = "tpu-training"
-    ksa_name      = "wid_sa"
+    ksa_name      = "wid-sa"
     roles = [
       "storage.objectAdmin",
       "logging.logWriter",
@@ -121,7 +121,7 @@ variable "cpu_node_pools" {
   description = "Configurations for a CPU node pool"
   type = map(object({
     zones          = list(string)
-    min_node_count = optional(number, 1)
+    min_node_count = optional(number, 3)
     max_node_count = optional(number, 3)
     machine_type   = optional(string, "n1-standard-16")
     disk_size_gb   = optional(number, 200)

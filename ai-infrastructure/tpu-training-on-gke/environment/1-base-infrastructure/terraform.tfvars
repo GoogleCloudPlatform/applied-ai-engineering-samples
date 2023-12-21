@@ -27,14 +27,14 @@ cpu_node_pools = {
 }
 
 tpu_node_pools = {
-  tpu-v4-8-node-pool-1 = {
+  tpu-v4-16-node-pool-1 = {
     zones    = ["us-central2-b"]
-    tpu_type = "v4-8"
+    tpu_type = "v4-16"
   }
 
-  #  tpu-v4-16-node-pool-2 = {
-  #    zones    = ["us-central2-b"]
-  #    tpu_type = "v4-16"
-  #  }
+  tpu-v4-16-node-pool-2 = {
+    zones    = ["us-central2-b"]
+    tpu_type = "v4-16"
+  }
 }
 
