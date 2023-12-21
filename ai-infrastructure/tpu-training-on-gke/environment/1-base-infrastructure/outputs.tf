@@ -79,4 +79,11 @@ output "wid_gsa_email" {
   value = module.wid_service_account.email
 }
 
+output "gcs_buckets" {
+  value = module.base_environment.gcs_buckets
+}
 
+output "artifact_registry_image_path" {
+  description = "The URI of an Artifact Registry if created"
+  value       = try(module.base_environment.artifact_registry_image_path, null)
+}

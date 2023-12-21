@@ -8,53 +8,35 @@ The examples are all based on the [MaxText](https://github.com/google/maxtext/tr
 
 ## Prerequisites for running examples
 
-### Building Training Container Image
+### Build container images
 Before you can run the examples, you need to package MaxText in a training container image. You also need to build auxiliary images used in some examples, including a container image that packages the [TensorBoard uploader](https://cloud.google.com/vertex-ai/docs/experiments/tensorboard-overview#upload-tb-logs) and to copy the datasets required by the samples to your Cloud Storage data and artifact repository. We have automated this process with Cloud Build. 
 
-Modify the settings in [`examples.env`](examples.env) file to reflect your environment and submit the build:
-
-- `DATASETS_URI` - the location in Cloud Storage bucket where datasets are downloaded
-- `MAX_TEXT_IMAGE_NAME` - the name of the container image packaging MaxText (MaxText scripts uploads container image to Container Registry in the project configured)
-- `TB_UPLOADER_IMAGE_URI` - the full URI of the container image in Artifact Registry packaging TensorBoard uploader
-
-NOTE: Ensure you are working from `examples` directory
+NOTE: Ensure you are working from  the `examples` directory
 
 ```bash
-export REPO_ROOT_DIR=$(git rev-parse --show-toplevel)
-pushd ${REPO_ROOT_DIR}/examples
-source ${REPO_ROOT_DIR}/env_setup/vars.env
-source ${REPO_ROOT_DIR}/examples/examples.env
+export PROJECT_ID=<PROJECT_ID>
+export ARTIFACT_BUCKET=gs://<ARTIFACT_BUCKET>
+export ARTIFACT_REGISTRY_PATH=<ARTIFACT_REGISTRY_PATH>
 
 gcloud builds submit \
   --project $PROJECT_ID \
   --config build-images-datasets.yaml \
-  --substitutions _MAXTEXT_IMAGE_NAME=$MAX_TEXT_IMAGE_NAME,_TB_UPLOADER_IMAGE_URI=$TB_UPLOADER_IMAGE_URI,_DATASETS_URI=$DATASETS_URI \
+  --substitutions _ARTIFACT_BUCKET=$ARTIFACT_BUCKET,_ARTIFACT_REGISTRY_PATH=$ARTIFACT_REGISTRY_PATH \
   --machine-type=e2-highcpu-32 \
   --quiet
 ```
 
+Replace the following values:
+- `<PROJECT_ID>` - your project ID.
+- `<ARTIFACT_BUCKET>` - the name of the Google Cloud Storage (GCS) bucket where you want to manage training artifacts like datasets and checkpoints. 
+- `<ARTIFACT_REGISTRY_PATH>` - the path to the Artifact Registry that you intend to use for pushing Maxtext and TensorBoard container images.
 
-### Setting up development environment
+### Set up your development environment
 
-Run the following steps in your development environment (e.g. Cloud Shell) before running the commands:
-
-- To submit workloads to the cluster you need to create cluster credentials.
-
-```
-gcloud container clusters get-credentials $CLUSTER_NAME --region $REGION
-```
-
-> [!NOTE]
-> You may be prompted to to install the `gke-gcloud-auth-plugin` binary to use kubectl with the cluser. Run `gcloud components install gke-gcloud-auth-plugin` to install the plugin.
+Before you can run the examples, it's necessary to install the latest versions of [Kustomize](https://kustomize.io/) and [xpk](https://github.com/google/xpk) on your development workstation.
 
 
-- To install Kustomize, please follow the instructions in the [Kustomize documentation](https://kubectl.docs.kubernetes.io/installation/kustomize/). If you running from Cloud Shell, you can run the following commands to install Kustomize by downloading precompiled binaries.:
-
-```bash
-USER_HOME=$(bash -c "cd ~$(printf %q $USER) && pwd")
-curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash -s -- ${USER_HOME}
-export PATH="${USER_HOME}:${PATH}"
-```
+- To install Kustomize, please follow the instructions in the [Kustomize documentation](https://kubectl.docs.kubernetes.io/installation/kustomize/binaries/). `
 
 - **xpk** is implemented as a [Python script](https://github.com/google/xpk/blob/main/xpk.py) and distributed through the [xpk repo](https://github.com/google/xpk). To access **xpk** you can either clone the whole repo or download the `xpk.py` module.
 
@@ -66,6 +48,16 @@ chmod +x ${USER_HOME}/xpk.py
 export PYTHONPATH="$USER_HOME:$PYTHON_PATH"
 ```
 
+You also need to set credentials to your GKE cluster.
+```
+gcloud container clusters get-credentials <CLUSTER_NAME> --region <CLUSTER_REGION>
+```
+
+Replace `<CLUSTER_NAME>` and `<CLUSTER_REGION>` to match your environment.
+
+
+> [!NOTE]
+> You may be prompted to to install the `gke-gcloud-auth-plugin` binary to use kubectl with the cluser. Run `gcloud components install gke-gcloud-auth-plugin` to install the plugin.
 
 ## Running examples
 

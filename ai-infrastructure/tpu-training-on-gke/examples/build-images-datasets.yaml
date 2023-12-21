@@ -30,7 +30,7 @@ steps:
       - |
           ./download_dataset.sh $PROJECT_ID $_DATASETS_URI 
 
-  - id: build and upload Maxtext image 
+  - id: build the Maxtext image 
     name: google/cloud-sdk:latest
     entrypoint: /bin/bash
     args: 
@@ -39,8 +39,8 @@ steps:
           cd /workspace/maxtext
           chmod 755 docker_build_dependency_image.sh
           ./docker_build_dependency_image.sh MODE=stable
-          chmod 755 docker_upload_runner.sh
-          ./docker_upload_runner.sh CLOUD_IMAGE_NAME=$_MAXTEXT_IMAGE_NAME
+          docker build --build-arg BASEIMAGE=maxtext_base_image -f ./maxtext_runner.Dockerfile -t ${_MAXTEXT_IMAGE_URI} .
+          
 
   - id: build the Tensorboard uploader image
     name: google/cloud-sdk:latest
@@ -51,7 +51,18 @@ steps:
         docker build -t $_TB_UPLOADER_IMAGE_URI -f Dockerfile.tensorboard .
 
 images:
-  - $_TB_UPLOADER_IMAGE_URI:latest
+  - $_TB_UPLOADER_IMAGE_URI
+  - $_MAXTEXT_IMAGE_URI
+
+substitutions:
+  _TB_UPLOADER_IMAGE_NAME: 'tb-uploader'
+  _TB_UPLOADER_IMAGE_TAG: 'latest'
+  _TB_UPLOADER_IMAGE_URI: '${_ARTIFACT_REGISTRY_PATH}/${_TB_UPLOADER_IMAGE_NAME}:${_TB_UPLOADER_IMAGE_TAG}'
+  _MAXTEXT_IMAGE_NAME: 'maxtext-runner'
+  _MAXTEXT_IMAGE_TAG: 'latest'
+  _MAXTEXT_IMAGE_URI: '${_ARTIFACT_REGISTRY_PATH}/${_MAXTEXT_IMAGE_NAME}:${_MAXTEXT_IMAGE_TAG}' 
+  _DATASETS_FOLDER: 'datasets'
+  _DATASETS_URI: '${_ARTIFACT_BUCKET}/${_DATASETS_FOLDER}'
 
 options:
   dynamic_substitutions: true
