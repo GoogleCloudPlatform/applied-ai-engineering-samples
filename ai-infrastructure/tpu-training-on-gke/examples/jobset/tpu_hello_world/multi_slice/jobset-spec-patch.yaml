@@ -26,11 +26,14 @@ spec:
           spec:
             containers:
             - name: tpu-job 
+              envFrom:
+              - configMapRef:
+                  name: hello-world-parameters
               command:
               - python3 
               - pedagogical_examples/shardings.py
-              - --dcn_data_parallelism=2
-              - --ici_fsdp_parallelism=16
+              - --dcn_data_parallelism=$(NUM_SLICES)
+              - --ici_fsdp_parallelism=$(ICI_PARALLELISM)
               - --batch_size=131072
               - --embedding_dimension=2048
 

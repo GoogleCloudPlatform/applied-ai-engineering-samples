@@ -235,7 +235,7 @@ To track the progress of the build, you can either follow the link displayed in 
 
 The [`examples`](examples/) folder contains code samples that demonstrate how to configure, submit and manage a number of different training workloads.
 
-> Refer to the [README](examples/README.md) in `examples` folder for detailed instructions.
+> Refer to the [README](examples/README.md) in the `examples` folder for detailed instructions.
 
 ## Cleanup Environment 
 

@@ -36,17 +36,9 @@ Replace the following values:
 Before you can run the examples, it's necessary to install the latest versions of [Kustomize](https://kustomize.io/) and [xpk](https://github.com/google/xpk) on your development workstation.
 
 
-- To install Kustomize, please follow the instructions in the [Kustomize documentation](https://kubectl.docs.kubernetes.io/installation/kustomize/binaries/). `
+- To install Kustomize, please follow the instructions in the [Kustomize documentation](https://kubectl.docs.kubernetes.io/installation/kustomize/binaries/). 
 
 - **xpk** is implemented as a [Python script](https://github.com/google/xpk/blob/main/xpk.py) and distributed through the [xpk repo](https://github.com/google/xpk). To access **xpk** you can either clone the whole repo or download the `xpk.py` module.
-
-
-```bash
-USER_HOME=$(bash -c "cd ~$(printf %q $USER) && pwd")
-curl -s "https://raw.githubusercontent.com/google/xpk/main/xpk.py" --output ${USER_HOME}/xpk.py
-chmod +x ${USER_HOME}/xpk.py
-export PYTHONPATH="$USER_HOME:$PYTHON_PATH"
-```
 
 You also need to set credentials to your GKE cluster.
 ```
