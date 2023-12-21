@@ -235,12 +235,7 @@ To track the progress of the build, you can either follow the link displayed in 
 
 The [`examples`](examples/) folder contains code samples that demonstrate how to configure, submit and manage a number of different training workloads.
 
-- [Examples (`examples/`)](examples/README.md) demonstrates two approaches to orchestrate large-scale distributed training workloads on GKE using JobSet and **`xpk`**
-  - [JobSet (`examples/jobset`)](examples/jobset/README.md) shows configuring and running training workloads with **JobSet** and **Kueue** APIs using **Kustomize**.
-  - [xpk (`examples/xpk`)](examples/xpk/README.md) (Accelerated Processing Kit) shows examples of configuring and running training workloads using **xpk** for same as with JobSet APIs. 
-
-> [!IMPORTANT]
-> Refer to the [README](main/examples/README.md) in `examples` folder for detailed instructions.
+> Refer to the [README](examples/README.md) in `examples` folder for detailed instructions.
 
 ## Cleanup Environment 
 
