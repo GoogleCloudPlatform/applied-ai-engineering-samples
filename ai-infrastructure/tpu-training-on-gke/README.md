@@ -76,6 +76,7 @@ In the first stage a Terraform configuration is applied, which:
 - [ ] Configures the cluster for Workload Identity.
 - [ ] Creates a Google Cloud Storage bucket.
 - [ ] Creates a Vertex TensorBoard instance
+- [ ] Creates an Artifact Registry
 
 In the second stage, the [JobSet](https://github.com/kubernetes-sigs/jobset) and [Kueue](https://kueue.sigs.k8s.io/docs/concepts/cluster_queue/) custom resources are installed and Kueue is configured as described in the previous section. 
 
@@ -131,7 +132,7 @@ The prerequisites may need to be configured by your GCP organization administrat
 4. Modify the `terraform.tfvars` file to reflect your environment
   - Set `project_id` to your project ID
   - Set `automation_bucket` to the name of a bucket you want to create in your project
-  - Set `location` to your location
+  - Set `location` to a location where you want to create the automation bucket
   - Set `automation_sa_name` to the automation service account name in your environment
 5. Execute the `terraform init` command
 6. Execute the `terraform apply` command
@@ -170,13 +171,12 @@ If you used the `bootstrap` configuration to configure the prerequisites, copy t
 
 If the automation bucket and the automation service account were provided to you by your administrator, rename the `backend.tf.tmpl` and the `providers.tf.tmpl` files to `backend.tf` and `providers.tf` and update them with your settings.
 
-To configure the Terraform steps in the build, rename the `terraform.tfvars.tmpl` file the `1-base-infrastructure` folder to `terraform.tfvars`. Make modifications to the `terraform.tfvars` file to align it with your specific environment. At the very least, you should set the following variables:
+To configure the Terraform steps in the build, rename the `terraform.tfvars.tmpl` file in the `1-base-infrastructure` folder to `terraform.tfvars`. Make modifications to the `terraform.tfvars` file to align it with your specific environment. At the very least, you should set the following variables:
 
 - `project_id` - your project ID
 - `region` - your region for a VPC and a GKE cluster
 - `prefix` - the prefix that will be added to the default names of resources provisioned by the configuration
-- `tensorboard_region` - the region of a TensorBoard instance
-- `tensorboard_name` - the name of your TensorbBoard instance. The prefix is not added to the TensorBoard name.
+- `tensorboard_config.region` - the region of a TensorBoard instance
 - `cpu_node_pools` - The `terraform.tfvars.tmpl` template provides an example configuration for a single autoscaling node pool.  
 - `tpu_node_pools` - The  template shows an example configuration for two TPU node pools with  v4-16 pod slices. Modify the `tpu_node_pools` variable to provision different TPU node pool configurations, as described below.
 
@@ -205,11 +205,11 @@ When configuring TPU node pools, ensure that you set the TPU type to one of the 
 | v4-4096| tpu-v4-podslice | 8x16x16 | ct4p-hightpu-4t | 512 | 4 |
 
 
-You also need to set a couple of parameters that configure the installation and configuration of **JobSet** and **Kueue** APIs.
+You also need to set a couple of parameters that configure the installation and configuration of the **JobSet** and **Kueue** APIs.
 
 These parameters are passed to Cloud Build through [Cloud Build substitutions](https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values). 
 
-- `JOBSET_API_VERSION` - the version of the [JobSet API](https://github.com/kubernetes-sigs/jobset/releases))to install. The examples in this repo have been tested with `v0.3.0`
+- `JOBSET_API_VERSION` - the version of the [JobSet API](https://github.com/kubernetes-sigs/jobset/releases) to install. The examples in this repo have been tested with `v0.3.0`
 - `KUEUE_API_VERSION` - the version of the [Kueue API](https://github.com/kubernetes-sigs/kueue/releases) to install. The examples have been test with `v0.5.1`
 
 
@@ -235,12 +235,8 @@ To track the progress of the build, you can either follow the link displayed in 
 
 The [`examples`](examples/) folder contains code samples that demonstrate how to configure, submit and manage a number of different training workloads.
 
-- [Provision infrastructure](#provision-infrastructure)
-- [Setup prerequisites for running examples](examples/README.md#prerequisites-for-running-examples)
 - [Examples (`examples/`)](examples/README.md) demonstrates two approaches to orchestrate large-scale distributed training workloads on GKE using JobSet and **`xpk`**
   - [JobSet (`examples/jobset`)](examples/jobset/README.md) shows configuring and running training workloads with **JobSet** and **Kueue** APIs using **Kustomize**.
-    - [TPU Hello World (`examples/jobset/tpu_hello_world`)](examples/jobset/README.md#example-1-tpu-hello-world-examples) shows examples of experimenting with different data and model parallelism strategies with in single slice and multislice TPU configurations.
-    - [MaxText (`examples/jobset/maxtext`)](examples/jobset/README.md#example-2-maxtext-pre-training-examples) shows examples of pre-training a MaxText 6.5B parameter model in both single slice and multislice TPU configurations.
   - [xpk (`examples/xpk`)](examples/xpk/README.md) (Accelerated Processing Kit) shows examples of configuring and running training workloads using **xpk** for same as with JobSet APIs. 
 
 > [!IMPORTANT]
@@ -258,10 +254,3 @@ gcloud builds submit \
 ```
 
 
-## Scratchpad
-
-```
-kustomize edit set namespace tpu-training-1
-
-kustomize edit set configmap wid-config --from-literal=ksa_name=wid_sa_1 --from-literal=gsa_email=wid_sa_1@jk-mlops-dev.iam.gserviceaccount.com
-```

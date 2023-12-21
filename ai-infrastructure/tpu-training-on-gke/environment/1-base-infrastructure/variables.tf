@@ -122,7 +122,7 @@ variable "cpu_node_pools" {
   type = map(object({
     zones          = list(string)
     min_node_count = optional(number, 3)
-    max_node_count = optional(number, 3)
+    max_node_count = optional(number, 5)
     machine_type   = optional(string, "n1-standard-16")
     disk_size_gb   = optional(number, 200)
     labels         = optional(map(string), {})
