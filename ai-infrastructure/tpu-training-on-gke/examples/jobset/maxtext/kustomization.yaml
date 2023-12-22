@@ -89,13 +89,3 @@ replacements:
       kind: JobSet
       version: v1alpha2
 
-configMapGenerator:
-- envs:
-  - parameters.env
-  name: maxtext-parameters
-nameSuffix: -single-slice-102
-namespace: tpu-training
-images:
-- name: maxtext-runner-image
-  newName: us-docker.pkg.dev/jk-mlops-dev/jk2-training-images/maxtext-runner
-  newTag: latest

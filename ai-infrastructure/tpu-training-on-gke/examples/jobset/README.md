@@ -10,13 +10,14 @@ We utilize [Kustomize](https://kubernetes.io/docs/tasks/manage-kubernetes-object
 The [base_jobset](base_jobset) folder houses a [Kustomize base](https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/#bases-and-overlays) for JobSet configurations. The [tpu_hello_world](tpu_hello_world/) and [maxtext](maxtext/) folders contain [Kustomize overlays](https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/#bases-and-overlays) that adapt the base configuration for use with the TPU Hello World and MaxText examples, respectively.
 
 > [!IMPORTANT] 
-> When configuring the examples, you will need to substitute the placeholders with values that match your specific environment. This includes the name of the Kubernetes namespace, the Kubernetes service account for use with the Workload Identity, the Artifact Registry path, and the name of a Google Cloud Storage (GCS) bucket. Keep in mind that unless you modified the defaults during the environment setup, these resources were created with the following names.
+> When configuring the examples, you will need to substitute the placeholders with values that match your specific environment. This includes the name of the Kubernetes namespace, the Kubernetes service account for use with the Workload Identity, the Artifact Registry path, the name of a Google Cloud Storage (GCS) bucket, and the full path of a TensorBoard instance. Bear in mind that, unless you made changes to the defaults during the environment setup or if you didn't utilize the automated setup, these resources were created with the following names.
+
 
 > - Kubernetes namespace - `tpu-training`
 > - Artifact Registry - `us-docker.pkg.dev/<YOUR_PROJECT_ID>/<YOUR_PREFIX>-training-images`
 > - Cloud Storage bucket - `<YOUR_PREFIX>-artifact-repository` 
 > - Kubernetes service account  - `wid-sa`
-
+> - TensorBoard instance full name - The format should be - `projects/<PROJECT_NUMBER>/locations/<TENSORBOARD_REGION>/tensorboard/<TENSORBOARD_ID>`. If you provisioned your environment using the automated setup, you can retrieve the TensorBoard name from the Terraform state, using the `terraform output tensorboard_id` command. You can also get the `<TENSORBOARD_ID>` from [Vertex Experiments](https://console.cloud.google.com/vertex-ai/experiments/experiments) on the TensorBoard instances tab. The default display name for the TensorBoard instance created during the setup is `TPU Training`. 
 
 
 ## TPU Hello World 
@@ -216,7 +217,7 @@ Replace the following values:
 - `<BASE_OUTPUT_DIRECTORY>` with the Cloud Storage location for checkpoints and logs. You can use the bucket created during the setup. 
 - `<DATASET_PATH>` with the Cloud Storage location of the C4 dataset. Specify the Cloud Storage location of the C4 dataset, excluding the `c4` folder name in the path. As part of the setup for the examples' prerequisites, the C4 dataset is copied to the `gs://<ARTIFACT_BUCKET>/datasets/c4` location.
 - `<RUN_NAME>` with the MaxText run name. MaxText will use this value to name the folders for checkpoints and TensorBoard logs in the `<BASE_OUTPUT_DIRECTORY>`. If you want to restart from a previously set checkpoint set this to the run name used for the previous run. Although not required it may be convenient to use the same name as the `<NAME_SUFFIX>`.
-- `<TENSORBOARD_NAME>` with the fully qualified name of the TensorBoardr instance to use for a training run tracking. The format should be - `projects/<PROJECT_NUMBER>/locations/<TENSORBOARD_REGION>/tensorboard/<TENSORBOARD_ID>`. If you provisioned your environment using the automated setup, you can retrieve the TensorBoard name from the Terraform state, using the `terraform output tensorboard_id` command.
+- `<TENSORBOARD_NAME>` with the fully qualified name of the TensorBoardr instance to use for a training run tracking. 
 - `<WID_KSA>` with the name of Kubernetes service account to use for the Workload Identity. 
 - `<ARGS>` with any additional parameters you want to pass to the MaxText trainer. Refer to the below notes and the [MaxText documentation](https://github.com/google/maxtext/blob/main/MaxText/configs/base.yml) for more info.
 - `<LIBTPU_INIT_ARGS>` with `libtpu` and XLA compiler settings. Refer to the below notes and the [MaxText documentation](https://github.com/google/maxtext/tree/main) for more info
