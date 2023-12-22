@@ -175,7 +175,7 @@ Set the Maxtext container image:
 kustomize edit set image maxtext-runner-image=<ARTIFACT_REGISTRY_PATH>/maxtext-runner:latest
 ```
 
-Replace `<ARTIFACT_REGISTRY_PATH>` with the path to your Artifact Registry. Keep in mind that the default path, as established during the setup process, is `us-docker.pkg.dev/<YOUR_PROJECT_ID>/<YOUR_PREFIX>-training-images`. If you made any modifications to these defaults, please make the necessary updates to the patch accordingly.
+Replace `<ARTIFACT_REGISTRY_PATH>` with the path to your Artifact Registry. 
 
 
 Set the job ID suffix: 
