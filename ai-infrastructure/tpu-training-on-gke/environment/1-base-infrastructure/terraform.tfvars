@@ -38,3 +38,6 @@ tpu_node_pools = {
   }
 }
 
+tensorboard_config = {
+  region = "us-central1"
+}

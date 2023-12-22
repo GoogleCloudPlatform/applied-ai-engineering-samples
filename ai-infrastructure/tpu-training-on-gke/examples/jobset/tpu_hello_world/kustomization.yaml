@@ -12,15 +12,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
 
-apiVersion: kustomize.config.k8s.io/v1alpha1
-kind: Component
+
+resources:
+- ../base_jobset
+ 
+patches:
+- options:
+    allowNameChange: true
+  path: jobset-spec-patch.yaml
+  target:
+    kind: JobSet
+namespace: tpu-training
+images:
+- name: python
+  newName: us-docker.pkg.dev/jk-mlops-dev/jk2-training-images/maxtext-runner
+  newTag: latest
 
 replacements:
 - source:
     fieldPath: data.TPU_TOPOLOGY
     kind: ConfigMap
-    name: maxtext-parameters
+    name: hello-world-parameters
   targets:
   - fieldPaths:
     - spec.replicatedJobs.0.template.spec.template.spec.nodeSelector.[cloud.google.com/gke-tpu-topology]
@@ -30,7 +45,7 @@ replacements:
 - source:
     fieldPath: data.TPU_SLICE_TYPE
     kind: ConfigMap
-    name: maxtext-parameters
+    name: hello-world-parameters
   targets:
   - fieldPaths:
     - spec.replicatedJobs.0.template.spec.template.spec.nodeSelector.[cloud.google.com/gke-tpu-accelerator]
@@ -40,7 +55,7 @@ replacements:
 - source:
     fieldPath: data.LOCAL_QUEUE
     kind: ConfigMap
-    name: maxtext-parameters
+    name: hello-world-parameters
   targets:
   - fieldPaths:
     - metadata.labels.[kueue.x-k8s.io/queue-name]
@@ -50,7 +65,7 @@ replacements:
 - source:
     fieldPath: data.JOB_PARALLELISM
     kind: ConfigMap
-    name: maxtext-parameters
+    name: hello-world-parameters
   targets:
   - fieldPaths:
     - spec.replicatedJobs.0.template.spec.parallelism
@@ -61,10 +76,16 @@ replacements:
 - source:
     fieldPath: data.NUM_SLICES
     kind: ConfigMap
-    name: maxtext-parameters
+    name: hello-world-parameters
   targets:
   - fieldPaths:
-    - spec.replicatedJobs.[name=slice].replicas
+    - spec.replicatedJobs.0.replicas
     select:
       kind: JobSet
       version: v1alpha2
+
+configMapGenerator:
+- envs:
+  - parameters.env
+  name: hello-world-parameters
+nameSuffix: "-101"
