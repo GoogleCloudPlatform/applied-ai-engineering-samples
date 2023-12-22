@@ -228,7 +228,7 @@ The necessary parameters are configured through the `RUN_NAME`, `BASE_OUTPUT_DIR
 
 For both single slice and multi-slice job types, you can use the `ARGS` field to adjust training regimen parameters, including training steps, batch size, ICI (Inter-Chunk Interaction) settings, DCN (Deep Cascade Network) parallelization settings, and parameters governing the model architecture.
 
-We've included example settings for a pretraining task for a ~6.5 billion parameter model on TPU v4-32 pods. These settings have undergone thorough testing to ensure high model flops utilization (MFU). We also encourage you to experiment with your own settings.
+We've included example settings for a pretraining task for a ~6.5 billion parameter model on TPU v4-16 pods. These settings have undergone thorough testing to ensure high model flops utilization (MFU). We also encourage you to experiment with your own settings.
 
 The example settings for a single slice training job are found in the `parameters.env.single_slice_6B` file, while the example settings for a multi-slice training job are provided in the `parameters.env.multi_slice_6B` file.
 
