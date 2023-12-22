@@ -43,9 +43,11 @@ spec:
         template:
           spec:
             serviceAccountName: cloud-tpu-sa
+            nodeSelector:
+              iam.gke.io/gke-metadata-server-enabled: "true"
             containers:
             - name: tb-uploader 
-              image: tb-uploader-image
+              image: us-docker.pkg.dev/vertex-ai/tensorboard/uploader
               command:
               - tb-gcp-uploader
               args:

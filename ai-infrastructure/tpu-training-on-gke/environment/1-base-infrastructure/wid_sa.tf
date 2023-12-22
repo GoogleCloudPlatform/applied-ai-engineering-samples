@@ -15,7 +15,7 @@
 
 locals {
   gcp_sa_static_id        = "projects/${var.project_id}/serviceAccounts/${module.wid_service_account.email}"
-  k8s_sa_gcp_derived_name = "serviceAccount:${var.project_id}.svc.id.goog[${var.wid_sa.ksa_namespace}/${var.wid_sa.name}]"
+  k8s_sa_gcp_derived_name = "serviceAccount:${var.project_id}.svc.id.goog[${var.wid_sa.ksa_namespace}/${var.wid_sa.ksa_name}]"
 }
 
 module "wid_service_account" {

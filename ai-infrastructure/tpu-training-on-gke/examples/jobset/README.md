@@ -130,19 +130,22 @@ kubectl delete -k .
 
 The [`maxtext`](maxtext/) folder contains examples of pre-training a MaxText 6.5 billion parameters model on the [English C4 dataset](https://www.tensorflow.org/datasets/catalog/c4#c4en_default_config).
 
-The [`maxtext/base_maxtext`](maxtext/base_maxtext/) folder contains the base configuration of the JobSet workload. In the [`maxtext/base_maxtext/jobset-spec-patch.yaml`](maxtext/base_maxtext/jobset-spec-patch.yaml) you will notice that a JobSet resource is configured with two job templates. One (named `slice`) starts the MaxText trainer and the other (named `tensorboard`) starts the TensorBoard uploader. The runtime parameters to the MaxText trainer and the TensorBoard uploader are passed through environment variables that are set through the `maxtext-parameters` ConfigMap.
+The `maxtext/jobset-spec-patch.yaml` file includes overrides for the base JobSet configuration. This file configures a JobSet resource with two job templates: one named `slice` for starting the MaxText trainer and another named `tensorboard` for launching the TensorBoard uploader. Runtime parameters for both the MaxText trainer and the TensorBoard uploader are specified through environment variables set within the `maxtext-parameters` ConfigMap.
 
-The [`maxtext-6B`](maxtext/maxtext-6B/) folder contains the Kustomize overlay that customize the base MaxText JobSet configuration for running single slice and multislice training workloads.
+### Configure the job
 
-### Configure the training job
-
-Set the current folder to [`maxtext/maxtext-6B`](maxtext/maxtext-6B)
+Set the current folder to [`maxtext`](maxtext/)
 
 ```
-cd <REPO_ROOT_DIR>/ai-infrastructure/tpu-training-on-gke/examples/jobset/maxtext/maxtext-6B
+cd <REPO_ROOT_DIR>/ai-infrastructure/tpu-training-on-gke/examples/jobset/maxtext
 ```
 
 Replace `<REPO_ROOT_DIR>` with the full path to the root of the cloned repo.
+
+
+#### Update namespace, images, and job suffix
+
+Remember to update the values in the kustomization.yaml file to align with your specific environment.
 
 Set the namespace:
 
@@ -158,41 +161,35 @@ Set the Maxtext container image:
 kustomize edit set image maxtext-runner-image=<ARTIFACT_REGISTRY_PATH>/maxtext-runner:latest
 ```
 
-Set the TP Uploader container image
-
-```
-kustomize edit set image tb-uploader-image=<ARTIFACT_REGISTRY_PATH>/tb-uploader:latest
-```
-
-
 Replace `<ARTIFACT_REGISTRY_PATH>` with the path to your Artifact Registry.
 
 
-Set the job ID suffix:
+Set the job ID suffix: 
 
 ```
 kustomize edit set namesuffix -- <NAME_SUFFIX>
 ```
 
-Replace `<NAME_SUFFIX>` with the suffix that will be appended to the default job name, which is `maxtext-run`. You can utilize the name suffix to prevent naming conflicts between concurrent jobs or to maintain completed jobs for tracking purposes.
+Replace `<NAME_SUFFIX>` with the suffix that will be appended to the default job name, which is `tpu-helloworld`. You can utilize the name suffix to prevent naming conflicts between concurrent jobs or to maintain completed jobs for tracking purposes.
 
 
-Set the job parameters: 
+#### Configure job topology and MaxText trainer parameters
+
+Create the `parameters.env` file with the following key-value settings:
 
 ```
-kustomize edit set configmap maxtext-parameters \
---from-literal=TPU_SLICE_TYPE=<TPU_SLICE_TYPE> \
---from-literal=TPU_TOPOLOGY=<TPU_TOPOLOGY> \
---from-literal=LOCAL_QUEUE=<LOCAL_QUEUE_NAME> \
---from-literal=ICI_PARALLELISM=<ICI_PARALLELISM> \
---from-literal=JOB_PARALLELISM=<JOB_PARALLELISM> \
---from-literal=NUM_SLICES=<NUM_SLICES> \
---from-literal=BASE_OUTPUT_DIRECTORY=<BASE_OUTPUT_DIRECTORY> \
---from-literal=RUN_NAME=<RUN_NAME> \
---from-literal=TENSORBOARD_NAME=<TENSORBOARD_NAME> \
---from-literal=DATASET_PATH=<DATASET_PATH> \
---from-literal=ARGS=<ARGS> \
---from-literal=LIBTPU_INIT_ARGS=<LIBTPU_INIT_ARGS>
+TPU_SLICE_TYPE=<TPU_SLICE_TYPE> 
+TPU_TOPOLOGY=<TPU_TOPOLOGY> 
+LOCAL_QUEUE=<LOCAL_QUEUE_NAME> 
+ICI_PARALLELISM=<ICI_PARALLELISM> 
+JOB_PARALLELISM=<JOB_PARALLELISM> 
+NUM_SLICES=<NUM_SLICES> 
+BASE_OUTPUT_DIRECTORY=<BASE_OUTPUT_DIRECTORY> 
+RUN_NAME=<RUN_NAME> 
+TENSORBOARD_NAME=<TENSORBOARD_NAME> 
+DATASET_PATH=<DATASET_PATH> 
+ARGS=<ARGS> 
+LIBTPU_INIT_ARGS=<LIBTPU_INIT_ARGS>
 
 ```
 
@@ -211,121 +208,23 @@ Replace the following values:
 
 The MaxText trainer [`MaxText/train.py`](https://github.com/google/maxtext/blob/main/MaxText/train.py) accepts a number of command line parameters that define a training regimen and model architecture. The required parameters are `run_name`, `base_output_directory`, and `dataset_path`. Other parameters are optional with the default values set in the [MaxText config file](https://github.com/google/maxtext/blob/main/MaxText/configs/base.yml). 
 
-The required parameters are set through the `RUN_NAME`, `BASE_OUTPUT_DIRECTORY`, and `DATASET_PATH` fields and the optional ones through the `ARGS` field in the `maxtext-parameters` *configMap* as described above. 
+The necessary parameters are configured through the `RUN_NAME`, `BASE_OUTPUT_DIRECTORY`, and `DATASET_PATH` fields, while optional ones are set in the `ARGS` field within the `parameters.env` file.
 
-For both single slice and multislice job types, you can utilize the `ARGS` field to configure training regimen parameters, such as training steps, batch size, ICI (Inter-Chunk Interaction) settings, DCN (Deep Cascade Network) parallelization settings, and parameters that control the model architecture.
+For both single slice and multi-slice job types, you can use the `ARGS` field to adjust training regimen parameters, including training steps, batch size, ICI (Inter-Chunk Interaction) settings, DCN (Deep Cascade Network) parallelization settings, and parameters governing the model architecture.
 
-Below are example settings for a pretraining task of a ~6.5B parameter model. These settings have been thoroughly tested to achieve high model flops utilization (MFU) on v4-16 slices. We encourage you to experiment with your own settings as well.
+We've included example settings for a pretraining task for a ~6.5 billion parameter model on TPU v4-32 pods. These settings have undergone thorough testing to ensure high model flops utilization (MFU). We also encourage you to experiment with your own settings.
 
-#### Settings for a single slice job
+The example settings for a single slice training job are found in the `parameters.env.single_slice_6B` file, while the example settings for a multi-slice training job are provided in the `parameters.env.multi_slice_6B` file.
 
-These are sample settings for a single slice job on a v4-32 slice.
-
-```
-ARGS="steps=200 log_period=50 save_period=100 dcn_data_parallelism=1 ici_fsdp_parallelism=16 per_device_batch_size=16 remat_policy=full base_emb_dim=4096 base_num_heads=16 base_mlp_dim=16384 head_dim=256 base_num_decoder_layers=32" 
-```
-
-```
-LIBTPU_INIT_ARGS="--xla_enable_async_all_gather=true TPU_MEGACORE=MEGACORE_DENSE"
-```
-
-This is a sample command that configures a single slice job
-
-```
-kustomize edit set configmap maxtext-parameters \
---from-literal=TPU_SLICE_TYPE=tpu-v4-podslice \
---from-literal=TPU_TOPOLOGY=2x2x2 \
---from-literal=LOCAL_QUEUE=tpu-job-queue \
---from-literal=ICI_PARALLELISM=8 \
---from-literal=JOB_PARALLELISM=2 \
---from-literal=NUM_SLICES=1 \
---from-literal=BASE_OUTPUT_DIRECTORY=gs://jk2-artifact-repository \
---from-literal=RUN_NAME=single-slice-101 \
---from-literal=TENSORBOARD_NAME=projects/895222332033/locations/us-central1/tensorboards/9108042063194095616 \
---from-literal=DATASET_PATH=gs://jk2-artifact-repository/datasets \
---from-literal=ARGS="steps=200 log_period=50 save_period=100 dcn_data_parallelism=2 ici_fsdp_parallelism=16 per_device_batch_size=16 remat_policy=full base_emb_dim=4096 base_num_heads=16 base_mlp_dim=16384 head_dim=256 base_num_decoder_layers=32" \
---from-literal=LIBTPU_INIT_ARGS="--xla_enable_async_all_gather=true TPU_MEGACORE=MEGACORE_DENSE"
-```
-
-#### Settings for a multi-slice job 
-
-These are sample settings for a single slice job on a v4-32 slice.
-
-```
-ARGS="steps=200 log_period=50 save_period=100 dcn_data_parallelism=2 ici_fsdp_parallelism=16 per_device_batch_size=16 remat_policy=full base_emb_dim=4096 base_num_heads=16 base_mlp_dim=16384 head_dim=256 base_num_decoder_layers=32" 
-```
-
-```
-LIBTPU_INIT_ARGS="--xla_enable_async_all_gather=true TPU_MEGACORE=MEGACORE_DENSE"
-```
-
-
-
-
-
-
-
- 
 
 
 #### Run the job
 
 ```bash
 kubectl apply -k . 
-
-### Configure the job
-
-You will use `envsubst` tool to adapt the examples to your environment (using environment variables) and update `single-slice-6B\kustomization.template.yaml` and `multi-slice-6B\kustomization.template.yaml` files to reference names used in your configuration. Following are the fields for configuration:
-
-- `namespace` refers to the Kubernetes namespace created during setup (`$NAMESPACE` in [`vars.env`](../../env_setup/vars.env))
-- `newName` property of the `images` field refers to the name of your MaxText training container image (`$MAX_TEXT_IMAGE_NAME` in [`examples.env`](../examples.env)).
-- `nameSuffix` field refers to with a unique identifier of your workload. If you try to submit a workload using the same identifier as in any of the previous workloads you will receive an error. You will configure `$MAXTEXT_JOB_ID` in the following command. For example, `singleslice-6b-105`.
-- Fields in the `configMapGenerator` 
-  - `REPLICAS` - The number of TPU slices to use for the job. If set to a number higher than 1 a multi-slice job will be started
-  - `RUN_NAME` - The MaxText run name. MaxText will use this value to name the folders for checkpoints and TensorBoard logs - see BASE_OUTPUT_DIRECTORY. If you want to restart from a previously set checkpoint set this to the run name used for the previous run. Although not required it may be convenient to use the same name as the `nameSuffix`.
-  - `BASE_OUTPUT_DIRECTORY` - The base Cloud Storage location for checkpoints and logs.
-  - `DATASET_PATH` - The base Cloud Storage location for the C4 dataset. Do not include the `c4` folder name. E.g. if the `c4` dataset was copied to `gs:\\bucket_name\datasets` set the DATASET_PATH to this URI. DATASET_PATH is set to `$DATASETS_URI` from [`examples.env`](../examples.env)
-  - `TENSORBOARD_NAME`` - The full name of the TensorBoard instance you want to use for tracking. In the format `projects\YOUR_PROJECT_NUMBER\locations\YOUR_LOCATON\tensorboard\YOUR_TENSORBOARD_ID`. You can get the full name of TensorBoard from the Terraform state file as shown in the following command.
-  - `ARGS` - Any additional parameters you want to pass to the MaxText trainer. Refer to the below notes and the [MaxText documentation](https://github.com/google/maxtext/blob/main/MaxText/configs/base.yml) for more info.
-  - `LIBTPU_INIT_ARGS` - An environmental variable that controls `libtpu` including XLA compiler. Refer to [MaxText documentation](https://github.com/google/maxtext/tree/main) for more info.
-
-The MaxText trainer [`MaxText/train.py`](https://github.com/google/maxtext/blob/main/MaxText/train.py) accepts a number of command line parameters that define a training regimen and model architecture. The required parameters are `run_name`, `base_output_directory`, and `dataset_path`. Other parameters are optional with the default values set in the [MaxText config file](https://github.com/google/maxtext/blob/main/MaxText/configs/base.yml). 
-
-In our examples, the required parameters are set through the `RUN_NAME`, `BASE_OUTPUT_DIRECTORY`, and `DATASET_PATH` fields and the optional ones through the `ARGS` field in the `maxtext-parameters` *configMap* as described above. 
-
-In both single slice and multislice examples, we use the `ARGS` field to set the training regimen parameters like training steps or batch size,  ICI and DCN parallelization settings, and parameters controlling model architecture for a ~6.5B parameter model pretraining task. These settings have been tested to achieve high model flops utilization (MFU). We encourage you to experiment with your own settings.
-
-> [!IMPORTANT]
-> Make sure that the `REPLICAS` field and the `dcn_data_parallelism` and `ici_fsdp_parallelism` trainer parameters align with the TPU topology configured in your environment.
-
-### Run jobs
-
-Run the following commands to set the environment variables you have used for configuration during provisioning:
-
-```bash
-export REPO_ROOT_DIR=$(git rev-parse --show-toplevel)
-source ${REPO_ROOT_DIR}/env_setup/vars.env
-source ${REPO_ROOT_DIR}/examples/examples.env
-pushd ${REPO_ROOT_DIR}/examples/jobset/maxtext
 ```
 
-To run a single slice example execute the following command from the [`maxtext`](maxtext) folder:
 
-```bash
-export TENSORBOARD_ID=$(gsutil cat gs://${TF_STATE_BUCKET}/${TF_STATE_PREFIX}/default.tfstate | jq '.outputs.tensorboard_id.value')
-export MAXTEXT_JOB_ID=YOUR_UNIQUE_JOB_ID
-envsubst < single-slice-6B/kustomization.template.yaml > single-slice-6B/kustomization.yaml
-kustomize build single-slice-6B | kubectl apply -f -
-```
-
-> [!NOTE]
-> Note that we use `kustomize` utility as some of the **Kustomize** features we utilize are not yet supported by `kubectl`.
-
-To start a multislice training example execute the following command from the [`maxtext`](maxtext) folder:
-
-```bash
-kustomize build multi-slice-6B | kubectl apply -f -
-```
 
 ### Monitor jobs
 
