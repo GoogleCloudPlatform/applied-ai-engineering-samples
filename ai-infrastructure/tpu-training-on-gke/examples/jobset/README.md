@@ -9,6 +9,16 @@ We utilize [Kustomize](https://kubernetes.io/docs/tasks/manage-kubernetes-object
 
 The [base_jobset](base_jobset) folder houses a [Kustomize base](https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/#bases-and-overlays) for JobSet configurations. The [tpu_hello_world](tpu_hello_world/) and [maxtext](maxtext/) folders contain [Kustomize overlays](https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/#bases-and-overlays) that adapt the base configuration for use with the TPU Hello World and MaxText examples, respectively.
 
+> [!IMPORTANT] 
+> When configuring the examples, you will need to substitute the placeholders with values that match your specific environment. This includes the name of the Kubernetes namespace, the Kubernetes service account for use with the Workload Identity, the Artifact Registry path, and the name of a Google Cloud Storage (GCS) bucket. Keep in mind that unless you modified the defaults during the environment setup, these resources were created with the following names.
+
+> - Kubernetes namespace - `tpu-training`
+> - Artifact Registry - `us-docker.pkg.dev/<YOUR_PROJECT_ID>/<YOUR_PREFIX>-training-images`
+> - Cloud Storage bucket - `<YOUR_PREFIX>-artifact-repository` 
+> - Kubernetes service account  - `wid-sa`
+
+
+
 ## TPU Hello World 
 
 In the [`tpu_hello_world`](tpu_hello_world/) folder you will find examples of experimenting with different data and model parallelism strategies. The examples use the [`shardings.py`](https://github.com/google/maxtext/blob/main/pedagogical_examples/shardings.py) script from MaxText that is designed to make experimentation with different parallelism options easy for both single slice and multislice settings. For more information about parallelism strategies and TPU Multislice refer to the [Cloud TPU Multislice Overview](https://cloud.google.com/tpu/docs/multislice-introduction) article. 
@@ -42,7 +52,7 @@ Set the Maxtext container image:
 kustomize edit set image python=<ARTIFACT_REGISTRY_PATH>/maxtext-runner:latest
 ```
 
-Replace `<ARTIFACT_REGISTRY_PATH>` with the path to your Artifact Registry. Keep in mind that the default path, as established during the setup process, is `us-docker.pkg.dev/<YOUR_PROJECT_ID>/<YOUR_PREFIX>-training-images`. If you made any modifications to these defaults, please make the necessary updates to the patch accordingly.
+Replace `<ARTIFACT_REGISTRY_PATH>` with the path to your Artifact Registry. 
 
 
 Set the job ID suffix: 
@@ -203,11 +213,11 @@ Replace the following values:
 - `<ICI_PARALLELISM>` with the value that is equal to the number of chips in the TPU slice 
 - `<JOB_PARALLELISM>` with the value that matches the number of TPU VMs in the TPU slice
 - `<NUM_SLICES>` with the number of TPU slices on which you want to run the training job. Make sure to have at least this number of TPU node pools in your environment.
-- `<BASE_OUTPUT_DIRECTORY>` with the Cloud Storage location for checkpoints and logs. Recall that if you haven't made any changes to the defaults during the environment setup, the name of the bucket created by the setup should be `<YOUR_PREFIX>-artifact-repository`. 
+- `<BASE_OUTPUT_DIRECTORY>` with the Cloud Storage location for checkpoints and logs. You can use the bucket created during the setup. 
 - `<DATASET_PATH>` with the Cloud Storage location of the C4 dataset. Specify the Cloud Storage location of the C4 dataset, excluding the `c4` folder name in the path. As part of the setup for the examples' prerequisites, the C4 dataset is copied to the `gs://<ARTIFACT_BUCKET>/datasets/c4` location.
 - `<RUN_NAME>` with the MaxText run name. MaxText will use this value to name the folders for checkpoints and TensorBoard logs in the `<BASE_OUTPUT_DIRECTORY>`. If you want to restart from a previously set checkpoint set this to the run name used for the previous run. Although not required it may be convenient to use the same name as the `<NAME_SUFFIX>`.
 - `<TENSORBOARD_NAME>` with the fully qualified name of the TensorBoardr instance to use for a training run tracking. The format should be - `projects/<PROJECT_NUMBER>/locations/<TENSORBOARD_REGION>/tensorboard/<TENSORBOARD_ID>`. If you provisioned your environment using the automated setup, you can retrieve the TensorBoard name from the Terraform state, using the `terraform output tensorboard_id` command.
-- `<WID_KSA>` with the name of Kubernetes service account to use for the Workload Identity. Remember that the default name used during the environment setup is `wid-sa`
+- `<WID_KSA>` with the name of Kubernetes service account to use for the Workload Identity. 
 - `<ARGS>` with any additional parameters you want to pass to the MaxText trainer. Refer to the below notes and the [MaxText documentation](https://github.com/google/maxtext/blob/main/MaxText/configs/base.yml) for more info.
 - `<LIBTPU_INIT_ARGS>` with `libtpu` and XLA compiler settings. Refer to the below notes and the [MaxText documentation](https://github.com/google/maxtext/tree/main) for more info
 
@@ -236,6 +246,9 @@ kubectl apply -k .
 ### Monitor jobs
 
 You can monitor the runs using the techniques described in the [`tpu_hello_world`](#monitor-jobs) section. Since both single slice and multislice workloads  upload TensorBoard metrics generated by the MaxText trainer to Vertex AI TensorBoard, you can also monitor the run - in real time - through [Vertex Experiments](https://console.cloud.google.com/vertex-ai/experiments/experiments). The experiment name that will receive the metrics is the same as the value configured in `RUN_NAME`
+
+
+![Tensorboard](../../images/tensorboard.png)
 
 - To remove your workload and all resources that it created execute:
 ```bash
