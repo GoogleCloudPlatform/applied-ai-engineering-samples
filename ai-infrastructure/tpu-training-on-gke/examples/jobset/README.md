@@ -1,8 +1,8 @@
-# Examples using Jobset APIs
+# JobSet API Examples 
 
-There are two set of examples in this folder showing how to configure and run training workloads with **JobSet** and **Kueue** APIs.
+This folder contains two sets of examples that demonstrate how to configure and execute training workloads using  the JobSet and Kueue APIs.
 
-- [`TPU Hello World`](tpu_hello_world/) shows examples of experimenting with different data and model parallelism strategies  in single slice and multislice TPU configurations.
+- THe [`TPU Hello World`](tpu_hello_world/) folder  offers examples for exploring different data and model parallelism strategies in both single-slice and multi-slice TPU configurations.
 - The [MaxText](maxtext/) section provides examples of both single-slice and multi-slice pre-training for a MaxText model with 6.5 billion parameters.
 
 We utilize [Kustomize](https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/) to streamline the customization of JobSet resource YAML definitions. 
@@ -26,7 +26,7 @@ Replace `<REPO_ROOT_DIR>` with the full path to the root of the cloned repo.
 
 #### Update namespace, images, and job suffix
 
-Remember to update the values in the kustomization.yaml file to align with your specific environment.
+Remember to update the values in the `kustomization.yaml` file to align with your specific environment.
 
 Set the namespace:
 
@@ -69,7 +69,7 @@ NUM_SLICE=<NUM_SLICES>
 
 Replace the following values:
 - `<TPU_SLICE_TYPE>` and `<TPU_TOPOLOGY>` with the type and topology of a TPU slice you want to run your job on. For TPU v4, use `tpu-v4-podslice` for `<TPU_SLICE_TYPE>`. For TPU v5e, use `tpu-v5-lite-podslice`. For TPU v5p, use `tpu-v5p-slice`. For TPU v4, define the topology in 3-tuples, for example `2x2x2`. For TPU v5e, define the topology in 2-tuples. For TPU v5p, define the topology in 3-tuples. Refer to [TPU on GKE documentation](https://cloud.google.com/kubernetes-engine/docs/concepts/tpus) for detailed information on TPU configurations.
-- `<LOCAL_QUEUE_NAME>` with the name of the Kueue local queue in your namespace. Recall that the default name as created during the setup is `tpu-job-queue`
+- `<LOCAL_QUEUE_NAME>` with the name of the  local Kueue queue in your namespace. Recall that the default name as created during the setup is `tpu-job-queue`
 - `<ICI_PARALLELISM>` with the value that is equal to the number of chips in the TPU slice 
 - `<JOB_PARALLELISM>` with the value that matches the number of TPU VMs in the TPU slice
 - `<NUM_SLICES>` with the number of TPU slices on which you want to run the training job. Make sure to have at least this number of TPU node pools in your environment.
@@ -130,7 +130,11 @@ kubectl delete -k .
 
 The [`maxtext`](maxtext/) folder contains examples of pre-training a MaxText 6.5 billion parameters model on the [English C4 dataset](https://www.tensorflow.org/datasets/catalog/c4#c4en_default_config).
 
-The `maxtext/jobset-spec-patch.yaml` file includes overrides for the base JobSet configuration. This file configures a JobSet resource with two job templates: one named `slice` for starting the MaxText trainer and another named `tensorboard` for launching the TensorBoard uploader. Runtime parameters for both the MaxText trainer and the TensorBoard uploader are specified through environment variables set within the `maxtext-parameters` ConfigMap.
+The `maxtext/jobset-spec-patch.yaml` file includes overrides for the base JobSet configuration. This file configures a JobSet resource with two job templates: one named `slice` for starting the MaxText trainer and another named `tensorboard` for launching the [TensorBoard uploader](https://cloud.google.com/vertex-ai/docs/experiments/tensorboard-upload-existing-logs). 
+
+The tensorboard job is responsible for uploading TensorBoard logs generated during the MaxText training job to a Vertex AI TensorBoard instance.
+
+Runtime parameters for both the MaxText trainer and the TensorBoard uploader are specified through environment variables set within the `maxtext-parameters` ConfigMap.
 
 ### Configure the job
 
@@ -145,7 +149,7 @@ Replace `<REPO_ROOT_DIR>` with the full path to the root of the cloned repo.
 
 #### Update namespace, images, and job suffix
 
-Remember to update the values in the kustomization.yaml file to align with your specific environment.
+Remember to update the values in the `kustomization.yaml` file to align with your specific environment.
 
 Set the namespace:
 
@@ -170,7 +174,7 @@ Set the job ID suffix:
 kustomize edit set namesuffix -- <NAME_SUFFIX>
 ```
 
-Replace `<NAME_SUFFIX>` with the suffix that will be appended to the default job name, which is `tpu-helloworld`. You can utilize the name suffix to prevent naming conflicts between concurrent jobs or to maintain completed jobs for tracking purposes.
+Replace `<NAME_SUFFIX>` with the suffix that will be appended to the default job name, which is `maxtext-run`. You can utilize the name suffix to prevent naming conflicts between concurrent jobs or to maintain completed jobs for tracking purposes.
 
 
 #### Configure job topology and MaxText trainer parameters
@@ -216,6 +220,8 @@ We've included example settings for a pretraining task for a ~6.5 billion parame
 
 The example settings for a single slice training job are found in the `parameters.env.single_slice_6B` file, while the example settings for a multi-slice training job are provided in the `parameters.env.multi_slice_6B` file.
 
+> [!WARNING]
+> If you use the templates, do not forget to update them with the settings matching your environment.
 
 
 #### Run the job
@@ -232,9 +238,5 @@ You can monitor the runs using the techniques described in the [`tpu_hello_world
 
 - To remove your workload and all resources that it created execute:
 ```bash
-kustomize build single-slice-6B | kubectl delete -n $NAMESPACE -f -
-```
-or
-```bash
-kustomize build multi-slice-6B | kubectl delete -n $NAMESPACE -f -
+kubectl delete -k . 
 ```

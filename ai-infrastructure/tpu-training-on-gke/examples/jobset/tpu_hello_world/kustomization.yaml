@@ -88,4 +88,4 @@ configMapGenerator:
 - envs:
   - parameters.env
   name: hello-world-parameters
-nameSuffix: "-101"
+nameSuffix: "-111"

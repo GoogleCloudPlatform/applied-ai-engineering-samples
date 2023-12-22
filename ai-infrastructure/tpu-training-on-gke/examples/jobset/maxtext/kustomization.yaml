@@ -93,7 +93,7 @@ configMapGenerator:
 - envs:
   - parameters.env
   name: maxtext-parameters
-nameSuffix: -single-slice-101
+nameSuffix: -single-slice-102
 namespace: tpu-training
 images:
 - name: maxtext-runner-image
