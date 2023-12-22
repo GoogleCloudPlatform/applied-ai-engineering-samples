@@ -9,7 +9,7 @@ The examples are all based on the [MaxText](https://github.com/google/maxtext/tr
 ## Prerequisites for running examples
 
 ### Build container images
-Before you can run the examples, you need to package MaxText in a training container image. You also need to build auxiliary images used in some examples, including a container image that packages the [TensorBoard uploader](https://cloud.google.com/vertex-ai/docs/experiments/tensorboard-overview#upload-tb-logs) and to copy the datasets required by the samples to your Cloud Storage data and artifact repository. We have automated this process with Cloud Build. 
+Before you can run the examples, you need to package MaxText in a training container image. You also need to copy the datasets required by the samples to your Cloud Storage  artifact repository. We have automated this process with Cloud Build. 
 
 NOTE: Ensure you are working from  the `examples` directory
 
@@ -29,7 +29,7 @@ gcloud builds submit \
 Replace the following values:
 - `<PROJECT_ID>` - your project ID.
 - `<ARTIFACT_BUCKET>` - the name of the Google Cloud Storage (GCS) bucket where you want to manage training artifacts like datasets and checkpoints. 
-- `<ARTIFACT_REGISTRY_PATH>` - the path to the Artifact Registry that you intend to use for pushing Maxtext and TensorBoard container images.
+- `<ARTIFACT_REGISTRY_PATH>` - the path to the Artifact Registry that you intend to use for pushing the Maxtext  container image.
 
 ### Set up your development environment
 

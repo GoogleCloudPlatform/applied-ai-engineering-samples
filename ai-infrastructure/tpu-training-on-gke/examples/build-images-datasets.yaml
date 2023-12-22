@@ -42,22 +42,10 @@ steps:
           docker build --build-arg BASEIMAGE=maxtext_base_image -f ./maxtext_runner.Dockerfile -t ${_MAXTEXT_IMAGE_URI} .
           
 
-  - id: build the Tensorboard uploader image
-    name: google/cloud-sdk:latest
-    entrypoint: /bin/bash
-    args:
-      - -c
-      - |
-        docker build -t $_TB_UPLOADER_IMAGE_URI -f Dockerfile.tensorboard .
-
 images:
-  - $_TB_UPLOADER_IMAGE_URI
   - $_MAXTEXT_IMAGE_URI
 
 substitutions:
-  _TB_UPLOADER_IMAGE_NAME: 'tb-uploader'
-  _TB_UPLOADER_IMAGE_TAG: 'latest'
-  _TB_UPLOADER_IMAGE_URI: '${_ARTIFACT_REGISTRY_PATH}/${_TB_UPLOADER_IMAGE_NAME}:${_TB_UPLOADER_IMAGE_TAG}'
   _MAXTEXT_IMAGE_NAME: 'maxtext-runner'
   _MAXTEXT_IMAGE_TAG: 'latest'
   _MAXTEXT_IMAGE_URI: '${_ARTIFACT_REGISTRY_PATH}/${_MAXTEXT_IMAGE_NAME}:${_MAXTEXT_IMAGE_TAG}' 
