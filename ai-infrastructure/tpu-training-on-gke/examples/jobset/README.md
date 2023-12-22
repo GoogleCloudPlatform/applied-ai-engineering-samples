@@ -42,7 +42,7 @@ Set the Maxtext container image:
 kustomize edit set image python=<ARTIFACT_REGISTRY_PATH>/maxtext-runner:latest
 ```
 
-Replace `<ARTIFACT_REGISTRY_PATH>` with the path to your Artifact Registry.
+Replace `<ARTIFACT_REGISTRY_PATH>` with the path to your Artifact Registry. Keep in mind that the default path, as established during the setup process, is `us-docker.pkg.dev/<YOUR_PROJECT_ID>/<YOUR_PREFIX>-training-images`. If you made any modifications to these defaults, please make the necessary updates to the patch accordingly.
 
 
 Set the job ID suffix: 
@@ -165,7 +165,7 @@ Set the Maxtext container image:
 kustomize edit set image maxtext-runner-image=<ARTIFACT_REGISTRY_PATH>/maxtext-runner:latest
 ```
 
-Replace `<ARTIFACT_REGISTRY_PATH>` with the path to your Artifact Registry.
+Replace `<ARTIFACT_REGISTRY_PATH>` with the path to your Artifact Registry. Keep in mind that the default path, as established during the setup process, is `us-docker.pkg.dev/<YOUR_PROJECT_ID>/<YOUR_PREFIX>-training-images`. If you made any modifications to these defaults, please make the necessary updates to the patch accordingly.
 
 
 Set the job ID suffix: 
@@ -203,7 +203,7 @@ Replace the following values:
 - `<ICI_PARALLELISM>` with the value that is equal to the number of chips in the TPU slice 
 - `<JOB_PARALLELISM>` with the value that matches the number of TPU VMs in the TPU slice
 - `<NUM_SLICES>` with the number of TPU slices on which you want to run the training job. Make sure to have at least this number of TPU node pools in your environment.
-- `<BASE_OUTPUT_DIRECTORY>` with the Cloud Storage location for checkpoints and logs. 
+- `<BASE_OUTPUT_DIRECTORY>` with the Cloud Storage location for checkpoints and logs. Recall that if you haven't made any changes to the defaults during the environment setup, the name of the bucket created by the setup should be `<YOUR_PREFIX>-artifact-repository`. 
 - `<DATASET_PATH>` with the Cloud Storage location of the C4 dataset. Specify the Cloud Storage location of the C4 dataset, excluding the `c4` folder name in the path. As part of the setup for the examples' prerequisites, the C4 dataset is copied to the `gs://<ARTIFACT_BUCKET>/datasets/c4` location.
 - `<RUN_NAME>` with the MaxText run name. MaxText will use this value to name the folders for checkpoints and TensorBoard logs in the `<BASE_OUTPUT_DIRECTORY>`. If you want to restart from a previously set checkpoint set this to the run name used for the previous run. Although not required it may be convenient to use the same name as the `<NAME_SUFFIX>`.
 - `<TENSORBOARD_NAME>` with the fully qualified name of the TensorBoardr instance to use for a training run tracking. The format should be - `projects/<PROJECT_NUMBER>/locations/<TENSORBOARD_REGION>/tensorboard/<TENSORBOARD_ID>`. If you provisioned your environment using the automated setup, you can retrieve the TensorBoard name from the Terraform state, using the `terraform output tensorboard_id` command.
