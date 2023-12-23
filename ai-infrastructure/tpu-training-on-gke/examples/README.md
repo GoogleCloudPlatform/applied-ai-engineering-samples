@@ -39,7 +39,11 @@ Before you can run the examples, it's necessary to install the latest versions o
 
 - To install Kustomize, please follow the instructions in the [Kustomize documentation](https://kubectl.docs.kubernetes.io/installation/kustomize/binaries/). 
 
-- **xpk** is implemented as a [Python script](https://github.com/google/xpk/blob/main/xpk.py) and distributed through the [xpk repo](https://github.com/google/xpk). To access **xpk** you can either clone the whole repo or download the `xpk.py` module.
+- To install [xpk](https://github.com/google/xpk)
+
+```
+pip install xpk
+```
 
 You also need to set credentials to your GKE cluster.
 ```

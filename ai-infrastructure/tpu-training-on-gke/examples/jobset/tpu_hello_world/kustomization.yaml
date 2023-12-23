@@ -25,11 +25,7 @@ patches:
   path: jobset-spec-patch.yaml
   target:
     kind: JobSet
-namespace: tpu-training
-images:
-- name: python
-  newName: us-docker.pkg.dev/jk-mlops-dev/jk2-training-images/maxtext-runner
-  newTag: latest
+
 
 replacements:
 - source:
@@ -89,3 +85,4 @@ configMapGenerator:
   - parameters.env
   name: hello-world-parameters
 nameSuffix: "-111"
+namespace: tpu-training
