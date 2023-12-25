@@ -1,6 +1,6 @@
 #  GKE for Large Model Training and Serving 
 
-his Terraform module configures a GKE-based infrastructure environment specifically designed for training and serving large and extremely large deep learning models, including the most recent Generative AI models.
+This Terraform module configures a GKE-based infrastructure environment specifically designed for training and serving large and extremely large deep learning models, including the most recent Generative AI models.
 
 The central element of this environment is a VPC-native GKE Standard cluster. This cluster is configured to utilize Workload Identity. Users of the module can decide whether to deploy the cluster within an existing VPC or create a new VPC specifically for the cluster. The cluster can be configured with multiple CPU and TPU node pools. The node pools use a custom service account. This service account can be an existing one or a newly created account.
 
@@ -11,11 +11,10 @@ The module carries out the following tasks:
 - If a reference to an existing VPC is not provided, it will create a network, a subnet, and IP ranges for GKE pods and services.
 - Optionally, it can provision [Cloud NAT](https://cloud.google.com/nat/docs/overview)
 - If a reference to an existing service account is not provided, the module will create a new service account and assign it to a user-defined set of security roles.
+- Deploys a standard, VPC-native GKE cluster that is configured to utilize Workload Identity.
 - Creates a user defined number of CPU node pools
 - Creates a user defined number of TPU node pools
 - The node pools are configured to use a custom service account
-- Provisions a standard, VPC-native GKE cluster.
-- Deploys a standard, VPC-native GKE cluster that is configured to utilize Workload Identity.
 - Optionally, it can create an Artifact Registry.
 - Creates the specified number of user-defined Cloud Storage buckets.
 
@@ -82,7 +81,7 @@ module "tpu-training-cluster" {
 |[cpu_node_pools](variables.tf#L125)|Settings for CPU node pools|`map(object({...}))`||`{...}`|
 |[tpu_node_pools](variables.tf#L156)|Settings for TPU node pools. See below for more information about TPU slice types|`map(object({...}))`||`{...}`|
 |[gcs_configs](variables.tf#L35)|Settings for Cloud Storage buckets|`map(object({...}))`||`{...}`|
-|[registry_config](variables.tf#47)|Settings for Artifact Registry|`object({...})`||`{...}`|
+|[registry_config](variables.tf#L47)|Settings for Artifact Registry|`object({...})`||`{...}`|
 
 
 ### Specifying TPU type
