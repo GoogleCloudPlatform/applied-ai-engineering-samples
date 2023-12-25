@@ -1,6 +1,6 @@
 #  Running TPU training workloads on GKE
 
-This reference guide compiles best practices, prescriptive guidance, and code samples for running large-scale machine learning training workloads with [TPU v4 and TPU v5e on Google Kubernetes Engine (GKE)](https://cloud.google.com/tpu/docs/tpus-in-gke).
+This reference guide compiles best practices, prescriptive guidance, and code samples for running large-scale machine learning training workloads with [TPU v4, TPU v5p, and TPU v5e on Google Kubernetes Engine (GKE)](https://cloud.google.com/tpu/docs/tpus-in-gke).
 
 The guide covers two main topics:
 - **Configuring a GKE based environment for large scale training on Cloud TPUs**
