@@ -81,9 +81,3 @@ replacements:
     select:
       kind: LocalQueue
       version: v1beta1
-configMapGenerator:
-- literals:
-  - ksa_name=wid-sa
-  - gsa_email=jk2-gke-wid-sa@jk-mlops-dev.iam.gserviceaccount.com
-  - cluster_queue=cluster-queue
-  name: wid-config
