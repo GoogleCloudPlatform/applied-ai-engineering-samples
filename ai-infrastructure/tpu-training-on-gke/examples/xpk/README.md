@@ -7,7 +7,7 @@ There are two set of examples in this folder showing how to configure and run tr
 - Experimenting with different data and model parallelism strategies with in single slice and multislice TPU configurations.
 - Pre-training a MaxText 6.5B parameter model in both single slice and multislice TPU configurations.
 
-**xpk** provides a simple command-line interface for managing GKE clusters and submitting training workloads that are encapsulated as JobSet configurations. In this reference guide, we do not use its cluster management capabilities. We use **xpk** to configure and submit training workloads to the GKE-based training environment provisioned during the setup.
+**xpk** provides a simple command-line interface for managing GKE clusters and submitting training workloads that are encapsulated as JobSet resources. In this reference guide, we do not use its cluster management capabilities. We use **xpk** to configure and submit training workloads to the GKE-based training environment provisioned during the setup.
 
 Refer to the [xpk documentation](https://github.com/google/xpk) for detailed information on how to create, delete, and list workloads.
 
@@ -47,7 +47,7 @@ By default, when xpk prepares a workload it layers the local directory (`--scrip
 
 If you don't want this layering behavior, you can specify the image to use through the `--docker-image` parameter.
 
-In our examples, we will set the `--base-docker-image` to the [MaxText training image](../README.md) build as part of prerequisites for running examples. Make sure that you have a working installation of **docker** before running the below examples.
+In our examples, we will set the `--base-docker-image` to the [MaxText training image](../README.md) that was built as part of prerequisites for running examples. Make sure that you have a working installation of **docker** before running the below examples.
 
 Recall that if you utilized the automated setup with the default settings, the path to your Artifact Registry is:
 
@@ -136,7 +136,7 @@ In this section we provide instructions for running parallelism experiments simi
 
 To run a configuration for a single slice workload with Interchip Interconnect (ICI) sharding using Fully Sharded Data Parallelism (FSDP), follow the steps below:
 
-- Create a workload script. Make sure to modify the `--ici_fsdp_parallelism` parameter to match your TPU type. The example `--ici_fsdp_parallelism=8` is configured for a TPU slice with 8 chips. E.g. v4-16 or v5p-16
+- Create a workload script. Make sure to modify the `--ici_fsdp_parallelism` parameter to match your TPU type. In the below example, the  `--ici_fsdp_parallelism=8`setting is configured for a TPU slice with 8 chips. E.g. v4-16 or v5p-16
 
 ```bash
 cat <<EOF >./ici-fsdp.sh
@@ -173,7 +173,7 @@ xpk workload delete \
 
 The below examples shows configuration for a multislice workload with data parallelism (DP) over data-center network (DCN) connections and FSDP over ICI.
 
-- Create a workload script. Make sure to modify the `--ici_fsdp_parallelism` parameter to match your TPU type. The example `--ici_fsdp_parallelism=8` is configured for a TPU slice with 8 chips. E.g. v4-16 or v5p-16
+- Create a workload script. Make sure to modify the `--ici_fsdp_parallelism` parameter to match your TPU type. 
 
 ```bash
 cat <<EOF >./dcn-dp-ici-fsdp.sh
