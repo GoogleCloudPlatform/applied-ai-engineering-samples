@@ -88,9 +88,10 @@ replacements:
     select:
       kind: JobSet
       version: v1alpha2
-nameSuffix: multislice-103
+nameSuffix: -single-slice-101
 
 configMapGenerator:
 - envs:
   - parameters.env
-  name: maxtext-parameterspu-training
+  name: maxtext-parameters
+namespace: tpu-training

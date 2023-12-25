@@ -84,5 +84,3 @@ configMapGenerator:
 - envs:
   - parameters.env
   name: hello-world-parameters
-nameSuffix: "-111"
-namespace: tpu-training

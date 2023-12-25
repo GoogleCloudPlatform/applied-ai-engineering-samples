@@ -17,7 +17,7 @@ The [base_jobset](base_jobset) folder houses a [Kustomize base](https://kubernet
 > - Artifact Registry - `us-docker.pkg.dev/<YOUR_PROJECT_ID>/<YOUR_PREFIX>-training-images`
 > - Cloud Storage bucket - `<YOUR_PREFIX>-artifact-repository` 
 > - Kubernetes service account  - `wid-sa`
-> - TensorBoard instance full name - The format should be - `projects/<PROJECT_NUMBER>/locations/<TENSORBOARD_REGION>/tensorboard/<TENSORBOARD_ID>`. If you provisioned your environment using the automated setup, you can retrieve the TensorBoard name from the Terraform state, using the `terraform output tensorboard_id` command. You can also get the `<TENSORBOARD_ID>` from [Vertex Experiments](https://console.cloud.google.com/vertex-ai/experiments/experiments) on the TensorBoard instances tab. The default display name for the TensorBoard instance created during the setup is `TPU Training`. 
+> - TensorBoard instance full name - The format should be - `projects/<PROJECT_ID>/locations/<TENSORBOARD_REGION>/tensorboard/<TENSORBOARD_ID>`. If you provisioned your environment using the automated setup, you can retrieve the TensorBoard name from the Terraform state, using the `terraform output tensorboard_id` command. You can also get the `<TENSORBOARD_ID>` from [Vertex Experiments](https://console.cloud.google.com/vertex-ai/experiments/experiments) on the TensorBoard instances tab. The default display name for the TensorBoard instance created during the setup is `TPU Training`. 
 
 
 ## TPU Hello World 
