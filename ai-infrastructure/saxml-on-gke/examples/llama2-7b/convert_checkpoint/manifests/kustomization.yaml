@@ -1,0 +1,42 @@
+# Copyright 2023 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+nameSuffix: llama7b
+
+configMapGenerator:
+- envs:
+  - parameters.env
+  name: converter-parameters
+
+resources:
+- ../../../../environment/2-saxml/checkpoint_converter_base
+
+replacements:
+- source:
+    fieldPath: data.KSA
+    kind: ConfigMap
+    name: converter-parameters
+  targets:
+  - fieldPaths:
+    - spec.template.spec.serviceAccountName
+    select:
+      kind: Job
+namespace: saxml
+images:
+- name: checkpoint-converter
+  newName: us-docker.pkg.dev/jk-mlops-dev/jk1-ml-images/checkpoint-converter
+  newTag: latest
