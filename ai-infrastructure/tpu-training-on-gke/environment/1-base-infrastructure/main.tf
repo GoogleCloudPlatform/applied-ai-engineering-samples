@@ -93,7 +93,7 @@ locals {
 }
 
 module "base_environment" {
-  source              = "github.com/GoogleCloudPlatform/applied-ai-engineering-samples//ai-infrastructure/terraform-modules/gke-aiml?ref=tpu-training-on-gke"
+  source              = "github.com/GoogleCloudPlatform/applied-ai-engineering-samples//ai-infrastructure/terraform-modules/gke-aiml"
   project_id          = var.project_id
   region              = var.region
   deletion_protection = var.deletion_protection
