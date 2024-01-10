@@ -1,8 +1,0 @@
-.vscode/
-backend/__pycache__/
-notebooks/sandbox.ipynb
-backend/application_default_credentials.json
-.env
-backend/service_account_key.json
-backend/config_*.py
-backend/app.yaml
