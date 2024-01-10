@@ -39,32 +39,63 @@ variable "prefix" {
   nullable    = false
 }
 
-variable "node_pool_sa_name" {
-  description = "The name of the node pool service account"
-  type        = string
-  default     = "saxml-node-pool-sa"
-  nullable    = false
+variable "node_pool_sa" {
+  description = "The config for a node pool service account"
+  type = object({
+    name        = string
+    description = string
+    roles       = list(string)
+  })
+  default = {
+    name        = "gke-node-pool-sa"
+    description = "GKE node pool service account"
+    roles = [
+      "storage.objectAdmin",
+      "logging.logWriter",
+      "artifactregistry.reader",
+    ]
+  }
 }
 
-variable "wid_sa_name" {
-  description = "The name of the workload identify sa"
-  type        = string
-  default     = "saxml-wid-sa"
-  nullable    = false
+variable "wid_sa" {
+  description = "The config for a workload identity service account"
+  type = object({
+    name          = string
+    description   = string
+    roles         = list(string)
+    ksa_namespace = string
+    ksa_name      = string
+  })
+  default = {
+    name          = "gke-wid-sa"
+    description   = "GKE Wid service account"
+    ksa_namespace = "saxml"
+    ksa_name      = "wid-sa"
+    roles = [
+      "storage.objectAdmin",
+      "logging.logWriter",
+      "artifactregistry.reader",
+    ]
+  }
 }
 
-variable "artifact_registry_name" {
-  description = "The name of the Artifact Registry"
-  type        = string
-  default     = null
-  nullable    = true
+
+variable "create_artifact_registry" {
+  description = "Whether to create an Artifact Registry"
+  type        = bool
+  default     = true
 }
 
-variable "artifact_registry_location" {
-  description = "The location of the Artifact Registry"
-  type        = string
-  default     = "us"
-  nullable    = true
+variable "registry_config" {
+  description = "The configs for Artifact registry"
+  type = object({
+    name     = string
+    location = string
+  })
+  default = {
+    name     = "serving-images"
+    location = "us"
+  }
 }
 
 variable "gcs_configs" {
@@ -160,11 +191,40 @@ variable "cpu_node_pools" {
 variable "tpu_node_pools" {
   description = "Configurations for a TPU node pools"
   type = map(object({
-    zones          = list(string)
-    min_node_count = number
-    max_node_count = number
-    tpu_type       = string
+    zones        = list(string)
+    tpu_type     = string
+    disk_size_gb = optional(number, 200)
+    autoscaling  = optional(bool, false)
   }))
+  validation {
+    condition = alltrue([
+      for tpu_type in [for name, node_pool in var.tpu_node_pools : node_pool.tpu_type] :
+      contains(
+        [
+          "v5litepod-1",
+          "v5litepod-4",
+          "v5litepod-8",
+          "v5litepod-16",
+          "v5litepod-32",
+          "v5litepod-64",
+          "v5litepod-128",
+          "v5litepod-256",
+          "v4-8",
+          "v4-16",
+          "v4-32",
+          "v4-64",
+          "v4-128",
+          "v4-256",
+          "v4-512",
+          "v4-1024",
+          "v4-1536",
+          "v4-2048",
+          "v4-4096",
+        ],
+        tpu_type
+    )])
+    error_message = "Unsupported TPU type"
+  }
   nullable = false
 }
 

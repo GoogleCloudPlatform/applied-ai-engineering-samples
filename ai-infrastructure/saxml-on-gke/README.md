@@ -90,8 +90,9 @@ The prerequisites may need to be configured by your GCP organization administrat
 4. Modify the `terraform.tfvars` file to reflect your environment
   - Set `project_id` to your project ID
   - Set `automation_bucket` to the name of a bucket you want to create in your project
-  - Set `location` to your location
+  - Set `location` to a location where you want to create the automation bucket 
   - Set `automation_sa_name` to the automation service account name in your environment
+  - If you are going to configure the performance testing components uncomment the `services` and `roles` variables
 5. Execute the `terraform init` command
 6. Execute the `terraform apply` command
 
@@ -106,6 +107,16 @@ TBD
 ### Step by step deployment 
 
 As an alternative to an automated deployment, you can run each stage of the setup individually.
+
+If you haven't already, please clone this repository now.
+
+```
+git clone https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples.git
+```
+
+Change the current directory to `ai-infrastructure/saxml-on-gke/environment
+
+
 
 #### Provision the base environment
 

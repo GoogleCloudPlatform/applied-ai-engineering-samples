@@ -17,22 +17,27 @@ output "cluster_name" {
   value = module.base_environment.cluster_name
 }
 
-output "region" {
-  value = module.base_environment.region
+output "cluster_region" {
+  value = var.region
 }
 
-output "artifact_registry_image_path" {
-  value = module.base_environment.artifact_registry_image_path
+output "wid_ksa_name" {
+  value = var.wid_sa.ksa_name
 }
 
-output "namespace" {
-  value = module.base_environment.workloads_namespace
+output "wid_ksa_namespace" {
+  value = var.wid_sa.ksa_namespace
+}
+
+output "wid_gsa_email" {
+  value = module.wid_service_account.email
 }
 
 output "gcs_buckets" {
   value = module.base_environment.gcs_buckets
 }
 
-output "ksa_name" {
-  value = module.base_environment.wid_ksa
+output "artifact_registry_image_path" {
+  description = "The URI of an Artifact Registry if created"
+  value       = try(module.base_environment.artifact_registry_image_path, null)
 }
