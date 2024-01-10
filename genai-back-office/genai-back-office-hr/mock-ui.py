@@ -1,0 +1,73 @@
+# from io import StringIO
+# import datetime
+from chat_html import get_chat_html
+import streamlit as st
+import pandas as pd
+import os
+
+
+
+###_____________MAIN PAGE_____________### 
+# PAGE CONFIG  
+st.set_page_config(
+    page_title="Internal HR Portal",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+
+
+left, right = st.columns(2)
+left.title('Cymbal - Internal HR Portal')
+
+# TITLE AND ICON 
+st.image("image.png", width=1200)
+
+
+st.text("")
+
+left, middle, right = st.columns(3)
+left.write("Check out the [FAQ](https://ff6a2410e9a9651ad3e2c1330ee55c9fd2a419d711a1878ff037b54-apidata.googleusercontent.com/download/storage/v1/b/lob-hr-docs/o/faq.pdf?jk=AanfhSDQ7EL5pLLx4uZNOCS_aiycdrErajSBlowFL11Tpj2legRZhuKotq6QTy8vHi-P7WMqXOvt3p-rUVMw2FqSjB9B-5ZZpq9pDifYUC-2yOI35Vt0RpFpi5-x4I_o4ZzuXxRY7e53R3Uwm-BNfyzSSyyLwmRKeVm5AukDGeKR4qDS2sFbOXSLKGRo5D3lM78LBrebm_a9MKpH0JkweMhePUlKFMyxhvy4tzWdUN1vf37T6yaC3CdNDRnym9bQ8u4vvr1T4Sxzrt2nP1-EsmI3VYLWMjxv5xJw0Jio0SuPHbP448WAMAGKO3xOOT4vpypbc7_9cibPqQ2oQvPFJ8AZhpp2aoe_LzEREFpgFW8smK7DE4MDGQ8p-B7FP6waGODOjAts5grFX34Jd3NZLVjcV41q1n2dlbsg9uhGppZ2YJs_Mn2e3YUeAagFZcuUOVBJuco2Ht_DjHd2QuSFPgcYkO51gZ2yukd6rexBn8HGAT21mPTLxcOSpV2v9Wg2qmAT3saDgkINZgtmZOBy6SLDZGp4_Mgvp7tBrMCHF9RNbWl5mz4X75hnQwifo4aqSNy9U7cabfvzOxEjxHETgcaPhFvMchMnLoRsbO9AP9uycmIZDBuEdfycOa0jggZ1OIvyuBatYX87EGNl2qG7h78GjJzKsjk3qNuFR726O8-iW_D_uveUOdgMFS6n_Fiidvrx1IVGirRAYrpRYIFMQeu_8zBMEuQipEMz91XN19jU_fgyvj-ahGEP-hCrzPnF9-j6tiGqPDpIT8QRkzG4p5B6RvPydJx8PITxkZ0_LUjsNGyrsZLh33CvynbxqLJqxTu-R7YIi_NpupSLXQnZXgsjY3GPGhKLpmr4DjDkrgR2T5XLlf098X8NAGAR9Pum0c0WF_g5pEWtOBTblVYF-wvMmojYv92eI5Uosy1truYUQ-7HDgTDb4rZdUIVYS1jxMAg1Xwwq-4z7ROAGeNYG3VNL5sAtjn4CWgirW-Cx4saCkAGrhoaic88IhTpXbz6W-8jc4LD1zjJE9h5U67YDI_Ta2kgt_6FUojsH5-XVHWYfYK6T19Es7jslmEdGQ&isca=1)")
+middle.write("Check out the [Health Benefits](https://ff9daa9f835f9b5ffc8722a5d5b5f9245eed0807af30bb1e31033ec-apidata.googleusercontent.com/download/storage/v1/b/lob-hr-docs/o/benefitInsurance.pdf?jk=AanfhSAIDiYizBUKEcJBH-UXnZ2oEkD97gQt4uf2XgKL3VTOO0tYPbG-l_TyVucfFj_S5F_OIoy8wPfkg_PNhMXQ_Bnh_olyzdOCX0VJ8MWs1ENYj1tTjIm2GFo-PezwXu2JxlzoqEcjUKLxplrSsU8vWhwnjbmkb1pCDi-vATt5rWSoSB90ml91o43zrQMuuQac8stg920kGI_eFVrJfocepM4O7Q9fZCftskoE53aNETcddLgMeUlsumwRkmSldc3Ff_WwAmojNdm-FVuH5zGddRXfbCQp_mYoUKWMBFLpOE6Jygcpb6ui25NKhIab7OBFvtlHo2DBOK57_jAR7qckub3w0u2IWrdDOVZIAnGKwW-nQpzqd0oh6BqXtaUdoFukUsJ1-fPfP2VZ_Sk14vNMeTz5dNaUGIxLwf-D9EOgPLDEbqCrooTGqK5lbqn1wXNHGjqN838VwFkv0m30aynJUEj__j_q5CO0w4TXvcK1US0ek55koO8mr7WA2X07Dh_Z3RprF8OCuW8y5gaX3HH_t5SKrsJThvwhHwOz5rIuAc8Jw_h6GkCSA7ZzNFpjwEVJ17czLkDiEpEfabf5RXEWGqId4vc8ky6Blu2vHDdVoxq9MpWLTxW11zK-5IY3kzGSfUzU9fN4o8vku6bkEnFvyuEPQG9d5nrbtDD2NLHAGX5BkJ0O4B6PRPXM07Ypn32vm7KU1UHQ704SE8yLQlEn_LZxTc-TJNghmnywwB2hDkLTceiYZa3I_ct7tjItjryXb0A5Qw2Zs91vl065v2YlWKauRZzqiPCEU9B9GEE0g5b4W6MhagpH276RRahVV8a2yliRheeYZnrgBa2nvXRCEkEUnk2I9HbRT95vpjy1nokvt_EsnqB0Rs72CaPiE1eApYqVHy1sfUR5cZJ2t75cGsEkuSedbyubwUhTmdOY9F0dXH09O701ny6p0sI0Sq3IcrLNsIDtAci8-N2ngrxXXs1JVFmyNOn792Ljs6KUZDnbzG2wJXkx5iatmG5iJjvHUERq1SmzAbgHeGBZ47mLPephUFExWbU2vzOBIk9Jx3EmAXvpETda6IuWDLSmS0zxdydik6QVm7E&isca=1)")
+right.write("Check out the [Dental Plan](https://fff6eaf819f209c2c169d646b0b0b081283d133c9a623f7dff291b4-apidata.googleusercontent.com/download/storage/v1/b/lob-hr-docs/o/dentalplan.pdf?jk=AanfhSDNs3jb2jQIxrqYsPVKyvNsoiW3pbRm1XP8wHv0pCh_tZeTL-E7cZsGE8aMALKhJgycxu_8uj0yb66iH5lnV56g_F-rBr5C_NdFvRq4_tB-jzkVyN2vqQEPcuwJ3PhooYuUuSGC6JXb81iBKO_3eQRKcg5xgvgPSCSPXTah2i_bQJFgJo8W7Vwk1uNWtWVEBSkZDNVCdd_4Zou3ceJ7Fc7me-tWqArNhFvT-ey22WHqxmfDh68RMKiEEbifF2j6vbYYh6v5VFivS7HaB0ulBL6J3s5F-Lju23kVtwWvFmUOqUU330LW2BBqcd-TYZf3fq9sGmN00mCe6PzhuHb3qmfk0BmSuPDqDYSnVOgSAA4efY6SAZf2tbx3yr6YmTIxJY1CrMClagCBzQIhgexTwv6kUZW95WKF7XJvvHxfXhes5_xKhHckbIyxgFUmgBFWo894q8Bn1iklc7jRFmr5C9LS4A7I3RXxNS9zMIM3q1_ltnOzKcagOB8KJi-6UIvNzu0kqR9PzELi8m3SAJXgK0T2LIs_FSqVlko_wzJeiMpmFpBRlveQSUNzG20qO3_LSpg_iIksQ6XxWTe70CKl7saXz-5YZnZ8XYlZuupopu8d0pawF6-lgHlOLptGqAqT2nxT7Fq7IDs6ziu8L8y1dLewAOJ7O92_84xRONOap7BQrwet2eMl9LWQ5tegp2DhEcbkorftBCYbswrLlO7x_YEMJy2k3DZyr1T_TYkB157jrtVDYy3xJoIX-fyGH4ngD3WmXxFGu74OcJnkO2wXHmqeq0nI_ARs2bAhm89ohI4TEr4Bv5abgLhOPvixDBeIPVG8LZ0O8GQ8UI1oSHwq28FUr6Pxmmt8mO6RjcRL0qehT1AtQwx0ZvDtPPpmxQx8m6CBc1vwFoI105LyKHL4O5_IBKZuhTdnKS8qT3_LqpZFMhvdm4kmOYBA0X25ty9el2YJJ4zEN57U7bf6-lAF0_bXqzzpJ92nJy5af4QiYJ1UECINzIGVyUx6hnn1bQqMc_EyLEesQnuP-MMmol5CWSkuyC3dFIun4_OOsaIZUdLK6SrXGJz5GyJ_PtyXIBVpZdI&isca=1)")
+
+
+
+# VISIBILITY CONFIG 
+if "visibility" not in st.session_state:
+    st.session_state.visibility = "visible"
+    st.session_state.disabled = False
+
+
+
+# Retrieve Chat Widget 
+from streamlit.components.v1 import html
+my_html = get_chat_html()
+html(my_html, height=600) 
+
+
+
+
+
+###_____________SIDEBAR_____________###
+# Add a selectbox to the sidebar:
+# st.sidebar.image("Files/cloud.png", width = 50)
+
+
+st.sidebar.title('Boost Internal HR Processes with GenAI')
+st.sidebar.text("")
+st.sidebar.text("")
+
+st.sidebar.header('Retrieve Information Faster', divider='blue')
+st.sidebar.markdown('Leverage the HR Assistant to retrieve answers to HR related questions.')
+st.sidebar.text("")
+st.sidebar.text("")
+
+st.sidebar.header('Resolve Issues and Update Information in Workday', divider='blue')
+st.sidebar.markdown('The HR Assistant helps to retrieve and update information in your ESP system.')
+st.sidebar.text("")
+
+
+
+
+
+
