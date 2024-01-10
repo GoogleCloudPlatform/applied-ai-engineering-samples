@@ -15,15 +15,17 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-nameSuffix: llama7b
+nameSuffix: -llambda7b
+
+resources:
+- ../../../../environment/2-saxml/checkpoint_converter_base
+
 
 configMapGenerator:
 - envs:
   - parameters.env
   name: converter-parameters
 
-resources:
-- ../../../../environment/2-saxml/checkpoint_converter_base
 
 replacements:
 - source:
@@ -38,5 +40,5 @@ replacements:
 namespace: saxml
 images:
 - name: checkpoint-converter
-  newName: us-docker.pkg.dev/jk-mlops-dev/jk1-ml-images/checkpoint-converter
+  newName: us-docker.pkg.dev/jk-mlops-dev/jk-serving-images/checkpoint-converter
   newTag: latest

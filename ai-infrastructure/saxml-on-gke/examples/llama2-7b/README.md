@@ -14,11 +14,22 @@ Before deploying the model to Saxml, you need to convert the original Meta check
 ### Configure a converter job
 
 
-Update the  `parameters.env`  file the `convert_checkpoint/manifests` folder as follows:
+Update the `kustomization.yaml` file in the `convert_checkpoint/manifests` folder.
+
+```
+kustomize edit set namespace <SAXML_NAMESPACE> 
+kustomize edit set image checkpoint-converter=<ARTIFACT_REGISTRY>/checkpoint-converter:latest
+```
+
+Replace `<SAXML_NAMESPACE>` with the namespace for Saxml workloads, which  was created during the setup. Replace `<ARTIFACT_REGISTRY>` with the name of your Artifact Registry. 
+
+Update the  `parameters.env`  file in the `convert_checkpoint/manifests` folder as follows:
 - Set `GCS_BASE_CHECKPOINT_PATH` to the GCS location of the Llama-2-7b checkpoint you downloaded in the previous step
 - Set `GCS_PAX_CHECKPOINT_PATH` to the GCS location where you want to store the converted checkpoint.  
-- Set `KSA` to the Kubernetes service account name configured for Workload Identity. You can retrieve the name by executing the `terraform output ksa_name` command from the `environment/1-base_environment` folder.
+- Set `KSA` to the Kubernetes service account name configured for Workload Identity. 
 - Do not modify the `ARGS` and `CHECKPOINT_FOLDER_NAME` parameters
+
+If you deployed the environment using the automated setup you can retrieve the values of <SAXML_NAMESPACE>, <ARTIFACT_REGISTRY_PATH>, <KSA>, and GCS buckets by executing `terraform output` from the `environment/1-base_environment` folder.
 
 ### Start the conversion job:
 
@@ -67,7 +78,7 @@ saxml.server.pax.lm.params.lm_cloud.LLaMA7BFP16TPUv5e \
 BATCH_SIZE=[1]
 ```
 
-Replace `<CHECKPOINT_PATH>` with the path to the converted checkpoint.
+Replace `<CHECKPOINT_PATH>` with the path to the converted checkpoint. Remember that the path should adhere to the following format - `gs://<GCS_PAX_CHECKPOINT_PATH>/<CHECKPOINT_FOLDER_NAME>`, where `<GCS_PAX_CHECKPOINT_PATH>` and `<CHECKPOINT_FOLDER_NAME>` correspond to the settings configured for the conversion job in the previous step.
 
 The above command deploys as single replica of the model and configures the Saxml model server to use a batch size of 1.
 
