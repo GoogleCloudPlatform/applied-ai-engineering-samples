@@ -49,9 +49,6 @@ html(my_html, height=600)
 
 
 ###_____________SIDEBAR_____________###
-# Add a selectbox to the sidebar:
-# st.sidebar.image("Files/cloud.png", width = 50)
-
 
 st.sidebar.title('Boost Internal HR Processes with GenAI')
 st.sidebar.text("")
