@@ -9,7 +9,7 @@ The diagram below illustrates the high-level architecture of the Saxml system on
 
 ![arch](images/saxml-gke.png)
 
-- The foundation of the environment is a standard, regional, VPC-native GKE cluster with two types of node pools: TPU v5e node pools and CPU node pools.
+- The foundation of the environment is a standard, regional, VPC-native GKE cluster with two types of node pools: TPU v4/v5e node pools and CPU node pools.
 - TPU node pools host **Saxml Model Servers**.
 - A dedicated fixed size CPU node pool hosts **Saxml Admin Servers**. 
 - A dedicated autoscaling CPU node pool hosts **Saxml HTTP Proxy** instances. **Saxml HTTP Proxy** is a custom API server that encapsulates **Saxml Client API** and exposes it through REST interfaces.
@@ -24,9 +24,18 @@ The diagram below illustrates the high-level architecture of the Saxml system on
 
 ## Setup
 
-The deployment process is automated using [Cloud Build](https://cloud.google.com/build), [Terraform](https://cloud.google.com/docs/terraform), and [Kustomize](https://kustomize.io/). The Cloud Build configuration file  defines two deployment stages:
+The deployment process is divided into 2 stages:
 
-In the first stage a Terraform configuration is applied, which:
+1. Base infrastructure: In this stage, the core infrastructure components are configured, including a VPC, a GKE cluster, service accounts, and storage buckets. Optionally, Pubsub and BigQuery services can also be installed to support performance testing management. The deployment process provides the flexibility to use existing VPCs and service accounts, aligning with common IT governance structures in enterprises.
+
+2. Saxml Deployment: In this stage, Saxml servers and utilities are deployed to the GKE cluster.
+
+The deployment process is automated using [Cloud Build](https://cloud.google.com/build), [Terraform](https://cloud.google.com/docs/terraform),  [Kustomize](https://kustomize.io/), and [Skaffold](ihttps://skaffold.dev/). 
+To run the setup and execute code samples, you will need a workstation with [Google Cloud SDK](https://cloud.google.com/sdk/docs/install-sdk), [Terraform](https://www.terraform.io/), [Kustomize](https://kubectl.docs.kubernetes.io/installation/kustomize), [Skaffold](https://skaffold.dev), and [kubectl](https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-access-for-kubectl) utilities. We recommend using [Cloud Shell](https://cloud.google.com/shell/docs/using-cloud-shell), which has all the utilities pre-installed.
+
+
+
+The first stage is automated with **Cloud Build** and **Terraform**. The **Cloud Build** configuration orchestrates the following steps:
 
 - [ ] Creates a network, a subnet, and IP ranges for GKE pods and services.
 - [ ] Creates a VPC-native cluster.
@@ -34,18 +43,19 @@ In the first stage a Terraform configuration is applied, which:
 - [ ] Creates TPU node pools.
 - [ ] Creates an IAM service account for Workload Identity and an IAM service account to be used as a custom node pool service account.
 - [ ] Configures the cluster for Workload Identity.
+- [ ] Creates a Kubernetes namespace to host Saxml servers and a Kubernetes service account to use with Workload Identity
 - [ ] Creates two Google Cloud Storage buckets.
 - [ ] Creates an Artifact Registry
 - [ ] Creates a BigQuery dataset and table 
 - [ ] Creates a Pubsub topic and BigQuery subscription
 
-The last three steps are optional. They can be skipped by setting the `create_artifact_registry` and the `create_perf_testing_infrastructure` input variables to `false`.
+The last three steps are optional. They can be skipped by setting the `create_artifact_registry` and the `create_perf_testing_infrastructure` Terraform input variables to `false`.
 
 The Terraform configuration creates and configures a new VPC  by default. However, you can also opt to use an existing VPC for a GKE cluster, as this functionality is supported by the [gke-aiml Terraform module](../terraform-modules/gke-aiml/README.md), which is used by the Terraform configuration.
 
-To use an existing VPC you need to modify the inputs to the `module "base_environment"` in the `main.tf` file, following the instructions in [gke-aiml Terraform module documentation](../terraform-modules/gke-aiml/README.md) 
+To use an existing VPC you need to modify the inputs to the `module "base_environment"` in the `environment/1-base-infrastrucutre/main.tf` file, following the instructions in [gke-aiml Terraform module documentation](../terraform-modules/gke-aiml/README.md) 
 
-In the second stage, the Saxml components, including admin servers, model servers, and http proxies are deployed to the GKE cluster. 
+In the second stage, the Saxml components, including admin servers, model servers, and http proxies are deployed to the GKE cluster. This stage is automated with **Skaffold** and **Kustomize**. 
 
 
 > [!WARNING]
@@ -128,7 +138,7 @@ gcloud iam service-accounts add-iam-policy-binding $AUTOMATION_SERVICE_ACCOUNT -
 
 Replace <PROJECT_NUMBER> with your project number. Replace <AUTOMATION_SERVICE_ACCOUNT_EMAIL> with the email of your automation service account. If you created the automation service account using the bootstrap Terraform you can retrieve its email by executing the `terraform output automation_sa` command from the `environment\0-bootstrap` folder.
 
-### Deploy 
+### Deploy base infrastructure 
 
 #### Clone the GitHub repo. 
 
@@ -142,7 +152,7 @@ Change the current directory, to `ai-infrastructure/saxml-on-gke/environment`.
 
 #### Configure build parameters
 
-If you used the `bootstrap` configuration to configure the prerequisites, copy the `providers\providers.tf` and `providers\backend.tf` files from the `providers` folder in your automation bucket to the `1-base-environment` folder. Modify the `backend.tf` by setting the `prefix` field to the name of a folder in the automation bucket where you want to store your Terraform configuration's state. For example, if you want to manage the Terraform state in the `tf_state/gke_saxml` subfolder of the automation bucket set the `prefix` field to `tf_state/gke_saxml`.
+If you used the `bootstrap` configuration to configure the prerequisites, copy the `providers\providers.tf` and `providers\backend.tf` files from the `providers` folder in your automation bucket to the `1-base-infrastructure` folder. Modify the `backend.tf` by setting the `prefix` field to the name of a folder in the automation bucket where you want to store your Terraform configuration's state. For example, if you want to manage the Terraform state in the `tf_state/gke_saxml` subfolder of the automation bucket set the `prefix` field to `tf_state/gke_saxml`.
 
 If the automation bucket and the automation service account were provided to you by your administrator, rename the `backend.tf.tmpl` and the `providers.tf.tmpl` files to `backend.tf` and `providers.tf` and update them with your settings.
 
@@ -151,9 +161,7 @@ To configure the Terraform steps in the build, copy the `terraform.tfvars.tmpl` 
 - `project_id` - your project ID
 - `region` - your region for a VPC and a GKE cluster
 - `prefix` - the prefix that will be added to the default names of resources provisioned by the configuration
-- `tensorboard_config.region` - the region of a TensorBoard instance
-- `cpu_node_pools` - The `terraform.tfvars.tmpl` template provides an example configuration for a single autoscaling node pool.  
-- `tpu_node_pools` - The  template shows an example configuration for two TPU node pools with  v4-16 pod slices. Modify the `tpu_node_pools` variable to provision different TPU node pool configurations, as described below.
+- `tpu_node_pools` - The  template shows an example configuration for one TPU node pool with a v4-8 device. Modify the `tpu_node_pools` variable to provision different TPU node pool configurations, as described below.
 
 If you wish to modify other default settings, such as the default name suffixes for a cluster or GCS bucket names, you can override the defaults specified in the `variables.tf` file within your `terraform.tfvars` file.
 
@@ -192,21 +200,28 @@ gcloud builds submit \
 ```
 
 
-```
-export JOBSET_API_VERSION=v0.3.0
-export KUEUE_API_VERSION=v0.5.1 
-
-gcloud builds submit \
-  --config cloudbuild.provision.yaml \
-  --substitutions _JOBSET_API_VERSION=$JOBSET_API_VERSION,_KUEUE_API_VERSION=$KUEUE_API_VERSION \
-  --timeout "2h" \
-  --machine-type=e2-highcpu-32 
-```
-
 To track the progress of the build, you can either follow the link displayed in Cloud Shell or visit the Cloud Build page on the [Google Cloud Console](https://console.cloud.google.com/cloud-build).
 
+The Cloud Build runs are annotated with the `saxml-infra-deployment` tags.
 
-### Step by step deployment 
+If you need to access the build logs after the build completes you can use this tag for filtering.
+
+To list the builds:
+
+```
+gcloud builds list --filter "tags='saxml-infra-deployment'"
+```
+
+To retrieve the logs for a build:
+
+```
+gcloud builds log <BUILD_ID>
+```
+
+For your convenience, the final step of the build displays the names of all resources created during the build process. This makes it easier for you to retrieve them for configuring Saxml deployment and other workloads.
+
+
+### Deploy Saxml components 
 
 As an alternative to an automated deployment, you can run each stage of the setup individually.
 
