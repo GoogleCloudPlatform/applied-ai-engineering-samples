@@ -44,16 +44,16 @@ The first stage is automated with **Cloud Build** and **Terraform**. The **Cloud
 - [ ] Creates an IAM service account for Workload Identity and an IAM service account to be used as a custom node pool service account.
 - [ ] Configures the cluster for Workload Identity.
 - [ ] Creates a Kubernetes namespace to host Saxml servers and a Kubernetes service account to use with Workload Identity
-- [ ] Creates two Google Cloud Storage buckets.
+- [ ] Creates two Google Cloud Storage buckets. One to be used as a Saxml admin bucket. The other to manage serving checkpoints and other serving artifacts.
 - [ ] Creates an Artifact Registry
 - [ ] Creates a BigQuery dataset and table 
 - [ ] Creates a Pubsub topic and BigQuery subscription
 
-The last three steps are optional. They can be skipped by setting the `create_artifact_registry` and the `create_perf_testing_infrastructure` Terraform input variables to `false`.
+The last three steps are optional. They can be skipped by setting the `create_artifact_registry` and the `create_perf_testing_infrastructure` Terraform input variables to `false`. Refer to the below instructions on updating Terraform input variables.
 
 The Terraform configuration creates and configures a new VPC  by default. However, you can also opt to use an existing VPC for a GKE cluster, as this functionality is supported by the [gke-aiml Terraform module](../terraform-modules/gke-aiml/README.md), which is used by the Terraform configuration.
 
-To use an existing VPC you need to modify the inputs to the `module "base_environment"` in the `environment/1-base-infrastrucutre/main.tf` file, following the instructions in [gke-aiml Terraform module documentation](../terraform-modules/gke-aiml/README.md) 
+To use an existing VPC you need to modify the inputs to the `module "base_environment"` in the `environment/1-base-infrastrucutre/main.tf` file, following the instructions in the [gke-aiml Terraform module documentation](../terraform-modules/gke-aiml/README.md) 
 
 In the second stage, the Saxml components, including admin servers, model servers, and http proxies are deployed to the GKE cluster. This stage is automated with **Skaffold** and **Kustomize**. 
 
@@ -136,7 +136,7 @@ CLOUD_BUILD_SERVICE_ACCOUNT=<PROJECT_NUMBER>@cloudbuild.gserviceaccount.com
 gcloud iam service-accounts add-iam-policy-binding $AUTOMATION_SERVICE_ACCOUNT --member="serviceAccount:$CLOUD_BUILD_SERVICE_ACCOUNT" --role='roles/iam.serviceAccountTokenCreator'
 ```
 
-Replace <PROJECT_NUMBER> with your project number. Replace <AUTOMATION_SERVICE_ACCOUNT_EMAIL> with the email of your automation service account. If you created the automation service account using the bootstrap Terraform you can retrieve its email by executing the `terraform output automation_sa` command from the `environment\0-bootstrap` folder.
+Replace <PROJECT_NUMBER> with your project number. Replace <AUTOMATION_SERVICE_ACCOUNT_EMAIL> with the email of your automation service account. If you created the automation service account using the bootstrap Terraform you can retrieve its email by executing the `terraform output automation_sa` command from the [environment\0-bootstrap](environment/0-bootstrap/) folder.
 
 ### Deploy base infrastructure 
 
@@ -148,22 +148,22 @@ If you haven't already run the bootstrap stage, please clone this repository now
 git clone https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples.git
 ```
 
-Change the current directory, to `ai-infrastructure/saxml-on-gke/environment`.
+Change the current directory, to [environment](environment/).
 
 #### Configure build parameters
 
-If you used the `bootstrap` configuration to configure the prerequisites, copy the `providers\providers.tf` and `providers\backend.tf` files from the `providers` folder in your automation bucket to the `1-base-infrastructure` folder. Modify the `backend.tf` by setting the `prefix` field to the name of a folder in the automation bucket where you want to store your Terraform configuration's state. For example, if you want to manage the Terraform state in the `tf_state/gke_saxml` subfolder of the automation bucket set the `prefix` field to `tf_state/gke_saxml`.
+If you used the `bootstrap` configuration to configure the prerequisites, copy the `providers\providers.tf` and `providers\backend.tf` files from the `providers` folder in your automation bucket to the [1-base-infrastructure](environment/1-base-infrastructure/) folder. Modify the `backend.tf` by setting the `prefix` field to the name of a folder in the automation bucket where you want to store your Terraform configuration's state. For example, if you want to manage the Terraform state in the `tf_state/gke_saxml` subfolder of the automation bucket set the `prefix` field to `tf_state/gke_saxml`.
 
 If the automation bucket and the automation service account were provided to you by your administrator, rename the `backend.tf.tmpl` and the `providers.tf.tmpl` files to `backend.tf` and `providers.tf` and update them with your settings.
 
-To configure the Terraform steps in the build, copy the `terraform.tfvars.tmpl` file in the `1-base-infrastructure` folder to `terraform.tfvars`. Make modifications to the `terraform.tfvars` file to align it with your specific environment. At the very least, you should set the following variables:
+To configure the Terraform steps in the build, copy the [terraform.tfvars.tmpl](environment/1-base-infrastructure/terraform.tfvars.tmpl) file in the [1-base-infrastructure](environment/1-base-infrastructure/) folder to `terraform.tfvars`. Make modifications to the `terraform.tfvars` file to align it with your specific environment. At the very least, you should set the following variables:
 
 - `project_id` - your project ID
 - `region` - your region for a VPC and a GKE cluster
 - `prefix` - the prefix that will be added to the default names of resources provisioned by the configuration
 - `tpu_node_pools` - The  template shows an example configuration for one TPU node pool with a v4-8 device. Modify the `tpu_node_pools` variable to provision different TPU node pool configurations, as described below.
 
-If you wish to modify other default settings, such as the default name suffixes for a cluster or GCS bucket names, you can override the defaults specified in the `variables.tf` file within your `terraform.tfvars` file.
+If you wish to modify other default settings, such as the default name suffixes for a cluster or GCS bucket names, you can override the defaults specified in the [variables.tf](environment/1-base-infrastructure/variables.tf) file within your `terraform.tfvars` file.
 
 When configuring TPU node pools, ensure that you set the TPU type to one of the following values:
 
@@ -235,7 +235,7 @@ kustomize edit set namespace <NAMESPACE>
 
 Replace <NAMESPACE> with the name of the namespace established during the base infrastructure setup. Remember that you can retrieve the names of all the provisioned resources, including the namespace name, from the build logs.
 
-Copy the `parameters.env.tmpl` file to `parameters.env`.
+Copy the [parameters.env.tmpl](environment/2-workloads/saxml/manifests/parameters.env.tmpl) file to `parameters.env`.
 
 Update the `parameters.env` to reflect your desired configuration
 
