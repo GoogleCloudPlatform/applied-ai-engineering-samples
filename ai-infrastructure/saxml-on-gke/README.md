@@ -233,7 +233,7 @@ From the [environment/2-workloads/saxml/manifests](environment/2-workloads/saxml
 kustomize edit set namespace <NAMESPACE>
 ```
 
-Replace <NAMESPACE> with the name of the namespace established during the base infrastructure setup. Remember that you can retrieve the names of all the provisioned resources, including the namespace name, from the build logs.
+Replace `<NAMESPACE>` with the name of the namespace established during the base infrastructure setup. Remember that you can retrieve the names of all the provisioned resources, including the namespace name, from the build logs.
 
 Copy the [parameters.env.tmpl](environment/2-workloads/saxml/manifests/parameters.env.tmpl) file to `parameters.env`.
 
@@ -269,7 +269,7 @@ To build and push the container packaging the Saxml proxy to your Artifact Regis
 skaffold run --default-repo <ARTIFACT_REGISTRY_PATH> --profile cloudbuild
 ```
 
-Replace <ARTIFACT_REGISTRY> with the path to your Artifact Registry. 
+Replace `<ARTIFACT_REGISTRY>` with the path to your Artifact Registry. 
 
 Verify that all pods have started successfully:
 
