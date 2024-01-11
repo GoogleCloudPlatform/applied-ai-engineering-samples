@@ -190,7 +190,7 @@ When configuring TPU node pools, ensure that you set the TPU type to one of the 
 
 #### Submit the build
 
-To initiate the build, execute the following command:
+To initiate the build, execute the following command from the [environment](environment/) folder:
 
 ```
 gcloud builds submit \
