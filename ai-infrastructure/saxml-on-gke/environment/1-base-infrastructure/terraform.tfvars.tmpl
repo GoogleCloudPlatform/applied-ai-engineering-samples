@@ -12,14 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-project_id = "your-project-id"
-region = "your-region"
-prefix = "your-prefix"
-artifact_registry_name = "your-artifact-registry-name"
+project_id                         = "your-project-id"
+region                             = "your-region"
+prefix                             = "your-prefix"
+deletion_protection                = true
+create_artifact_registry           = true
+create_perf_testing_infrastructure = true
 
 tpu_node_pools = {
   tpu-v4-8-node-pool = {
-    zones = ["your_zone_1"]
+    zones    = ["your_zone_1"]
     tpu_type = "v4-8"
   }
 }

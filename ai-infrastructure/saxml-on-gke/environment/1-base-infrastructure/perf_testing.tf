@@ -13,9 +13,31 @@
 # limitations under the License.
 
 
+
 locals {
+  pubsub_config = (
+    var.prefix != ""
+    ? {
+      topic_name        = "${var.prefix}_${var.pubsub_config.topic_name}"
+      subscription_name = "${var.prefix}_${var.pubsub_config.subscription_name}"
+      schema_name       = "${var.prefix}_${var.pubsub_config.schema_name}"
+    }
+    : var.pubsub_config
+  )
+
+  bq_config = (
+    var.prefix != ""
+    ? {
+      dataset_name = "${var.prefix}_${var.bq_config.dataset_name}"
+      table_name   = var.bq_config.table_name
+      location     = var.bq_config.location
+    }
+    : var.bq_config
+  )
+
   message_schema = "syntax = \"proto3\";\n\nmessage Metrics {\n  string test_id=1;\n  string request_type = 2;\n  string request_name=3;\n  int32 response_length=4;\n  float response_time=5;\n  string start_time=6;\n  string exception=7;\n  optional string request=8;\n  optional string response=9;\n  optional string model_name=10;\n  optional string model_method=11;\n  optional string tokenizer=12;\n  optional int32 num_output_tokens=13;\n  optional int32 num_input_tokens=14;\n  optional int32 model_response_time=15;\n}"
-  table_schema   = <<EOF
+
+  table_schema = <<EOF
 [
     {
         "name": "subscription_name",
@@ -149,7 +171,9 @@ EOF
   message_retention_time = "86600s"
 }
 
+
 resource "google_pubsub_topic" "locust_sink" {
+  count      = var.create_perf_testing_infrastructure == true ? 1 : 0
   project    = data.google_project.project.project_id
   name       = local.pubsub_config.topic_name
   depends_on = [google_pubsub_schema.locust_metrics_schema]
@@ -163,6 +187,7 @@ resource "google_pubsub_topic" "locust_sink" {
 }
 
 resource "google_pubsub_schema" "locust_metrics_schema" {
+  count      = var.create_perf_testing_infrastructure == true ? 1 : 0
   project    = data.google_project.project.project_id
   name       = local.pubsub_config.schema_name
   type       = "PROTOCOL_BUFFER"
@@ -170,34 +195,32 @@ resource "google_pubsub_schema" "locust_metrics_schema" {
 }
 
 resource "google_bigquery_dataset" "locust_dataset" {
+  count                      = var.create_perf_testing_infrastructure == true ? 1 : 0
   project                    = data.google_project.project.project_id
   dataset_id                 = local.bq_config.dataset_name
   friendly_name              = "Locust metrics"
   description                = "Locust metrics"
   location                   = local.bq_config.location
   delete_contents_on_destroy = !var.deletion_protection
-
-  #  access {
-  #    role          = "OWNER"
-  #    user_by_email = var.sa_email 
-  #  }
 }
 
 resource "google_bigquery_table" "locust_metrics" {
+  count               = var.create_perf_testing_infrastructure == true ? 1 : 0
   project             = data.google_project.project.project_id
-  dataset_id          = google_bigquery_dataset.locust_dataset.dataset_id
+  dataset_id          = google_bigquery_dataset.locust_dataset[0].dataset_id
   table_id            = local.bq_config.table_name
   schema              = local.table_schema
   deletion_protection = var.deletion_protection
 }
 
 resource "google_pubsub_subscription" "locust_bq_subscription" {
+  count   = var.create_perf_testing_infrastructure == true ? 1 : 0
   project = data.google_project.project.project_id
   name    = local.pubsub_config.subscription_name
-  topic   = google_pubsub_topic.locust_sink.name
+  topic   = google_pubsub_topic.locust_sink[0].name
 
   bigquery_config {
-    table               = "${google_bigquery_table.locust_metrics.project}.${google_bigquery_table.locust_metrics.dataset_id}.${google_bigquery_table.locust_metrics.table_id}"
+    table               = "${google_bigquery_table.locust_metrics[0].project}.${google_bigquery_table.locust_metrics[0].dataset_id}.${google_bigquery_table.locust_metrics[0].table_id}"
     use_topic_schema    = true
     drop_unknown_fields = true
     write_metadata      = true
@@ -206,17 +229,16 @@ resource "google_pubsub_subscription" "locust_bq_subscription" {
   depends_on = [google_project_iam_member.viewer, google_project_iam_member.editor]
 }
 
-
 resource "google_project_iam_member" "viewer" {
+  count   = var.create_perf_testing_infrastructure == true ? 1 : 0
   project = data.google_project.project.project_id
   role    = "roles/bigquery.metadataViewer"
   member  = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
 }
 
-
 resource "google_project_iam_member" "editor" {
+  count   = var.create_perf_testing_infrastructure == true ? 1 : 0
   project = data.google_project.project.project_id
   role    = "roles/bigquery.dataEditor"
   member  = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
 }
-

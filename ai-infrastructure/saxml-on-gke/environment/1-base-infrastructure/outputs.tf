@@ -41,3 +41,28 @@ output "artifact_registry_image_path" {
   description = "The URI of an Artifact Registry if created"
   value       = try(module.base_environment.artifact_registry_image_path, null)
 }
+
+output "locust_dataset_id" {
+  description = "Locust metrics dataset id"
+  value       = try(google_bigquery_dataset.locust_dataset[0].id, null)
+}
+
+output "locust_metrics_table_id" {
+  description = "Locust metrics table id"
+  value       = try(google_bigquery_table.locust_metrics[0].id, null)
+}
+
+output "locust_metrics_topic_id" {
+  description = "Locust metrics topic ID"
+  value       = try(google_pubsub_topic.locust_sink[0].id, null)
+}
+
+output "locust_metrics_topic_name" {
+  description = "Locust metrics topic name"
+  value       = try(google_pubsub_topic.locust_sink[0].name, null)
+}
+
+output "locust_metrics_bq_subscription" {
+  description = "Locust metrics BQ subscription"
+  value       = try(google_pubsub_subscription.locust_bq_subscription[0].id, null)
+}

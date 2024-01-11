@@ -1,0 +1,83 @@
+# Copyright 2023 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+steps:
+  - id: log parameters 
+    name: gcr.io/cloud-builders/gke-deploy
+    entrypoint: /bin/bash 
+    args:
+      - -c
+      - |
+          echo BUILD SETTINGS:
+          cat 1-base-infrastructure/terraform.tfvars 
+
+  - id: tf init
+    name: hashicorp/terraform
+    dir: 1-base-infrastructure
+    args: 
+    - init 
+
+  - id: tf plan
+    name: hashicorp/terraform
+    dir: 1-base-infrastructure 
+    args: 
+    - plan 
+    - -out=tfplan
+
+  - id: tf apply
+    name: hashicorp/terraform
+    dir: 1-base-infrastructure 
+    args: 
+    - apply
+    - -auto-approve
+    - tfplan 
+
+  - id: tf output
+    name: hashicorp/terraform
+    entrypoint: sh
+    dir: 1-base-infrastructure  
+    args:
+    - -c
+    - |
+      touch params.env
+      echo "CLUSTER_NAME=$(terraform output cluster_name)" >> params.env 
+      echo "CLUSTER_REGION=$(terraform output cluster_region)" >> params.env
+      echo "WID_KSA_NAME=$(terraform output wid_ksa_name)" >> params.env
+      echo "SAXML_NAMESPACE=$(terraform output wid_ksa_namespace)" >> params.env
+      echo "WID_GSA_EMAIL=$(terraform output wid_gsa_email)" >> params.env
+      echo "ARTIFACT_REGISTRY_PATH=$(terraform output artifact_registry_image_path)" >> params.env
+      cat params.env
+      mv params.env scripts
+
+  - id: Configure namespace 
+    name: gcr.io/cloud-builders/gke-deploy
+    entrypoint: /bin/bash
+    dir: 1-base-infrastructure/scripts
+    args:
+      - -c
+      - |
+        set -o  allexport; source params.env; set +o allexport
+        gcloud container clusters get-credentials $$CLUSTER_NAME --region $$CLUSTER_REGION
+        bash config_namespace.sh NAMESPACE=$$SAXML_NAMESPACE KSA_NAME=$$WID_KSA_NAME GSA_EMAIL=$$WID_GSA_EMAIL ARTIFACT_REGISTRY_PATH=$$ARTIFACT_REGISTRY_PATH
+
+  - id: Log deployment configs 
+    name: hashicorp/terraform
+    entrypoint: sh 
+    dir: 1-base-infrastructure  
+    args:
+      - -c
+      - |
+        terraform output 
+tags:
+  - 'saxml-infra-deployment-dev'

@@ -241,4 +241,33 @@ variable "vpc_config" {
 }
 
 
+variable "create_perf_testing_infrastructure" {
+  description = "Whether to create BigQuery and Pubsub components to support performance testing"
+  type        = bool
+  default     = true
+}
+
+
+variable "pubsub_config" {
+  description = "The settings for Pubsub topic and subscription"
+  type = object({
+    topic_name        = optional(string, "locust_pubsub_sink")
+    subscription_name = optional(string, "locust_pubsub_bq_sub")
+    schema_name       = optional(string, "locust_metrics_schema")
+  })
+  nullable = false
+  default  = {}
+}
+
+variable "bq_config" {
+  description = "The settings for BigQuery dataset and tables"
+  type = object({
+    dataset_name = optional(string, "locust_metrics_dataset")
+    location     = optional(string, "US")
+    table_name   = optional(string, "locust_metrics")
+  })
+  nullable = false
+  default  = {}
+}
+
 
