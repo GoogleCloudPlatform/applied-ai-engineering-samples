@@ -12,6 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+variable "deletion_protection" {
+  description = "Prevent Terraform from destroying the provisioned automation bucket"
+  type        = bool
+  default     = true
+  nullable    = false
+}
+
+
 variable "automation_bucket" {
   description = "The parameters of the bucket to be used by automation tools including Terraform backend"
   type = object({
