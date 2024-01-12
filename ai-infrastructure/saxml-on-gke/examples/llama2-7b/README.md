@@ -79,7 +79,7 @@ saxml.server.pax.lm.params.lm_cloud.LLaMA7BFP16TPUv5e \
 BATCH_SIZE=[1]
 ```
 
-Replace `<CHECKPOINT_PATH>` with the path to the converted checkpoint. 
+Replace `<CHECKPOINT_PATH>` with the path to the converted checkpoint. Make sure to include the checkpoint folder in the path. For instance, if the checkpoint is located in the `checkpoint_00000000` folder within the `<GCS_PAX_CHECKPOINT_PATH>` path  `<CHECKPOINT_PATH>` should be `<GCS_PAX_CHECKPOINT_PATH>/checkpoint_00000000` 
 
 The above command deploys as single replica of the model and configures the Saxml model server to use a batch size of 1.
 
