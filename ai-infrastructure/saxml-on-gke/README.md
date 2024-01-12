@@ -108,11 +108,11 @@ If the performance testing components are being deployed additional roles are re
 
 #### Configuring the prerequisites using the bootstrap Terraform 
 
-The prerequisites may need to be configured by your GCP organization administrator. If you have access to a project where you are a project owner, you can configure the prerequisites using the Terraform configuration in the `environment/0-bootstrap` folder.
+The prerequisites may need to be configured by your GCP organization administrator. If you have access to a project where you are a project owner, you can configure the prerequisites using the Terraform configuration in the [environment/0-bootstrap](environment/0-bootstrap/) folder.
 
 1. Clone this repo
-2. Change the current folder to `ai-infrastructureenvironment/saxml-on-gke/environment/0-bootstrap`
-3. Copy the `terraform.tfvars.tmpl` file to `terraform.tfvars`
+2. Change the current folder to [environment/0-bootstrap](environment/0-bootstrap/)
+3. Copy the [terraform.tfvars.tmpl](environment/0-bootstrap/terraform.tfvars.tmpl) file to `terraform.tfvars`
 4. Modify the `terraform.tfvars` file to reflect your environment
   - Set `project_id` to your project ID
   - Set `automation_bucket` to the name of a bucket you want to create in your project
