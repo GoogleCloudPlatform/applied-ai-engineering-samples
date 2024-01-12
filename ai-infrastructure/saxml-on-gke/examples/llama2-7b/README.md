@@ -14,32 +14,33 @@ Before deploying the model to Saxml, you need to convert the original Meta check
 ### Configure a converter job
 
 
-Update the `kustomization.yaml` file in the `convert_checkpoint/manifests` folder.
+From the [manifests](convert_checkpoint/manifests/) folder, execute the following steps:
+
+Update the namespace in [kustomization.yaml](convert_checkpoint/manifests/kustomization.yaml).
 
 ```
 kustomize edit set namespace <SAXML_NAMESPACE> 
-kustomize edit set image checkpoint-converter=<ARTIFACT_REGISTRY>/checkpoint-converter:latest
 ```
 
-Replace `<SAXML_NAMESPACE>` with the namespace for Saxml workloads, which  was created during the setup. Replace `<ARTIFACT_REGISTRY>` with the name of your Artifact Registry. 
+Replace `<SAXML_NAMESPACE>` with the namespace for Saxml workloads, which  was created during the setup. 
 
-Update the  `parameters.env`  file in the `convert_checkpoint/manifests` folder as follows:
+Copy [parameters.env.tmpl](convert_checkpoint/manifests/parameters.env.tmpl) to `parameters.env`
+
+Update  `parameters.env`  follows:
 - Set `GCS_BASE_CHECKPOINT_PATH` to the GCS location of the Llama-2-7b checkpoint you downloaded in the previous step
 - Set `GCS_PAX_CHECKPOINT_PATH` to the GCS location where you want to store the converted checkpoint.  
 - Set `KSA` to the Kubernetes service account name configured for Workload Identity. 
-- Do not modify the `ARGS` and `CHECKPOINT_FOLDER_NAME` parameters
-
-If you deployed the environment using the automated setup you can retrieve the values of <SAXML_NAMESPACE>, <ARTIFACT_REGISTRY_PATH>, <KSA>, and GCS buckets by executing `terraform output` from the `environment/1-base_environment` folder.
 
 ### Start the conversion job:
 
 ```shell
-kubectl apply -k . 
+skaffold run --default-repo <ARTIFACT_REGISTRY> --profile cloudbuild 
 ```
 
-You can monitor the progress of the job using **Cloud Console** or by streaming logs with `kubectl logs` command.
+Replace `<ARTIFACT_REGISTRY>` with the path to your Artifact Registry. 
 
-After the job is complete, you can find the converted checkpoint in the `<GCS_PAX_CHECKPOINT_PATH>/checkpoint_00000000` location.
+
+You can monitor the progress of the job using **Cloud Console** or by streaming logs with `kubectl logs` command.
 
 
 ## Deploy the model
@@ -64,7 +65,7 @@ Open a shell in the pod.
 kubectl exec -it <SAXUTIL_POD> -n <SAXML_NAMESPACE>  -- /bin/bash
 ```
 
-Several environment variables are pre-set in the `saxutil`` pod, including SAX_CELL and SAX_ROOT, which are set to the name of the Saxml cell and the name of the Saxml root folder, respectively. You will use a predefined Llama-2 7B model configuration to deploy the checkpoint.
+Several environment variables are pre-set in the `saxutil` pod, including `SAX_CELL` and `SAX_ROOT`, which are set to the name of the Saxml cell and the name of the Saxml root folder, respectively. You will use the predefined Llama-2 7B model configuration to deploy the checkpoint.
 
 
 Execute the following commands to deploy the model:
@@ -78,7 +79,7 @@ saxml.server.pax.lm.params.lm_cloud.LLaMA7BFP16TPUv5e \
 BATCH_SIZE=[1]
 ```
 
-Replace `<CHECKPOINT_PATH>` with the path to the converted checkpoint. Remember that the path should adhere to the following format - `gs://<GCS_PAX_CHECKPOINT_PATH>/<CHECKPOINT_FOLDER_NAME>`, where `<GCS_PAX_CHECKPOINT_PATH>` and `<CHECKPOINT_FOLDER_NAME>` correspond to the settings configured for the conversion job in the previous step.
+Replace `<CHECKPOINT_PATH>` with the path to the converted checkpoint. 
 
 The above command deploys as single replica of the model and configures the Saxml model server to use a batch size of 1.
 

@@ -17,21 +17,12 @@ kind: Job
 metadata:
   name: convert-checkpoint 
 spec:
-  backoffLimit: 0
-  completions: 1
-  parallelism: 1
   template:
     spec:
-      restartPolicy: Never
-      volumes:
-      - name: staging
-        emptyDir: {}
-      serviceAccountName: saxml-sa
       containers:
-      - name: convert-job
-        image: checkpoint-converter  
+      - name: convert-job 
         command:
-        - bash 
+        - bash
         - -c
         - |
             echo Starting checkpoint download 
@@ -43,7 +34,6 @@ spec:
                 echo ERROR downloading the checkpoint
                 exit 
             fi
-
             echo Checkpoint download completed 
 
             echo Starting checkpoint conversion 
@@ -55,22 +45,8 @@ spec:
             echo Checkpoint conversion completed 
             
             echo Starting checkpoint upload 
-            GCS_CHECKPOINT_PATH=${GCS_PAX_CHECKPOINT_PATH}/${CHECKPOINT_FOLDER_NAME}
-            gsutil -m cp -r /checkpoints/pax/${CHECKPOINT_FOLDER_NAME}/* ${GCS_CHECKPOINT_PATH}/
-            touch commit_success.txt
-            gsutil cp commit_success.txt ${GCS_CHECKPOINT_PATH}/
-            gsutil cp commit_success.txt ${GCS_CHECKPOINT_PATH}/metadata/
-            gsutil cp commit_success.txt ${GCS_CHECKPOINT_PATH}/state/
+            cd /checkpoints/pax
+            find . -type d -exec touch {}/commit.txt \;
+            rm commit.txt
+            gsutil -m cp -r . ${GCS_PAX_CHECKPOINT_PATH}
             echo Checkpoint upload completed
-
-        volumeMounts:
-        - name: staging
-          mountPath: /checkpoints
-        envFrom:
-        - configMapRef:
-            name: converter-parameters
-        resources:
-          requests:
-            memory: 112G 
-          limits:
-            memory: 112G

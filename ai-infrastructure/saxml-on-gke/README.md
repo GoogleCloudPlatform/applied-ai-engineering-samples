@@ -280,7 +280,7 @@ kubectl get pods -n <SAXML_NAMESPACE>
 
 #### Undeploy Saxml
 
-If you wish to undeploy the Saxml component, run the following command from the [environment/2-workloads/saxml](environment/2-workloads/saxml/) folder:
+If you wish to undeploy the Saxml components, run the following command from the [environment/2-workloads/saxml](environment/2-workloads/saxml/) folder:
 
 ```
 skaffold delete
