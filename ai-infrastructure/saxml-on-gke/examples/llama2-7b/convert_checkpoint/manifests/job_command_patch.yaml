@@ -46,7 +46,7 @@ spec:
             
             echo Starting checkpoint upload 
             cd /checkpoints/pax
-            find . -type d -exec touch {}/commit.txt \;
+            find . -type d -exec touch {}/commit_success.txt \;
             rm commit.txt
             gsutil -m cp -r . ${GCS_PAX_CHECKPOINT_PATH}
             echo Checkpoint upload completed
