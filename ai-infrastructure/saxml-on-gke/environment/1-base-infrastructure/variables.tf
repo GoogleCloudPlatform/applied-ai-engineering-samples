@@ -195,6 +195,7 @@ variable "tpu_node_pools" {
     tpu_type     = string
     disk_size_gb = optional(number, 200)
     autoscaling  = optional(bool, false)
+    spot         = optional(bool, false)
   }))
   validation {
     condition = alltrue([

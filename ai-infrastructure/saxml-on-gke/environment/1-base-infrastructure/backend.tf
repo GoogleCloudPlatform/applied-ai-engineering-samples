@@ -15,9 +15,9 @@
 
 terraform {
   backend "gcs" {
-    bucket                      = "jk-automation-serving"
-    impersonate_service_account = "jk-automation-sa-serving@jk-mlops-dev.iam.gserviceaccount.com"
+    bucket                      = "jk99-automation"
+    impersonate_service_account = "jk99-automation-sa@gkebatchenve1667028.iam.gserviceaccount.com"
     # remove the newline between quotes and set the prefix to the folder for Terraform state
-    prefix = "tf-state/saxml-env"
+    prefix = "tfstate-saxml-gke"
   }
 }
