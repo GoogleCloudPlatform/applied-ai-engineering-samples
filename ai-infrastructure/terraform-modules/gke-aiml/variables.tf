@@ -131,7 +131,7 @@ variable "cpu_node_pools" {
     machine_type   = string
     gcfs           = optional(bool, true)
     gvnic          = optional(bool, true)
-    disk_type      = optional(string, null)
+    disk_type      = optional(string, "pd-standard")
     disk_size_gb   = optional(string, 200)
     auto_repair    = optional(bool, true)
     auto_upgrade   = optional(bool, true)
@@ -160,7 +160,7 @@ variable "tpu_node_pools" {
     min_node_count = number
     max_node_count = number
     tpu_type       = string
-    disk_type      = optional(string, "pd-standard")
+    disk_type      = optional(string, null)
     disk_size_gb   = optional(string, 200)
     gvnic          = optional(bool, true)
     gcfs           = optional(bool, true)
