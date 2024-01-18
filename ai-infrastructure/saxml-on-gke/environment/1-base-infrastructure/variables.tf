@@ -131,61 +131,6 @@ variable "cpu_node_pools" {
     labels = map(string)
   }))
   nullable = false
-  default = {
-    saxml-admin-node-pool = {
-      zones          = ["us-central2-a"]
-      min_node_count = 1
-      max_node_count = 1
-      machine_type   = "n1-standard-8"
-      disk_size_gb   = 100
-      taints = {
-        saxml-admin-node-pool = {
-          value  = true
-          effect = "NO_SCHEDULE"
-        }
-      }
-      labels = {
-        saxml-admin-node-pool = true
-      }
-    }
-
-    default-node-pool = {
-      zones          = ["us-central2-a"]
-      min_node_count = 1
-      max_node_count = 3
-      machine_type   = "n1-standard-8"
-      disk_size_gb   = 200
-      taints         = {}
-      labels         = {}
-    }
-
-    large-workloads-node-pool = {
-      zones          = ["us-central2-a"]
-      min_node_count = 0
-      max_node_count = 3
-      machine_type   = "n2-highmem-32"
-      disk_size_gb   = 500
-      taints         = {}
-      labels         = {}
-    }
-
-    saxml-proxy-node-pool = {
-      zones          = ["us-central2-a"]
-      min_node_count = 1
-      max_node_count = 3
-      machine_type   = "n1-standard-8"
-      disk_size_gb   = 100
-      taints = {
-        saxml-proxy-node-pool = {
-          value  = true
-          effect = "NO_SCHEDULE"
-        }
-      }
-      labels = {
-        saxml-proxy-node-pool = true
-      }
-    }
-  }
 }
 
 variable "tpu_node_pools" {

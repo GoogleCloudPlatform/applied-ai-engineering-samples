@@ -131,7 +131,7 @@ variable "cpu_node_pools" {
     machine_type   = string
     gcfs           = optional(bool, true)
     gvnic          = optional(bool, true)
-    disk_type      = optional(string, "pd-standard")
+    disk_type      = optional(string, null)
     disk_size_gb   = optional(string, 200)
     auto_repair    = optional(bool, true)
     auto_upgrade   = optional(bool, true)
