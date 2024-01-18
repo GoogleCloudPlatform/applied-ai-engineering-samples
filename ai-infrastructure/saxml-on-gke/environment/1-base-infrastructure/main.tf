@@ -85,6 +85,7 @@ locals {
       zones          = node_pool.zones
       max_node_count = 1
       min_node_count = node_pool.autoscaling ? 0 : 1
+      spot           = node_pool.spot
     }
   }
 }
