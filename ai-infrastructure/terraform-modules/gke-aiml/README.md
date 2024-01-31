@@ -2,7 +2,7 @@
 
 This Terraform module configures a GKE-based infrastructure environment specifically designed for training and serving large and extremely large deep learning models, including the most recent Generative AI models.
 
-The central element of this environment is a VPC-native GKE Standard cluster.  Users of the module can decide whether to deploy the cluster within an existing VPC or create a new VPC specifically for the cluster. The cluster can be configured with multiple CPU and TPU node pools. The node pools use a custom service account. This service account can be an existing one or a newly created account.
+The central element of this environment is a VPC-native GKE Standard cluster.  Users of the module can decide whether to deploy the cluster within an existing VPC or create a new VPC specifically for the cluster. The cluster can be configured with multiple CPU, GPU and TPU node pools. The node pools use a custom service account. This service account can be an existing one or a newly created account.
 
 Beyond the cluster, users have the option to create additional services such as Artifact Registry or Cloud Storage buckets.
 
