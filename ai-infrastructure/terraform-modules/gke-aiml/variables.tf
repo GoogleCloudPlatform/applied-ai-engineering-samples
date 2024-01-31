@@ -108,7 +108,7 @@ variable "cluster_config" {
   type = object({
     name                           = optional(string, "gke-ml-cluster")
     release_channel                = optional(string, "REGULAR")
-    version                        = optional(string, "1.27.5-gke.200")
+    version                        = optional(string, null)
     description                    = optional(string, "GKE ML inference cluster")
     gcs_fuse_csi_driver            = optional(bool, true)
     gce_persistent_disk_csi_driver = optional(bool, true)
@@ -160,12 +160,13 @@ variable "tpu_node_pools" {
     min_node_count = number
     max_node_count = number
     tpu_type       = string
-    disk_type      = optional(string, "pd-standard")
+    disk_type      = optional(string, null)
     disk_size_gb   = optional(string, 200)
     gvnic          = optional(bool, true)
     gcfs           = optional(bool, true)
     auto_repair    = optional(bool, true)
     auto_upgrade   = optional(bool, true)
+    spot           = optional(bool, false)
     reservation_affinity = optional(object({
       consume_reservation_type = string
       key                      = string

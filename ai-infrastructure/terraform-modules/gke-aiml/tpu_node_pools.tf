@@ -159,6 +159,7 @@ locals {
       labels               = node_pool.labels
       oauth_scopes         = node_pool.oauth_scopes
       reservation_affinity = node_pool.reservation_affinity
+      spot                 = node_pool.spot
     }
   }
 }
@@ -198,6 +199,7 @@ resource "google_container_node_pool" "tpu_node_pools" {
     disk_type       = each.value.disk_type
     disk_size_gb    = each.value.disk_size_gb
     oauth_scopes    = each.value.oauth_scopes
+    spot            = each.value.spot
     gvnic {
       enabled = each.value.gvnic
     }
