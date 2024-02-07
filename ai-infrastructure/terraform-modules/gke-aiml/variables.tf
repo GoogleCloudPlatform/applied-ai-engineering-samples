@@ -190,3 +190,39 @@ variable "tpu_node_pools" {
   nullable = false
 }
 
+variable "gpu_node_pools" {
+  description = "Configurations for GPU node pools"
+  type = map(object({
+    zones          = list(string)
+    min_node_count = number
+    max_node_count = number
+    accelerator_type = string
+    accelerator_count = number
+    machine_type   = string
+    local_ssd_count= optional(number,0)
+    spot           = optional(bool,false)
+    preemptible    = optional(bool,false)
+    image_type     = optional(string,"COS_CONTAINERD")
+    gcfs           = optional(bool, true)
+    gvnic          = optional(bool, true)
+    disk_type      = optional(string, "pd-ssd")
+    disk_size_gb   = optional(string, 200)
+    auto_repair    = optional(bool, true)
+    auto_upgrade   = optional(bool, true)
+    oauth_scopes   = optional(list(string), ["https://www.googleapis.com/auth/cloud-platform"])
+    taints = optional(map(object({
+      value  = string
+      effect = string
+    })), {})
+    labels = optional(map(string), {})
+  }))
+  validation {
+    condition = alltrue([
+      for k, v in merge([for name, node_pool in var.gpu_node_pools : node_pool.taints]...) :
+      contains(["NO_SCHEDULE", "PREFER_NO_SCHEDULE", "NO_EXECUTE"], v.effect)
+    ])
+    error_message = "Invalid taint effect."
+  }
+  default  = {}
+  nullable = false
+}
