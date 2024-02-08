@@ -104,5 +104,4 @@ module "base_environment" {
   registry_config     = local.registry_config
   cpu_node_pools      = var.cpu_node_pools
   tpu_node_pools      = local.tpu_node_pools
-  gpu_node_pools      = var.gpu_node_pools
 }
