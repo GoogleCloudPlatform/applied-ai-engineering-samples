@@ -17,7 +17,7 @@ data "google_client_config" "default" {}
 
 data "google_service_account" "gsa" {
   count      = var.google_service_account_create ? 0 : 1
-  account_id = var.google_service_account
+  account_id = var.wid_sa_name
   project    = var.project_id
 }
 
@@ -58,7 +58,7 @@ module "workload-service-account" {
 resource "google_service_account_iam_member" "ksa-bind-to-gsa" {
   service_account_id = local.wid_sa_name
   role               = "roles/iam.workloadIdentityUser"
-  member             = "serviceAccount:${var.project_id}.svc.id.goog[${var.namespace}/${var.kubernetes_service_account}]"
+  member             = "serviceAccount:${var.project_id}.svc.id.goog[${var.namespace}/${var.ksa_name}]"
 }
 
 resource "kubernetes_namespace" "namespace" {
@@ -73,7 +73,7 @@ resource "kubernetes_namespace" "namespace" {
 
 resource "kubernetes_service_account" "ksa" {
   metadata {
-    name      = var.kubernetes_service_account
+    name      = var.ksa_name
     namespace = var.namespace
     annotations = {
       "iam.gke.io/gcp-service-account" = "${local.wid_sa_email}"

@@ -43,8 +43,8 @@ variable "namespace_create" {
   default     = true
 }
 
-variable "kubernetes_service_account" {
-  description = "Name for the Kubernetes Service Account to be used for benchmark"
+variable "ksa_name" {
+  description = "Name for the Kubernetes Service Account"
   type        = string
   nullable    = false
 }
@@ -55,8 +55,8 @@ variable "kubernetes_service_account_create" {
   default     = true
 }
 
-variable "google_service_account" {
-  description = "Name for the Google Service Account to be used for benchmark"
+variable "wid_sa_name" {
+  description = "Name for the workload identity Google Service Account"
   type        = string
   nullable    = false
 }
