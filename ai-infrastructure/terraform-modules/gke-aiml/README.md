@@ -14,6 +14,7 @@ The module carries out the following tasks:
 - Deploys a standard, VPC-native GKE cluster that is configured to utilize Workload Identity.
 - Creates a user defined number of CPU node pools
 - Creates a user defined number of TPU node pools
+- Creates a user defined number of GPU node pools
 - The node pools are configured to use a custom service account
 - Optionally, it can create an Artifact Registry.
 - Creates the specified number of user-defined Cloud Storage buckets.
@@ -67,6 +68,49 @@ module "tpu-training-cluster" {
 }
 ```
 
+### GKE GPU training environment
+
+This example demonstrates how to configure an environment optimized for executing large-scale training workloads on GPUs. In this sample, a new VPC, a new service account, and a new Artifact Registry are created. All resources are generated using default values for the majority of the settings. You can use all the GPU machine types and accelerator types available to you. Those are the ones supported: [GPU doc](https://cloud.google.com/compute/docs/gpus)
+
+
+```
+module "gpu-training-cluster" {
+    source     = "github.com/GoogleCloudPlatform/applied-ai-engineering-samples//ai-infrastructure/terraform-modules/gke-aiml
+    project_id = "project_id"
+    region     = "us-central1"
+    vpc_config = {
+        network_name = "gke-cluster-network"
+        subnet_name  = "gke-cluster-subnetwork"
+    }
+    node_pool_sa = {
+        name = "gke-node-pool-sa"
+    }
+    cluster_config = {
+        name = "gke-gpu-training-cluster"
+    }
+    gpu_node_pools = {
+    l4-gpu-node-pool = {
+      zones          = ["us-central1-a"]
+      min_node_count = 1
+      max_node_count = 2
+      machine_type   = "g2-standard-4"
+      accelerator_type = "nvidia-l4"
+      accelerator_count=1
+      disk_size_gb   = 200
+      taints         = {}
+      labels         = {}
+    }
+  }
+    gcs_configs = {
+      training-artifacts-bucket = {} 
+    }
+    registry_config = {
+        name     = "training-images"
+        location = "us"
+    }
+}
+```
+
 ## Variables
 
 | Name | Description | Type | Required | Default |
@@ -80,6 +124,7 @@ module "tpu-training-cluster" {
 |[node_pool_sa](variables.tf#L57)|Settings for a node pool service account|`object({...})`||`{...}`|
 |[cpu_node_pools](variables.tf#L125)|Settings for CPU node pools|`map(object({...}))`||`{...}`|
 |[tpu_node_pools](variables.tf#L156)|Settings for TPU node pools. See below for more information about TPU slice types|`map(object({...}))`||`{...}`|
+|[gpu_node_pools](variables.tf#L193)|Settings for GPU node pools|`map(object({...}))`||`{...}`|
 |[gcs_configs](variables.tf#L35)|Settings for Cloud Storage buckets|`map(object({...}))`||`{...}`|
 |[registry_config](variables.tf#L47)|Settings for Artifact Registry|`object({...})`||`{...}`|
 
