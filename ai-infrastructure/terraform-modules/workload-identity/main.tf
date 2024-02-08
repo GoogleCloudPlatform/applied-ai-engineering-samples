@@ -51,7 +51,7 @@ module "workload-service-account" {
   source      = "github.com/GoogleCloudPlatform/cloud-foundation-fabric.git//modules/iam-service-account?ref=v29.0.0&depth=1"
   count       = var.google_service_account_create ? 1 : 0
   project_id  = var.project_id
-  name        = var.google_service_account
+  name        = var.wid_sa_name
   description = "Service account for GKE workloads"
 }
 
