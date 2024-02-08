@@ -23,6 +23,11 @@ output "cluster_name" {
   value       = module.cluster.name
 }
 
+output "cluster_endpoint" {
+  description = "The endpoint of the GKE cluster"
+  value       = module.cluster.endpoint
+}
+
 output "cluster_region" {
   description = "The region of the GKE cluster"
   value       = var.region
