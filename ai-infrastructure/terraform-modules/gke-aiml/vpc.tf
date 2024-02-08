@@ -19,7 +19,7 @@ locals {
 }
 
 module "vpc" {
-  source                   = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/net-vpc?ref=v28.0.0&depth=1"
+  source                   = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/net-vpc?ref=v29.0.0&depth=1"
   count                    = var.vpc_ref == null ? 1 : 0
   project_id               = var.project_id
   name                     = var.vpc_config.network_name
@@ -39,7 +39,7 @@ module "vpc" {
 }
 
 module "nat" {
-  source         = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/net-cloudnat?ref=v28.0.0&depth=1"
+  source         = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/net-cloudnat?ref=v29.0.0&depth=1"
   count          = var.vpc_ref == null && var.vpc_config.nat_router_name != "" ? 1 : 0
   project_id     = var.project_id
   region         = var.region

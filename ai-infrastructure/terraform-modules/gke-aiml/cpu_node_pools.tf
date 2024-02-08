@@ -56,7 +56,7 @@ locals {
 
 
 module "cpu_node_pools" {
-  source          = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/gke-nodepool?ref=v28.0.0&depth=1"
+  source          = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/gke-nodepool?ref=v29.0.0&depth=1"
   project_id      = var.project_id
   for_each        = local.node_pools
   name            = each.key

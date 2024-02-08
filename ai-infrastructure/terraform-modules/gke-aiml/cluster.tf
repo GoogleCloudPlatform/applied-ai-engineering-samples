@@ -14,7 +14,7 @@
 
 
 module "cluster" {
-  source              = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/gke-cluster-standard?ref=v28.0.0&depth=1"
+  source              = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/gke-cluster-standard?ref=v29.0.0&depth=1"
   project_id          = var.project_id
   name                = var.cluster_config.name
   description         = var.cluster_config.description

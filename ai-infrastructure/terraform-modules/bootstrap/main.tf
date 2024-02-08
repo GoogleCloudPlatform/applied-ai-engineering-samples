@@ -52,14 +52,14 @@ locals {
 }
 
 module "project_config" {
-  source         = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/project?ref=v28.0.0&depth=1"
+  source         = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/project?ref=v29.0.0&depth=1"
   name           = var.project_id
   project_create = false
   services       = local.services
 }
 
 module "automation_gcs" {
-  source        = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/gcs?ref=v28.0.0&depth=1"
+  source        = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/gcs?ref=v29.0.0&depth=1"
   project_id    = module.project_config.project_id
   name          = var.automation_bucket.name
   location      = var.automation_bucket.location
@@ -70,7 +70,7 @@ module "automation_gcs" {
 
 
 module "automation_sa" {
-  source       = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v28.0.0&depth=1"
+  source       = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v29.0.0&depth=1"
   project_id   = module.project_config.project_id
   name         = var.automation_sa_name
   display_name = "Terraform automation service account."
