@@ -13,8 +13,15 @@
 # limitations under the License.
 
 
-variable "cluster_name" {
-  description = "Name of the GKE cluster."
+#variable "cluster_name" {
+#  description = "Name of the GKE cluster."
+#  type        = string
+#  nullable    = false
+#}
+#
+
+variable "cluster_endpoint" {
+  description = "Endpoint of the GKE cluster."
   type        = string
   nullable    = false
 }
