@@ -19,7 +19,7 @@ output "created_resources" {
       namespace_name = var.namespace
     } : {},
     var.kubernetes_service_account_create ? {
-      ksa_name = var.kubernetes_service_account
+      ksa_name = var.ksa_name
     } : {},
     var.google_service_account_create ? {
       gsa_name  = module.workload-service-account.0.name
