@@ -31,7 +31,7 @@ locals {
 
 
 module "service_accounts" {
-  source       = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v28.0.0&depth=1"
+  source       = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v29.0.0&depth=1"
   for_each     = local.service_accounts
   project_id   = var.project_id
   name         = each.key
