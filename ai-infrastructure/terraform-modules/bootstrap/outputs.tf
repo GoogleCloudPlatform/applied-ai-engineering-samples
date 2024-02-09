@@ -31,6 +31,12 @@ locals {
       sa     = module.automation_sa.email
     })
   }
+
+  tfvars = {
+    automation = {
+      outputs_bucket = module.automation_gcs.name
+    }
+  }
 }
 
 output "automation_gcs" {
@@ -48,4 +54,10 @@ resource "google_storage_bucket_object" "providers" {
   bucket   = module.automation_gcs.name
   name     = "providers/${each.key}.tf"
   content  = each.value
+}
+
+resource "google_storage_bucket_object" "tfvars" {
+  bucket  = module.automation_gcs.name
+  name    = "tfvars/0-bootstrap.tfvars/json"
+  content = jsonencode(local.tfvars)
 }
