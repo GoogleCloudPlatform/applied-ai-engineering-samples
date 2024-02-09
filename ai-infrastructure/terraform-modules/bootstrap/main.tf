@@ -72,7 +72,7 @@ module "automation_gcs" {
 module "automation_sa" {
   count        = var.create_automation_resources ? 1 : 0
   source       = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v29.0.0&depth=1"
-  project_id   = module.project_config.project_id
+  project_id   = var.project_id
   name         = var.automation_sa_name
   display_name = "Terraform automation service account."
   # allow SA used by CI/CD workflow to impersonate this SA
