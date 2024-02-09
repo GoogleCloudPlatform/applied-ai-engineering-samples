@@ -26,7 +26,7 @@ variable "create_automation_resources" {
   nullable    = false
 }
 
-variable "automation_bucket_name" {
+variable "automation_bucket" {
   description = "The parameters of the bucket to be used by automation tools including Terraform backend"
   type = object({
     name     = string
