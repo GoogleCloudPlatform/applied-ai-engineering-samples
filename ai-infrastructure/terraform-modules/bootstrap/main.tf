@@ -82,10 +82,10 @@ module "automation_sa" {
   #  ])
   #}
   iam_storage_roles = {
-    (module.automation_gcs.name) = ["roles/storage.admin"]
+    (var.automation_bucket.name) = ["roles/storage.admin"]
   }
   iam_project_roles = {
-    "${module.project_config.project_id}" = local.roles
+    "${var.project_id}" = local.roles
 
   }
 }
