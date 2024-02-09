@@ -73,7 +73,7 @@ module "automation_sa" {
   count        = var.create_automation_resources ? 1 : 0
   source       = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v29.0.0&depth=1"
   project_id   = var.project_id
-  name         = var.automation_sa.name
+  name         = var.automation_sa_name
   display_name = "Terraform automation service account."
   iam_project_roles = {
     "${var.project_id}" = local.roles
