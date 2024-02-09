@@ -24,9 +24,8 @@ locals {
 
     "backend" = templatefile(local._tpl_backend, {
       backend_extra = join("\n", [
-        "# remove the newline between quotes and set the prefix to the folder for Terraform state",
-        "prefix = \"",
-        "\""
+        "# Set the prefix to the folder for Terraform state",
+        "prefix = \"<FOLDER>\""
       ])
       bucket = module.automation_gcs.name
       sa     = module.automation_sa.email
