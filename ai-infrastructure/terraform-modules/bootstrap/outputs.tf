@@ -14,6 +14,10 @@
 
 
 locals {
+  automation_bucket_name = var.automation_bucket.name
+  automation_sa_name     = var.automation_sa_name
+  automation_sa_email    = "${var.automation_sa_name}@${var.project_id}.iam.gserviceaccount.com"
+
   _tpl_providers = "${path.module}/templates/providers.tf.tpl"
   _tpl_backend   = "${path.module}/templates/backend.tf.tpl"
 
