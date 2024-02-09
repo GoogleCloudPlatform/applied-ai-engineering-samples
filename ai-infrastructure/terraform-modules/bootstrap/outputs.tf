@@ -58,6 +58,6 @@ resource "google_storage_bucket_object" "providers" {
 
 resource "google_storage_bucket_object" "tfvars" {
   bucket  = module.automation_gcs.name
-  name    = "tfvars/0-bootstrap.tfvars.json"
+  name    = "tfvars/0-bootstrap.auto.tfvars.json"
   content = jsonencode(local.tfvars)
 }
