@@ -52,6 +52,7 @@ locals {
 }
 
 module "project_config" {
+  count          = var.create_automation_resources ? 1 : 0
   source         = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/project?ref=v29.0.0&depth=1"
   name           = var.project_id
   project_create = false
@@ -68,8 +69,8 @@ module "automation_gcs" {
   force_destroy = var.deletion_protection ? false : true
 }
 
-
 module "automation_sa" {
+  count        = var.create_automation_resources ? 1 : 0
   source       = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v29.0.0&depth=1"
   project_id   = module.project_config.project_id
   name         = var.automation_sa_name

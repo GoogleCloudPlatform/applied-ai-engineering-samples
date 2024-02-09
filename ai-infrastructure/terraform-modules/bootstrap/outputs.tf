@@ -14,6 +14,10 @@
 
 
 locals {
+  automation_bucket_name = module.automation_gcs.name
+  automation_sa_name     = var.automation_sa_name
+  automation_sa_email    = "${var.automation_sa_name}@${var.project_id}.iam.gserviceaccount.com"
+
   _tpl_providers = "${path.module}/templates/providers.tf.tpl"
   _tpl_backend   = "${path.module}/templates/backend.tf.tpl"
 
@@ -34,19 +38,19 @@ locals {
 
   tfvars = {
     automation = {
-      outputs_bucket = module.automation_gcs.name
+      outputs_bucket = local.automation_bucket_name
     }
   }
 }
 
-output "automation_gcs" {
+output "automation_bucket_name" {
   description = "GCS bucket where Terraform automation artifacts are managed"
-  value       = module.automation_gcs.name
+  value       = local.automation_bucket_name
 }
 
-output "automation_sa" {
+output "automation_sa_email" {
   description = "The email of the automation service account"
-  value       = module.automation_sa.email
+  value       = local.automation_sa_email
 }
 
 resource "google_storage_bucket_object" "providers" {

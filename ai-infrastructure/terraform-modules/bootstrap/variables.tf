@@ -19,7 +19,14 @@ variable "deletion_protection" {
   nullable    = false
 }
 
-variable "automation_bucket" {
+variable "create_automation_resources" {
+  description = "Whether to create/configure resources for Terraform automation"
+  type        = bool
+  default     = true
+  nullable    = false
+}
+
+variable "automation_bucket_name" {
   description = "The parameters of the bucket to be used by automation tools including Terraform backend"
   type = object({
     name     = string
