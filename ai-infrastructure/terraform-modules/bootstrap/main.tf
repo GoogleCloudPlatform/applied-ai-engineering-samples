@@ -61,7 +61,7 @@ module "project_config" {
 
 module "automation_gcs" {
   source        = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/gcs?ref=v29.0.0&depth=1"
-  project_id    = module.project_config.project_id
+  project_id    = var.project_id
   name          = var.automation_bucket.name
   location      = var.automation_bucket.location
   storage_class = local.gcs_storage_class
