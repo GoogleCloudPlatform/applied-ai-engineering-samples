@@ -49,6 +49,10 @@ locals {
     "roles/artifactregistry.admin",
   ]
   roles = concat(local.default_roles, var.roles)
+
+  automation_bucket_name = module.automation_gcs.name
+  automation_sa_name     = var.automation_sa_name
+  automation_sa_email    = "${var.automation_sa_name}@${var.project_id}.iam.gserviceaccount.com"
 }
 
 module "project_config" {
@@ -62,7 +66,7 @@ module "project_config" {
 module "automation_gcs" {
   source        = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/gcs?ref=v29.0.0&depth=1"
   project_id    = var.project_id
-  name          = var.automation_bucket.name
+  name          = local.automation_bucket_name
   location      = var.automation_bucket.location
   storage_class = local.gcs_storage_class
   versioning    = true
@@ -73,7 +77,7 @@ module "automation_sa" {
   count        = var.create_automation_resources ? 1 : 0
   source       = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v29.0.0&depth=1"
   project_id   = var.project_id
-  name         = var.automation_sa_name
+  name         = local.automation_sa_name
   display_name = "Terraform automation service account."
   # allow SA used by CI/CD workflow to impersonate this SA
   #iam = {
@@ -82,10 +86,19 @@ module "automation_sa" {
   #  ])
   #}
   iam_storage_roles = {
-    (var.automation_bucket.name) = ["roles/storage.admin"]
+    (local.automation_bucket_name) = ["roles/storage.admin"]
   }
   iam_project_roles = {
     "${var.project_id}" = local.roles
 
   }
+}
+
+resource "google_storage_bucket_iam_binding" "bucket_permissions" {
+  count  = var.create_automation_resources ? 0 : 1
+  bucket = local.automation_bucket_name
+  role   = "roles/storage.admin"
+  members = [
+    "serviceAccount:${local.automation_sa_email}",
+  ]
 }
