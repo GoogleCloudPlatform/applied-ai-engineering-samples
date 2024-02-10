@@ -49,6 +49,22 @@ locals {
     "roles/artifactregistry.admin",
   ]
   roles = concat(local.default_roles, var.roles)
+
+  automation_bucket_name = (
+    var.create_automation_bucket == true
+    ? module.automation_gcs[0].name
+    : var.automation_bucket.name
+  )
+  automation_sa_name = (
+    var.create_automation_sa == true
+    ? module.automation_sa[0].email
+    : var.automation_sa_name
+  )
+  automation_sa_email = (
+    var.create_automation_sa == true
+    ? module.automation_sa[0].email
+    : "${var.automation_sa_name}@${var.project_id}.iam.gserviceaccount.com"
+  )
 }
 
 module "project_config" {
@@ -82,7 +98,7 @@ module "automation_sa" {
 }
 
 resource "google_storage_bucket_iam_binding" "bucket_permissions" {
-  bucket = var.create_automation_bucket.name
+  bucket = local.automation_bucket_name
   role   = "roles/storage.admin"
   members = [
     "serviceAccount:${local.automation_sa_email}",
