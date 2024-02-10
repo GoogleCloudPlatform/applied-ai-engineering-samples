@@ -52,7 +52,7 @@ locals {
 }
 
 module "project_config" {
-  count          = var.create_automation_resources ? 1 : 0
+  count          = var.enable_apis ? 1 : 0
   source         = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/project?ref=v29.0.0&depth=1"
   name           = var.project_id
   project_create = false
@@ -60,6 +60,7 @@ module "project_config" {
 }
 
 module "automation_gcs" {
+  count         = var.create_automation_bucket ? 1 : 0
   source        = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/gcs?ref=v29.0.0&depth=1"
   project_id    = var.project_id
   name          = var.automation_bucket.name
@@ -70,7 +71,7 @@ module "automation_gcs" {
 }
 
 module "automation_sa" {
-  count        = var.create_automation_resources ? 1 : 0
+  count        = var.create_automation_sa ? 1 : 0
   source       = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v29.0.0&depth=1"
   project_id   = var.project_id
   name         = var.automation_sa_name
@@ -81,7 +82,7 @@ module "automation_sa" {
 }
 
 resource "google_storage_bucket_iam_binding" "bucket_permissions" {
-  bucket = module.automation_gcs.name
+  bucket = var.create_automation_bucket.name
   role   = "roles/storage.admin"
   members = [
     "serviceAccount:${local.automation_sa_email}",

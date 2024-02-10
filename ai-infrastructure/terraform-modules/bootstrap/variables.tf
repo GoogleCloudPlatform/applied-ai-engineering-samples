@@ -19,15 +19,29 @@ variable "deletion_protection" {
   nullable    = false
 }
 
-variable "create_automation_resources" {
-  description = "Whether to create/configure resources for Terraform automation"
+variable "create_automation_sa" {
+  description = "Whether to create an automation service account"
+  type        = bool
+  default     = true
+  nullable    = false
+}
+
+variable "create_automation_bucket" {
+  description = "Whether to create an automation bucket"
+  type        = bool
+  default     = true
+  nullable    = false
+}
+
+variable "enable_apis" {
+  description = "Whether to attempt to enable APIs on the project"
   type        = bool
   default     = true
   nullable    = false
 }
 
 variable "automation_bucket" {
-  description = "The parameters of the bucket to be used by automation tools including Terraform backend"
+  description = "The settings for the automation bucket"
   type = object({
     name     = string
     location = string
