@@ -13,10 +13,11 @@
 # limitations under the License.
 
 
-provider "google" {
-  impersonate_service_account = "jk-automation-sa-10@tpu-vm-gke-testing.iam.gserviceaccount.com"
+terraform {
+  backend "gcs" {
+    bucket                      = "jk-automation-bucket-10"
+    impersonate_service_account = "jk-automation-sa-10@tpu-vm-gke-testing.iam.gserviceaccount.com"
+    # remove the newline between quotes and set the prefix to the folder for Terraform state
+    prefix = "saxml-gke"
+  }
 }
-provider "google-beta" {
-  impersonate_service_account = "jk-automation-sa-10@tpu-vm-gke-testing.iam.gserviceaccount.com"
-}
-

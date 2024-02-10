@@ -12,11 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-provider "google" {
-  impersonate_service_account = "jk-automation-sa-10@tpu-vm-gke-testing.iam.gserviceaccount.com"
-}
-provider "google-beta" {
-  impersonate_service_account = "jk-automation-sa-10@tpu-vm-gke-testing.iam.gserviceaccount.com"
-}
-
+namespace     = "kubernetes-namespace"
+ksa_name      = "ksa-name"
+wid_sa_name   = "wid_sa_name"

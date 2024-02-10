@@ -1,3 +1,4 @@
+
 # Copyright 2023 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,10 +14,13 @@
 # limitations under the License.
 
 
-provider "google" {
-  impersonate_service_account = "jk-automation-sa-10@tpu-vm-gke-testing.iam.gserviceaccount.com"
-}
-provider "google-beta" {
-  impersonate_service_account = "jk-automation-sa-10@tpu-vm-gke-testing.iam.gserviceaccount.com"
-}
 
+module "wid" {
+  source       = "github.com/GoogleCloudPlatform/applied-ai-engineering-samples//ai-infrastructure/terraform-modules/workload-identity?ref=workload-identity"
+  cluster_name = var.cluster_name
+  location     = var.cluster_location
+  project_id   = var.project_id
+  wid_sa_name  = var.wid_sa_name
+  ksa_name     = var.ksa_name
+  namespace    = var.namespace
+}

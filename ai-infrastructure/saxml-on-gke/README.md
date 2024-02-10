@@ -194,9 +194,12 @@ When configuring TPU node pools, ensure that you set the TPU type to one of the 
 To initiate the build, execute the following command from the [environment](environment/) folder:
 
 ```
+export AUTOMATION_BUCKET=<YOUR_AUTOMATION_BUCKET>
+
 gcloud builds submit \
   --config cloudbuild.provision.yaml \
   --timeout "2h" \
+  --substitutions=_AUTOMATION_BUCKET=$AUTOMATION_BUCKET \
   --machine-type=e2-highcpu-32 
 ```
 
@@ -298,16 +301,20 @@ This repository contains comprehensive examples for deploying and performance te
 From the [environment](environment/) folder.
 
 ```
+
+export AUTOMATION_BUCKET=<YOUR_AUTOMATION_BUCKET>
+
 gcloud builds submit \
   --config cloudbuild.destroy.yaml \
   --timeout "2h" \
+  --substitutions=_AUTOMATION_BUCKET=$AUTOMATION_BUCKET \
   --machine-type=e2-highcpu-32 
 ```
 
 
 #### Bootstrap
 
-If you provisioned the prerequistes using the bootstrap configuration you can optionally remove the automation account and the automation bucket.
+To clean up the automation bootstrap resources.
 
 From the [environment](environment/0-bootstrap/) folder:
 

@@ -12,6 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+variable "automation" {
+  description = "Automation configs"
+  type = object({
+    outputs_bucket = string
+  })
+  default = {
+    outputs_bucket = null
+  }
+  nullable = false
+}
 
 variable "project_id" {
   description = "The GCP project ID"
@@ -56,29 +66,6 @@ variable "node_pool_sa" {
     ]
   }
 }
-
-variable "wid_sa" {
-  description = "The config for a workload identity service account"
-  type = object({
-    name          = string
-    description   = string
-    roles         = list(string)
-    ksa_namespace = string
-    ksa_name      = string
-  })
-  default = {
-    name          = "gke-wid-sa"
-    description   = "GKE Wid service account"
-    ksa_namespace = "saxml"
-    ksa_name      = "wid-sa"
-    roles = [
-      "storage.objectAdmin",
-      "logging.logWriter",
-      "artifactregistry.reader",
-    ]
-  }
-}
-
 
 variable "create_artifact_registry" {
   description = "Whether to create an Artifact Registry"
@@ -215,5 +202,4 @@ variable "bq_config" {
   nullable = false
   default  = {}
 }
-
 

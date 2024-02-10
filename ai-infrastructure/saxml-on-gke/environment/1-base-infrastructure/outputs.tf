@@ -12,25 +12,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+locals {
+  tfvars = {
+    cluster_name     = module.base_environment.cluster_name
+    cluster_location = module.base_environment.cluster_region
+    project_id       = var.project_id
+  }
+
+  environment_settings = {
+    project_id                   = var.project_id
+    cluster_name                 = module.base_environment.cluster_name
+    cluster_location             = module.base_environment.cluster_region
+    cluster_endpoint             = module.base_environment.cluster_endpoint
+    gcs_buckets                  = module.base_environment.gcs_buckets
+    node_pool_sa_email           = module.base_environment.node_pool_sa_email
+    artifact_registry_image_path = try(module.base_environment.artifact_registry_image_path)
+    locust_dataset_id            = try(google_bigquery_dataset.locust_dataset[0].id, null)
+    locust_metrics_table_id      = try(google_bigquery_table.locust_metrics[0].id, null)
+    locust_metrics_topic_id      = try(google_pubsub_topic.locust_sink[0].id, null)
+    locust_metrics_topic_name    = try(google_pubsub_topic.locust_sink[0].name, null)
+  }
+}
 
 output "cluster_name" {
   value = module.base_environment.cluster_name
 }
 
+output "cluster_endpoint" {
+  value = module.base_environment.cluster_endpoint
+}
+
 output "cluster_region" {
   value = var.region
-}
-
-output "wid_ksa_name" {
-  value = var.wid_sa.ksa_name
-}
-
-output "wid_ksa_namespace" {
-  value = var.wid_sa.ksa_namespace
-}
-
-output "wid_gsa_email" {
-  value = module.wid_service_account.email
 }
 
 output "gcs_buckets" {
@@ -65,4 +78,18 @@ output "locust_metrics_topic_name" {
 output "locust_metrics_bq_subscription" {
   description = "Locust metrics BQ subscription"
   value       = try(google_pubsub_subscription.locust_bq_subscription[0].id, null)
+}
+
+resource "google_storage_bucket_object" "tfvars" {
+  for_each = var.automation.outputs_bucket == null ? {} : { 1 = 1 }
+  name     = "tfvars/1-base-infra.auto.tfvars.json"
+  bucket   = var.automation.outputs_bucket
+  content  = jsonencode(local.tfvars)
+}
+
+resource "google_storage_bucket_object" "environment_settings" {
+  for_each = var.automation.outputs_bucket == null ? {} : { 1 = 1 }
+  name     = "settings/1-base-infra-settings.json"
+  bucket   = var.automation.outputs_bucket
+  content  = jsonencode(local.environment_settings)
 }

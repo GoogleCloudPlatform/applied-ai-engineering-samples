@@ -15,10 +15,14 @@
 
 
 module "automation_bootstrap" {
-  source             = "../../../terraform-modules/bootstrap"
-  project_id         = var.project_id
-  automation_bucket  = var.automation_bucket
-  automation_sa_name = var.automation_sa_name
-  services           = var.services
-  roles              = var.roles
+  source                   = "github.com/GoogleCloudPlatform/applied-ai-engineering-samples//ai-infrastructure/terraform-modules/bootstrap?ref=workload-identity"
+  deletion_protection      = var.deletion_protection
+  create_automation_sa     = var.create_automation_sa
+  create_automation_bucket = var.create_automation_bucket
+  enable_apis              = var.enable_apis
+  project_id               = var.project_id
+  automation_bucket        = var.automation_bucket
+  automation_sa_name       = var.automation_sa_name
+  services                 = var.services
+  roles                    = var.roles
 }

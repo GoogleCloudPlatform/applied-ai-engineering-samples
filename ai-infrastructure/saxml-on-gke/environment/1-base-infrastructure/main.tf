@@ -12,19 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-terraform {
-  required_version = ">=1.5.1"
-  required_providers {
-    google = {
-      source  = "hashicorp/google"
-      version = ">= 5.6.0, < 6.0.0"
-    }
-    google-beta = {
-      source  = "hashicorp/google-beta"
-      version = ">= 5.6.0, < 6.0.0"
-    }
-  }
-}
+
 
 data "google_project" "project" {
   project_id = var.project_id
@@ -34,17 +22,12 @@ data "google_client_config" "default" {
   depends_on = [module.base_environment]
 }
 
+
 locals {
   node_pool_sa = (
     var.prefix != ""
     ? merge(var.node_pool_sa, { name = "${var.prefix}-${var.node_pool_sa.name}" })
     : var.node_pool_sa
-  )
-
-  wid_sa = (
-    var.prefix != ""
-    ? merge(var.wid_sa, { name = "${var.prefix}-${var.wid_sa.name}" })
-    : var.wid_sa
   )
 
   gcs_configs = (
@@ -91,7 +74,7 @@ locals {
 }
 
 module "base_environment" {
-  source              = "github.com/GoogleCloudPlatform/applied-ai-engineering-samples//ai-infrastructure/terraform-modules/gke-aiml"
+  source              = "github.com/GoogleCloudPlatform/applied-ai-engineering-samples//ai-infrastructure/terraform-modules/gke-aiml?ref=workload-identity"
   project_id          = var.project_id
   region              = var.region
   deletion_protection = var.deletion_protection
@@ -103,3 +86,5 @@ module "base_environment" {
   cpu_node_pools      = var.cpu_node_pools
   tpu_node_pools      = local.tpu_node_pools
 }
+
+

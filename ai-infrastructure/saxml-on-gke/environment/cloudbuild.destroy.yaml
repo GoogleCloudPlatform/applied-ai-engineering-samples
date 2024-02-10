@@ -13,24 +13,31 @@
 # limitations under the License.
 
 steps:
-  - id: log parameters 
-    name: hashicorp/terraform
-    entrypoint: sh 
+  - id: Prepare destroy 
+    name: gcr.io/cloud-builders/gke-deploy
+    entrypoint: /bin/bash
+    dir: 1-base-infrastructure
     args:
       - -c
       - |
-          echo DESTROY SETTINGS:
-          cat 1-base-infrastructure/terraform.tfvars
+        gsutil cp gs://${_AUTOMATION_BUCKET}/providers/* .
+        sed -i "s/<FOLDER-NAME>/${_BASE_INFRA_STATE}/g" backend.tf
+        cat backend.tf
 
-  - id: 'tf init'
+  - id: 'Destroy - tf init'
     name: hashicorp/terraform
     dir: 1-base-infrastructure
     args: 
     - init 
 
-  - id: 'tf destroy'
+  - id: 'Destroy - tf destroy'
     name: hashicorp/terraform
     dir: 1-base-infrastructure
     args: 
     - destroy 
     - -auto-approve 
+
+
+substitutions:
+  _AUTOMATION_BUCKET: "automation-bucket"
+  _BASE_INFRA_STATE: "base-infra-state"

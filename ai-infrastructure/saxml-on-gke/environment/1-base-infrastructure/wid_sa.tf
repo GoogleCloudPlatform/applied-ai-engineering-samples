@@ -13,24 +13,24 @@
 # limitations under the License.
 
 
-locals {
-  gcp_sa_static_id        = "projects/${var.project_id}/serviceAccounts/${module.wid_service_account.email}"
-  k8s_sa_gcp_derived_name = "serviceAccount:${var.project_id}.svc.id.goog[${var.wid_sa.ksa_namespace}/${var.wid_sa.ksa_name}]"
-}
-
-module "wid_service_account" {
-  source       = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v28.0.0&depth=1"
-  project_id   = var.project_id
-  name         = local.wid_sa.name
-  display_name = local.wid_sa.description
-  iam_project_roles = {
-    "${var.project_id}" = [for role in local.wid_sa.roles : "roles/${role}"]
-  }
-}
-
-
-resource "google_service_account_iam_member" "wid_role" {
-  service_account_id = local.gcp_sa_static_id
-  role               = "roles/iam.workloadIdentityUser"
-  member             = local.k8s_sa_gcp_derived_name
-}
+#locals {
+#  gcp_sa_static_id        = "projects/${var.project_id}/serviceAccounts/${module.wid_service_account.email}"
+#  k8s_sa_gcp_derived_name = "serviceAccount:${var.project_id}.svc.id.goog[${var.wid_sa.ksa_namespace}/${var.wid_sa.ksa_name}]"
+#}
+#
+#module "wid_service_account" {
+#  source       = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v29.0.0&depth=1"
+#  project_id   = var.project_id
+#  name         = local.wid_sa.name
+#  display_name = local.wid_sa.description
+#  iam_project_roles = {
+#    "${var.project_id}" = [for role in local.wid_sa.roles : "roles/${role}"]
+#  }
+#}
+#
+#
+#resource "google_service_account_iam_member" "wid_role" {
+#  service_account_id = local.gcp_sa_static_id
+#  role               = "roles/iam.workloadIdentityUser"
+#  member             = local.k8s_sa_gcp_derived_name
+#}

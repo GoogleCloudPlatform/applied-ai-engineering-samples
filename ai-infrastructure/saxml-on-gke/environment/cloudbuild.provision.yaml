@@ -13,71 +13,58 @@
 # limitations under the License.
 
 steps:
-  - id: log parameters 
+  - id: Prepare base infrastructure stage 
     name: gcr.io/cloud-builders/gke-deploy
     entrypoint: /bin/bash 
+    dir: 1-base-infrastructure
     args:
       - -c
       - |
-          echo BUILD SETTINGS:
-          cat 1-base-infrastructure/terraform.tfvars 
-
-  - id: tf init
+        gsutil cp gs://${_AUTOMATION_BUCKET}/providers/* .
+        gsutil cp gs://${_AUTOMATION_BUCKET}/tfvars/0-bootstrap.auto.tfvars.json .
+        sed -i "s/<FOLDER-NAME>/${_BASE_INFRA_STATE}/g" backend.tf
+        
+  - id: Provision base infra - tf init
     name: hashicorp/terraform
     dir: 1-base-infrastructure
     args: 
     - init 
 
-  - id: tf plan
-    name: hashicorp/terraform
-    dir: 1-base-infrastructure 
-    args: 
-    - plan 
-    - -out=tfplan
-
-  - id: tf apply
+  - id: Provision base infra -tf apply
     name: hashicorp/terraform
     dir: 1-base-infrastructure 
     args: 
     - apply
     - -auto-approve
-    - tfplan 
 
-  - id: tf output
-    name: hashicorp/terraform
-    entrypoint: sh
-    dir: 1-base-infrastructure  
-    args:
-    - -c
-    - |
-      touch params.env
-      echo "CLUSTER_NAME=$(terraform output cluster_name)" >> params.env 
-      echo "CLUSTER_REGION=$(terraform output cluster_region)" >> params.env
-      echo "WID_KSA_NAME=$(terraform output wid_ksa_name)" >> params.env
-      echo "SAXML_NAMESPACE=$(terraform output wid_ksa_namespace)" >> params.env
-      echo "WID_GSA_EMAIL=$(terraform output wid_gsa_email)" >> params.env
-      echo "ARTIFACT_REGISTRY_PATH=$(terraform output artifact_registry_image_path)" >> params.env
-      cat params.env
-      mv params.env scripts
-
-  - id: Configure namespace 
+  - id: Prepare GKE setup stage 
     name: gcr.io/cloud-builders/gke-deploy
-    entrypoint: /bin/bash
-    dir: 1-base-infrastructure/scripts
+    entrypoint: /bin/bash 
+    dir: 2-gke-config
     args:
       - -c
       - |
-        set -o  allexport; source params.env; set +o allexport
-        gcloud container clusters get-credentials $$CLUSTER_NAME --region $$CLUSTER_REGION
-        bash config_namespace.sh NAMESPACE=$$SAXML_NAMESPACE KSA_NAME=$$WID_KSA_NAME GSA_EMAIL=$$WID_GSA_EMAIL ARTIFACT_REGISTRY_PATH=$$ARTIFACT_REGISTRY_PATH
+        gsutil cp gs://${_AUTOMATION_BUCKET}/providers/* .
+        gsutil cp gs://${_AUTOMATION_BUCKET}/tfvars/0-bootstrap.auto.tfvars.json .
+        gsutil cp gs://${_AUTOMATION_BUCKET}/tfvars/1-base-infra.auto.tfvars.json .
+        sed -i "s/<FOLDER-NAME>/${_GKE_CONFIG_STATE}/g" backend.tf
 
-  - id: Log deployment configs 
+  - id: Configure GKE - tf init
     name: hashicorp/terraform
-    entrypoint: sh 
-    dir: 1-base-infrastructure  
-    args:
-      - -c
-      - |
-        terraform output 
-tags:
-  - 'saxml-infra-deployment-dev'
+    dir: 2-gke-config
+    args: 
+    - init 
+
+  - id: Configure GKE - tf apply
+    name: hashicorp/terraform
+    dir: 2-gke-config 
+    args: 
+    - apply
+    - -auto-approve
+
+
+substitutions:
+  _AUTOMATION_BUCKET: "automation-bucket"
+  _BASE_INFRA_STATE: "base-infra-state"
+  _GKE_CONFIG_STATE: "gke-config-state"
+  
