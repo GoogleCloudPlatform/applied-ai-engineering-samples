@@ -27,3 +27,26 @@ output "created_resources" {
     } : {}
   )
 }
+
+output "wid_sa_email" {
+  description = "Email of the workload service account."
+  value       = local.wid_sa_email
+}
+
+output "wid_sa_name" {
+  description = "Name of the workload service account."
+  value       = local.wid_sa_name
+}
+
+output "namespace" {
+  description = "Name of the namespace."
+  value       = var.namespace
+}
+
+output "ksa_name" {
+  description = "Name of the Kubernetes service account."
+  value       = var.ksa_name
+}
+
+
+
