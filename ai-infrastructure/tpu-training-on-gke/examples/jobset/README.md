@@ -226,7 +226,7 @@ The MaxText trainer [`MaxText/train.py`](https://github.com/google/maxtext/blob/
 
 The necessary parameters are configured through the `RUN_NAME`, `BASE_OUTPUT_DIRECTORY`, and `DATASET_PATH` fields, while optional ones are set in the `ARGS` field within the `parameters.env` file.
 
-For both single slice and multi-slice job types, you can use the `ARGS` field to adjust training regimen parameters, including training steps, batch size, ICI (Inter-Chunk Interaction) settings, DCN (Deep Cascade Network) parallelization settings, and parameters governing the model architecture.
+For both single slice and multi-slice job types, you can use the `ARGS` field to adjust training regimen parameters, including training steps, batch size, ICI  settings, DCN  parallelization settings, and parameters governing the model architecture.
 
 We've included example settings for a pretraining task for a ~6.5 billion parameter model on TPU v4-16 pods. These settings have undergone thorough testing to ensure high model flops utilization (MFU). We also encourage you to experiment with your own settings.
 
