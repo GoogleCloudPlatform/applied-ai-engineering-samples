@@ -19,34 +19,46 @@ locals {
 
   providers = {
     "providers" = templatefile(local._tpl_providers, {
-      sa = module.automation_sa.email
+      sa = local.automation_sa_email
+
     })
 
     "backend" = templatefile(local._tpl_backend, {
       backend_extra = join("\n", [
-        "# remove the newline between quotes and set the prefix to the folder for Terraform state",
-        "prefix = \"",
-        "\""
+        "# Set the prefix to the folder for Terraform state",
+        "prefix = \"<FOLDER-NAME>\""
       ])
-      bucket = module.automation_gcs.name
-      sa     = module.automation_sa.email
+      bucket = local.automation_bucket_name
+      sa     = local.automation_sa_email
     })
+  }
+
+  tfvars = {
+    automation = {
+      outputs_bucket = local.automation_bucket_name
+    }
   }
 }
 
-output "automation_gcs" {
+output "automation_bucket_name" {
   description = "GCS bucket where Terraform automation artifacts are managed"
-  value       = module.automation_gcs.name
+  value       = local.automation_bucket_name
 }
 
-output "automation_sa" {
+output "automation_sa_email" {
   description = "The email of the automation service account"
-  value       = module.automation_sa.email
+  value       = local.automation_sa_email
 }
 
 resource "google_storage_bucket_object" "providers" {
   for_each = local.providers
-  bucket   = module.automation_gcs.name
+  bucket   = local.automation_bucket_name
   name     = "providers/${each.key}.tf"
   content  = each.value
+}
+
+resource "google_storage_bucket_object" "tfvars" {
+  bucket  = local.automation_bucket_name
+  name    = "tfvars/0-bootstrap.auto.tfvars.json"
+  content = jsonencode(local.tfvars)
 }

@@ -49,18 +49,36 @@ locals {
     "roles/artifactregistry.admin",
   ]
   roles = concat(local.default_roles, var.roles)
+
+  automation_bucket_name = (
+    var.create_automation_bucket == true
+    ? module.automation_gcs[0].name
+    : var.automation_bucket.name
+  )
+  automation_sa_name = (
+    var.create_automation_sa == true
+    ? module.automation_sa[0].email
+    : var.automation_sa_name
+  )
+  automation_sa_email = (
+    var.create_automation_sa == true
+    ? module.automation_sa[0].email
+    : "${var.automation_sa_name}@${var.project_id}.iam.gserviceaccount.com"
+  )
 }
 
 module "project_config" {
-  source         = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/project?ref=v28.0.0&depth=1"
+  count          = var.enable_apis ? 1 : 0
+  source         = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/project?ref=v29.0.0&depth=1"
   name           = var.project_id
   project_create = false
   services       = local.services
 }
 
 module "automation_gcs" {
-  source        = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/gcs?ref=v28.0.0&depth=1"
-  project_id    = module.project_config.project_id
+  count         = var.create_automation_bucket ? 1 : 0
+  source        = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/gcs?ref=v29.0.0&depth=1"
+  project_id    = var.project_id
   name          = var.automation_bucket.name
   location      = var.automation_bucket.location
   storage_class = local.gcs_storage_class
@@ -68,23 +86,21 @@ module "automation_gcs" {
   force_destroy = var.deletion_protection ? false : true
 }
 
-
 module "automation_sa" {
-  source       = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v28.0.0&depth=1"
-  project_id   = module.project_config.project_id
+  count        = var.create_automation_sa ? 1 : 0
+  source       = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v29.0.0&depth=1"
+  project_id   = var.project_id
   name         = var.automation_sa_name
   display_name = "Terraform automation service account."
-  # allow SA used by CI/CD workflow to impersonate this SA
-  #iam = {
-  #  "roles/iam.serviceAccountTokenCreator" = compact([
-  #    try(module.automation-tf-cicd-sa["bootstrap"].iam_email, null)
-  #  ])
-  #}
-  iam_storage_roles = {
-    (module.automation_gcs.name) = ["roles/storage.admin"]
-  }
   iam_project_roles = {
-    "${module.project_config.project_id}" = local.roles
-
+    "${var.project_id}" = local.roles
   }
+}
+
+resource "google_storage_bucket_iam_binding" "bucket_permissions" {
+  bucket = local.automation_bucket_name
+  role   = "roles/storage.admin"
+  members = [
+    "serviceAccount:${local.automation_sa_email}",
+  ]
 }

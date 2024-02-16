@@ -25,15 +25,15 @@ locals {
         oauth_scopes = node_pool.oauth_scopes
       }
       node_config = {
-        machine_type = node_pool.machine_type
-        accelerator_type = node_pool.accelerator_type
+        machine_type      = node_pool.machine_type
+        accelerator_type  = node_pool.accelerator_type
         accelerator_count = node_pool.accelerator_count
-        disk_type    = node_pool.disk_type
-        disk_size_gb = node_pool.disk_size_gb
-        local_ssd_count           = 0
-        spot                      = false
-        preemptible               = false
-        image_type                = "COS_CONTAINERD"
+        disk_type         = node_pool.disk_type
+        disk_size_gb      = node_pool.disk_size_gb
+        local_ssd_count   = 0
+        spot              = false
+        preemptible       = false
+        image_type        = "COS_CONTAINERD"
       }
       node_count = {
         initial = node_pool.min_node_count
@@ -62,7 +62,7 @@ locals {
 }
 
 module "gpu_node_pools" {
-  source          = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/gke-nodepool?ref=v28.0.0&depth=1"
+  source          = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/gke-nodepool?ref=v29.0.0&depth=1"
   project_id      = var.project_id
   for_each        = local.gpu_node_pools
   name            = each.key

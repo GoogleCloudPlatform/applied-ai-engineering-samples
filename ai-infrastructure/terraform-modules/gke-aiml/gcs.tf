@@ -27,7 +27,7 @@ locals {
 }
 
 module "gcs_buckets" {
-  source        = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/gcs?ref=v28.0.0&depth=1"
+  source        = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/gcs?ref=v29.0.0&depth=1"
   for_each      = local.bucket_configs
   project_id    = var.project_id
   name          = each.key
