@@ -54,7 +54,7 @@ module "workload-service-account" {
   name        = var.wid_sa_name
   description = "Service account for GKE workloads"
   iam_project_roles = {
-    "${var.project_id}" = [for role in var.service_account_roles : "roles/${role}"]
+    "${var.project_id}" = [for role in var.wid_sa_roles : "roles/${role}"]
   }
 }
 
