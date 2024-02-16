@@ -67,3 +67,8 @@ variable "google_service_account_create" {
   default     = true
 }
 
+variable "service_account_roles" {
+  description = "Roles to assign to a service account"
+  type        = list(string)
+  default     = []
+}

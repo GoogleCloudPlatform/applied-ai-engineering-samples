@@ -53,6 +53,9 @@ module "workload-service-account" {
   project_id  = var.project_id
   name        = var.wid_sa_name
   description = "Service account for GKE workloads"
+  iam_project_roles = {
+    "${var.project_id}" = [for role in var.service_account_roles : "roles/${role}"]
+  }
 }
 
 resource "google_service_account_iam_member" "ksa-bind-to-gsa" {
