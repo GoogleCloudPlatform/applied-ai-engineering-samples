@@ -39,21 +39,19 @@ variable "deletion_protection" {
 variable "pubsub_config" {
   description = "The settings for Pubsub topic and subscription"
   type = object({
-    topic_name        = optional(string, "performance_metrics_pubsub_sink")
-    subscription_name = optional(string, "performance_metrics_pubsub_bq_sub")
-    schema_name       = optional(string, "performance_metrics_schema")
+    topic_name        = string
+    subscription_name = string
+    schema_name       = string
   })
   nullable = false
-  default  = {}
 }
 
 variable "bq_config" {
   description = "The settings for BigQuery dataset and tables"
   type = object({
-    dataset_name = optional(string, "performance_metrics_dataset")
-    location     = optional(string, "US")
-    table_name   = optional(string, "performance_metrics_table")
+    dataset_name = string
+    location     = string
+    table_name   = string
   })
   nullable = false
-  default  = {}
 }
