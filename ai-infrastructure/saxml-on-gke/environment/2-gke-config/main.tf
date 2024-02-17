@@ -16,11 +16,13 @@
 
 
 module "wid" {
-  source       = "github.com/GoogleCloudPlatform/applied-ai-engineering-samples//ai-infrastructure/terraform-modules/workload-identity?ref=workload-identity"
+  source       = "github.com/GoogleCloudPlatform/applied-ai-engineering-samples//ai-infrastructure/terraform-modules/workload-identity?ref=main"
   cluster_name = var.cluster_name
   location     = var.cluster_location
   project_id   = var.project_id
   wid_sa_name  = var.wid_sa_name
+  wid_sa_roles = var.wid_sa_roles
   ksa_name     = var.ksa_name
   namespace    = var.namespace
+
 }

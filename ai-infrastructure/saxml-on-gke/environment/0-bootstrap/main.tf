@@ -15,7 +15,7 @@
 
 
 module "automation_bootstrap" {
-  source                   = "github.com/GoogleCloudPlatform/applied-ai-engineering-samples//ai-infrastructure/terraform-modules/bootstrap?ref=workload-identity"
+  source                   = "github.com/GoogleCloudPlatform/applied-ai-engineering-samples//ai-infrastructure/terraform-modules/bootstrap?ref=main"
   deletion_protection      = var.deletion_protection
   create_automation_sa     = var.create_automation_sa
   create_automation_bucket = var.create_automation_bucket

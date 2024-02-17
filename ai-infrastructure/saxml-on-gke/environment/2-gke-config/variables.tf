@@ -49,7 +49,13 @@ variable "wid_sa_name" {
   description = "Name for the workload identity Google Service Account"
   type        = string
   nullable    = false
-  default     = "saxml-wid-ksa"
+  default     = "saxml-wid-sa"
+}
+
+variable "wid_sa_roles" {
+  description = "Roles to assign to a wid service account"
+  type        = list(string)
+  default     = ["storage.objectAdmin", "logging.logWriter"]
 }
 
 variable "automation" {

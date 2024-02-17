@@ -22,15 +22,15 @@ locals {
   environment_settings = {
     project_id                   = var.project_id
     cluster_name                 = module.base_environment.cluster_name
-    cluster_location             = module.base_environment.cluster_region
+    cluster_location             = var.region
     cluster_endpoint             = module.base_environment.cluster_endpoint
     gcs_buckets                  = module.base_environment.gcs_buckets
     node_pool_sa_email           = module.base_environment.node_pool_sa_email
-    artifact_registry_image_path = try(module.base_environment.artifact_registry_image_path)
-    locust_dataset_id            = try(google_bigquery_dataset.locust_dataset[0].id, null)
-    locust_metrics_table_id      = try(google_bigquery_table.locust_metrics[0].id, null)
-    locust_metrics_topic_id      = try(google_pubsub_topic.locust_sink[0].id, null)
-    locust_metrics_topic_name    = try(google_pubsub_topic.locust_sink[0].name, null)
+    artifact_registry_image_path = try(module.base_environment.artifact_registry_image_path, null)
+    metrics_dataset_id           = try(module.performance_metrics_infra[0].performance_metrics_dataset_id, null)
+    metrics_table_id             = try(module.performance_metrics_infra[0].performance_metrics_table_id, null)
+    metrics_topic_id             = try(module.performance_metrics_infra[0].performance_metrics_topic_id, null)
+    metrics_topic_name           = try(module.performance_metrics_infra[0].performance_metrics_topic_name, null)
   }
 }
 
@@ -46,38 +46,41 @@ output "cluster_region" {
   value = var.region
 }
 
+output "node_pool_sa_email" {
+  value = module.base_environment.node_pool_sa_email
+}
 output "gcs_buckets" {
   value = module.base_environment.gcs_buckets
 }
 
 output "artifact_registry_image_path" {
   description = "The URI of an Artifact Registry if created"
-  value       = try(module.base_environment.artifact_registry_image_path, null)
+  value       = try(module.base_environment[0].artifact_registry_image_path, null)
 }
 
-output "locust_dataset_id" {
-  description = "Locust metrics dataset id"
-  value       = try(google_bigquery_dataset.locust_dataset[0].id, null)
+output "metrics_dataset_id" {
+  description = "Performance metrics dataset id"
+  value       = try(module.performance_metrics_infra[0].performance_metrics_dataset_id, null)
 }
 
-output "locust_metrics_table_id" {
-  description = "Locust metrics table id"
-  value       = try(google_bigquery_table.locust_metrics[0].id, null)
+output "metrics_table_id" {
+  description = "Performance metrics table id"
+  value       = try(module.performance_metrics_infra[0].performance_metrics_table_id, null)
 }
 
-output "locust_metrics_topic_id" {
-  description = "Locust metrics topic ID"
-  value       = try(google_pubsub_topic.locust_sink[0].id, null)
+output "metrics_topic_id" {
+  description = "Performance metrics topic ID"
+  value       = try(module.performance_metrics_infra[0].performance_metrics_topic_id, null)
 }
 
-output "locust_metrics_topic_name" {
-  description = "Locust metrics topic name"
-  value       = try(google_pubsub_topic.locust_sink[0].name, null)
+output "metrics_topic_name" {
+  description = "Performance metrics topic name"
+  value       = try(module.performance_metrics_infra[0].performance_metrics_topic_name, null)
 }
 
-output "locust_metrics_bq_subscription" {
-  description = "Locust metrics BQ subscription"
-  value       = try(google_pubsub_subscription.locust_bq_subscription[0].id, null)
+output "metrics_bq_subscription" {
+  description = "Performance metrics BQ subscription"
+  value       = try(module.performance_metrics_infra[0].performance_metrics_bq_subscription, null)
 }
 
 resource "google_storage_bucket_object" "tfvars" {

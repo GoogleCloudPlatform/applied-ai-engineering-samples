@@ -71,10 +71,30 @@ locals {
       spot           = node_pool.spot
     }
   }
+
+  pubsub_config = (
+    var.prefix != ""
+    ? {
+      topic_name        = "${var.prefix}_${var.pubsub_config.topic_name}"
+      subscription_name = "${var.prefix}_${var.pubsub_config.subscription_name}"
+      schema_name       = "${var.prefix}_${var.pubsub_config.schema_name}"
+    }
+    : var.pubsub_config
+  )
+
+  bq_config = (
+    var.prefix != ""
+    ? {
+      dataset_name = "${var.prefix}_${var.bq_config.dataset_name}"
+      table_name   = var.bq_config.table_name
+      location     = var.bq_config.location
+    }
+    : var.bq_config
+  )
 }
 
 module "base_environment" {
-  source              = "github.com/GoogleCloudPlatform/applied-ai-engineering-samples//ai-infrastructure/terraform-modules/gke-aiml?ref=workload-identity"
+  source              = "github.com/GoogleCloudPlatform/applied-ai-engineering-samples//ai-infrastructure/terraform-modules/gke-aiml?ref=main"
   project_id          = var.project_id
   region              = var.region
   deletion_protection = var.deletion_protection
@@ -85,6 +105,15 @@ module "base_environment" {
   registry_config     = local.registry_config
   cpu_node_pools      = var.cpu_node_pools
   tpu_node_pools      = local.tpu_node_pools
+}
+
+module "performance_metrics_infra" {
+  count               = var.create_perf_testing_infrastructure ? 1 : 0
+  source              = "github.com/GoogleCloudPlatform/applied-ai-engineering-samples//ai-infrastructure/terraform-modules/metrics-tracking?ref=performance-testing"
+  project_id          = var.project_id
+  deletion_protection = var.deletion_protection
+  pubsub_config       = local.pubsub_config
+  bq_config           = local.bq_config
 }
 
 
