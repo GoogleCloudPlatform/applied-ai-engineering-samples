@@ -12,8 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-deletion_protection = true
+
+create_automation_sa     = true
+create_automation_bucket = true
+enable_apis              = true
+
+deletion_protection      = true
+
 project_id = "your-project-id"
+
 automation_bucket = {
   name = "your-automation-bucket-name"
   location = "the-location-for-your-bucket"
@@ -21,15 +28,37 @@ automation_bucket = {
 
 automation_sa_name = "your-automation-sa-name"
 
-# Uncomment if you want to provision BigQuery and Pubsub components as part of the base infrastructure
-#services = [
-# "bigquery.googleapis.com",
-# "pubsub.googleapis.com"
-#]
-#
-#roles = [
-#  "roles/pubsub.editor",
-#  "roles/bigquery.admin"
-#]
+services = [
+  "accesscontextmanager.googleapis.com",
+  "artifactregistry.googleapis.com",
+  "cloudbuild.googleapis.com",
+  "cloudkms.googleapis.com",
+  "cloudresourcemanager.googleapis.com",
+  "container.googleapis.com",
+  "compute.googleapis.com",
+  "container.googleapis.com",
+  "iam.googleapis.com",
+  "iamcredentials.googleapis.com",
+  "serviceusage.googleapis.com",
+  "sourcerepo.googleapis.com",
+  "stackdriver.googleapis.com",
+  "storage-component.googleapis.com",
+  "storage.googleapis.com",
+  "sts.googleapis.com"
+  "bigquery.googleapis.com",
+  "pubsub.googleapis.com"
+]
+
+roles = [
+  "roles/iam.securityAdmin",
+  "roles/iam.serviceAccountAdmin",
+  "roles/compute.networkAdmin",
+  "roles/container.admin",
+  "roles/iam.serviceAccountUser",
+  "roles/storage.admin",
+  "roles/artifactregistry.admin",
+  "roles/pubsub.editor",
+  "roles/bigquery.admin"
+]
 
 

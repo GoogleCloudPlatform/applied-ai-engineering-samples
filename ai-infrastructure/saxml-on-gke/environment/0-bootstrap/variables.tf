@@ -59,15 +59,15 @@ variable "automation_sa_name" {
 }
 
 variable "services" {
-  description = "Additional services to enable"
+  description = "Services to enable in the project"
   type        = list(string)
-  default     = ["aiplatform.googleapis.com"]
+  default     = []
   nullable    = false
 }
 
 variable "roles" {
-  description = "Additional roles to add to an automation account"
+  description = "Project level roles to add to an automation account"
   type        = list(string)
-  default     = ["roles/aiplatform.user"]
+  default     = []
   nullable    = false
 }

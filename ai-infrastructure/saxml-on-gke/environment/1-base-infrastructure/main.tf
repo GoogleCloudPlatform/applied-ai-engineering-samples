@@ -109,7 +109,7 @@ module "base_environment" {
 
 module "performance_metrics_infra" {
   count               = var.create_perf_testing_infrastructure ? 1 : 0
-  source              = "github.com/GoogleCloudPlatform/applied-ai-engineering-samples//ai-infrastructure/terraform-modules/metrics-tracking?ref=performance-testing"
+  source              = "github.com/GoogleCloudPlatform/applied-ai-engineering-samples//ai-infrastructure/terraform-modules/metrics-tracking?ref=main"
   project_id          = var.project_id
   deletion_protection = var.deletion_protection
   pubsub_config       = local.pubsub_config

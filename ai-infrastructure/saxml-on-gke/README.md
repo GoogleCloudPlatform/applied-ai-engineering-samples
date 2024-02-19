@@ -65,7 +65,7 @@ In the second stage, the Saxml components, including admin servers, model server
 
 ### Configure pre-requisites
 
-Before proceeding with the deployment stages, you must:
+Before proceeding with the environment deployment stages, you must:
 
 - Create a new Google Cloud project or select an existing one.
 - Enable the necessary services.
@@ -106,23 +106,31 @@ If the performance testing components are being deployed additional roles are re
 - `bigquery.admin`
 
 
-#### Configuring the prerequisites using the bootstrap Terraform 
+If you lack administrative-level permissions to enable GCP services or to create and configure service accounts in your project, your project administrator must perform these tasks. However, if you are a project owner, you can enable the services and create and configure the automation service account as part of the [Configure automation settings](#configure-automation-settings) step.
 
-The prerequisites may need to be configured by your GCP organization administrator. If you have access to a project where you are a project owner, you can configure the prerequisites using the Terraform configuration in the [environment/0-bootstrap](environment/0-bootstrap/) folder.
+
+
+#### Configure automation settings 
+
+During this step, Terraform is configured to utilize the specified automation bucket and service account. Optionally, if configured, it can also enable the necessary services and create both the automation service account and the automation bucket.
+
 
 1. Clone this repo
 2. Change the current folder to [environment/0-bootstrap](environment/0-bootstrap/)
 3. Copy the [terraform.tfvars.tmpl](environment/0-bootstrap/terraform.tfvars.tmpl) file to `terraform.tfvars`
 4. Modify the `terraform.tfvars` file to reflect your environment
-  - Set `project_id` to your project ID
-  - Set `automation_bucket` to the name of a bucket you want to create in your project
-  - Set `location` to a location where you want to create the automation bucket 
-  - Set `automation_sa_name` to the automation service account name in your environment
-  - If you are going to configure the performance testing components uncomment the `services` and `roles` variables
+  - `project_id` - your project ID
+  - `create_automation_bucket` - set to `true` if you want to create a new automation bucket; set to `false` if you want to use an existing bucket
+  - `automation_bucket` - the name and location of a bucket you want to use for automation. If you use an existing bucket the `location` field will be ignored
+  - `create_automation_sa` - set to `true` if you want to create a new automation service account; set to `false` if you want to use an existing service account
+  - `automation_sa_name` - the name of an automation service account to be used by Terraform for impersonation
+  - `enable_apis` - set to `true` if you want to enable the services listed in the `services` variable
+  - `services` - the list of services to enable in your project
+  - `roles` - the list of roles to assign to an automation services account. These roles will only be assigned to a newly created account. If you are using an existing account, this list will be ignored.
 5. Execute the `terraform init` command
 6. Execute the `terraform apply` command
 
-Besides enabling the necessary services and setting up an automation service account and an automation GCS bucket, the Terraform configuration has generated prepopulated template files for configuring the Terraform backend and providers, which can be utilized in the following setup stages. These template files are stored in the `gs://<YOUR-AUTOMATION-BUCKET/providers` folder.
+The Terraform configuration generates prepopulated template files for configuring the Terraform backend and providers, which can be utilized in the following setup stages. These template files are stored in the `gs://<YOUR-AUTOMATION-BUCKET/providers` and `gs://<YOUR-AUTOMATION-BUCKET/tfvars` folders. 
 
 
 #### Granting Cloud Build impersonating rights
@@ -151,10 +159,6 @@ git clone https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples.
 Change the current directory, to [environment](environment/).
 
 #### Configure build parameters
-
-If you used the `bootstrap` configuration to configure the prerequisites, copy the `providers\providers.tf` and `providers\backend.tf` files from the `providers` folder in your automation bucket to the [1-base-infrastructure](environment/1-base-infrastructure/) folder. Modify the `backend.tf` by setting the `prefix` field to the name of a folder in the automation bucket where you want to store your Terraform configuration's state. For example, if you want to manage the Terraform state in the `tf_state/gke_saxml` subfolder of the automation bucket set the `prefix` field to `tf_state/gke_saxml`.
-
-If the automation bucket and the automation service account were provided to you by your administrator, rename the `backend.tf.tmpl` and the `providers.tf.tmpl` files to `backend.tf` and `providers.tf` and update them with your settings.
 
 To configure the Terraform steps in the build, copy the [terraform.tfvars.tmpl](environment/1-base-infrastructure/terraform.tfvars.tmpl) template file in the [1-base-infrastructure](environment/1-base-infrastructure/) folder to `terraform.tfvars`. Make modifications to the `terraform.tfvars` file to align it with your specific environment. At the very least, you should set the following variables:
 
