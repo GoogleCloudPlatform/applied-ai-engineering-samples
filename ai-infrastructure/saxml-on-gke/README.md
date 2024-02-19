@@ -167,6 +167,8 @@ To configure the Terraform steps in the build, copy the [terraform.tfvars.tmpl](
 - `prefix` - the prefix that will be added to the default names of resources provisioned by the configuration
 - `tpu_node_pools` - The  template shows an example configuration for one TPU node pool with a single `v5litepod-4` slice. Modify the `tpu_node_pools` variable to provision different TPU node pool configurations, as described below.
 - `cput_node_pools` - The template shows an example configuration for a number of CPU node pools as outlined in the [High Level Architecture section](#high-level-architecture)  
+- `create_artifact_registry` - set to `true` to create a new artifact registry
+- `create_performance_testing_infrastructure` - set to `true` if you want to provision and configure Pubsub and BigQuery resources to support tracking and managing performance metrics.
 
 If you wish to modify other default settings, such as the default name suffixes for a cluster or GCS bucket names, you can override the defaults specified in the [variables.tf](environment/1-base-infrastructure/variables.tf) file within your `terraform.tfvars` file.
 
