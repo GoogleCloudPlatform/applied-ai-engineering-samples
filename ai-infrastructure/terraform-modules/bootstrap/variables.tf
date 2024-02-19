@@ -62,14 +62,14 @@ variable "automation_sa_name" {
 }
 
 variable "services" {
-  description = "Additional services to enable"
+  description = "Services to enable"
   type        = list(string)
   default     = []
   nullable    = false
 }
 
 variable "roles" {
-  description = "Additional roles to add to an automation account"
+  description = "Project level roles to add to an automation account"
   type        = list(string)
   default     = []
   nullable    = false

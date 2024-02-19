@@ -19,36 +19,8 @@ locals {
     : "REGIONAL"
   )
 
-  default_services = [
-    "accesscontextmanager.googleapis.com",
-    "artifactregistry.googleapis.com",
-    "cloudbuild.googleapis.com",
-    "cloudkms.googleapis.com",
-    "cloudresourcemanager.googleapis.com",
-    "container.googleapis.com",
-    "compute.googleapis.com",
-    "container.googleapis.com",
-    "iam.googleapis.com",
-    "iamcredentials.googleapis.com",
-    "serviceusage.googleapis.com",
-    "sourcerepo.googleapis.com",
-    "stackdriver.googleapis.com",
-    "storage-component.googleapis.com",
-    "storage.googleapis.com",
-    "sts.googleapis.com"
-  ]
-  services = concat(local.default_services, var.services)
-
-  default_roles = [
-    "roles/iam.securityAdmin",
-    "roles/iam.serviceAccountAdmin",
-    "roles/compute.networkAdmin",
-    "roles/container.admin",
-    "roles/iam.serviceAccountUser",
-    "roles/storage.admin",
-    "roles/artifactregistry.admin",
-  ]
-  roles = concat(local.default_roles, var.roles)
+  services = var.services
+  roles    = var.roles
 
   automation_bucket_name = (
     var.create_automation_bucket == true
