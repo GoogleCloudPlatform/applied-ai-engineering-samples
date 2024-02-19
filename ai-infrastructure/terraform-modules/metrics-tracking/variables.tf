@@ -12,17 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-variable "automation" {
-  description = "Automation configs"
-  type = object({
-    outputs_bucket = string
-  })
-  default = {
-    outputs_bucket = null
-  }
-  nullable = false
-}
-
 variable "project_id" {
   description = "The GCP project ID"
   type        = string
