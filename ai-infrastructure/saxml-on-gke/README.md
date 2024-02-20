@@ -150,7 +150,7 @@ Replace <PROJECT_NUMBER> with your project number. Replace <AUTOMATION_SERVICE_A
 
 #### Clone the GitHub repo. 
 
-If you haven't already run the bootstrap stage, please clone this repository now.
+If you haven't already, please clone this repository now.
 
 ```bash
 git clone https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples.git
@@ -227,8 +227,6 @@ To retrieve the logs for a build:
 ```
 gcloud builds log <BUILD_ID>
 ```
-
-For your convenience, the final step of the build displays the names of all resources created during the build process. This makes it easier for you to retrieve them for configuring Saxml deployment and other workloads.
 
 
 ### Deploy Saxml components 
