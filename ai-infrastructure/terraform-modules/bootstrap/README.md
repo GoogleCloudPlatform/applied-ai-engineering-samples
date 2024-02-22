@@ -21,39 +21,6 @@ module "automation_bootstrap" {
 }
 ```
 
-By default the module enables the following  services:
-
-- accesscontextmanager.googleapis.com
-- artifactregistry.googleapis.com
-- cloudbuild.googleapis.com
-- cloudkms.googleapis.com
-- cloudresourcemanager.googleapis.com
-- container.googleapis.com
-- compute.googleapis.com
-- container.googleapis.com
-- iam.googleapis.com
-- iamcredentials.googleapis.com
-- serviceusage.googleapis.com
-- sourcerepo.googleapis.com
-- stackdriver.googleapis.com
-- storage-component.googleapis.com
-- storage.googleapis.com
-- sts.googleapis.com
-
-You can specify additional services to enable through the services input variable.
-
-By default, the following roles are assigned to the automation service account:
-
-- roles/iam.securityAdmin
-- roles/iam.serviceAccountAdmin
-- roles/compute.networkAdmin
-- roles/container.admin
-- roles/iam.serviceAccountUser
-- roles/storage.admin
-- roles/artifactregistry.admin
-
-You can specify additional roles to assign to the automation service account through the roles input variable.
-
 
 ## Impersonating automation service account
 
@@ -84,10 +51,13 @@ gcloud iam service-accounts add-iam-policy-binding $AUTOMATION_SERVICE_ACCOUNT -
 |---|---|---|---|---|
 |[project_id](variables.tf#L31)| The project ID, where to enable services and create an automation service account and an automation bucket|`string`| &check; ||
 |[deletion_protection](variables.tf#L28)|Prevent Terraform from destroying the automation bucket. When this field is set, a terraform destroy or terraform apply that would delete the bucket will fail.|`string`||`true`|
+|[create_automation_bucket](variables.tf#29])|Whether to create an automation bucket|`bool`||`true`|
 |[automation_bucket](variables.tf#L22)| Settings for the automation bucket |`map(strings)`|&check;||
+|[create_automation_sa](variables.tf#22])|Whether to create an automation service account|`bool`||`true`|
 |[automation_sa_name](variables.tf#L37)|The name of the automation service account|`string`| &check;||
-|[services](variables.tf#L43)|The list of additional services to enable|`list(strings)`| &check; ||
-|[roles](varialbes.tf#L50)|The list of additional roles to assign to the automation service account|`list(strings)`|&check; ||
+|[enable_apis](variables.tf#36])|Whether to enable services in the `services` variable |`bool`||`true`|
+|[services](variables.tf#L43)|The list of services to enable|`list(strings)`| &check; ||
+|[roles](varialbes.tf#L50)|The list of roles to assign to the automation service account. These roles will only be assigned to a newly created account. If you are using an existing account, this list will be ignored|`list(strings)`|&check; ||
 
 
 ## Outputs
