@@ -1,0 +1,150 @@
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+.bs-stepper-content .btn {
+    /* border: 1px solid #e9f3dd!important; */
+    border-radius: 25px;
+    height: 45px;
+}
+
+.bs-stepper-content {
+    /* margin-top: 25px; */
+    padding: 0px;
+}
+
+.bs-stepper-pane .btn span {
+    vertical-align: sub;
+}
+
+.editable-section:hover {
+    position: relative;
+    border: 1px solid red !important;
+    box-shadow: 0 0 5px 3px #e04848;
+}
+
+.editable-section:hover .webmod-button,
+.webmod-button:hover {
+    display: inline-block;
+    z-index: 99;
+}
+
+.webmod-button {
+    display: none;
+    position: absolute;
+    top: -22px;
+    right: 10px;
+}
+
+.webmod-button::before {
+    border: 2px solid red;
+}
+
+.ai-suggest {
+    border: double 4px transparent;
+    border-radius: 5px;
+    background-image: linear-gradient(white, white),
+        radial-gradient(circle at top left, #f00, #3020ff);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+}
+
+#edit-button {
+    z-index: 9999999999999;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: inline-block;
+    padding: 10px;
+    border: none;
+    border-radius: 50%;
+    background-color: #a584d6;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+    font-size: 0.2rem;
+    box-shadow: 0 1px 3px 0 var(--devsite-elevation-key-shadow-color),
+        0 4px 8px 3px var(--devsite-elevation-ambient-shadow-color);
+    width: 65px;
+    height: 65px;
+}
+
+#edit-button:hover {
+    box-shadow: 0px 0px 50px #7d54bc;
+}
+
+#edit-button i {
+    color: #fff;
+    font-size: 24px;
+}
+
+#popup-overlay {
+    position: fixed;
+    background-color: rgba(0, 0, 0, 0.685);
+    width: 100%;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    z-index: 9998;
+    display: none;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.refine-modal {
+    position: absolute; /* Change to absolute positioning */
+    top: 0;
+    left: 0;
+    /* Remove fixed width and height */
+    width: auto;
+    height: auto;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    z-index: 100; /* Ensure the modal appears on top of other elements */
+}
+
+.refine-modal-content {
+    width: 100%;
+    margin: 0 auto;
+}
+
+.refine-modal input[type='text'] {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    margin-bottom: 10px;
+}
+
+.refine-modal button {
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    background-color: #eee;
+    cursor: pointer;
+}
+
+.ce-popover__item caption {
+    display: none;
+}
+
+.header-cnt {
+    max-width: 1660px;
+}

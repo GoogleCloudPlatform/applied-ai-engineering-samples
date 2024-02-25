@@ -1,0 +1,91 @@
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+:root {
+    --devsite-elevation-key-shadow-color: #3c40434d;
+    --devsite-elevation-ambient-shadow-color: #3c404326;
+    --devsite-elevation-inset-shadow-color: #9ba1a680;
+}
+h1 {
+    font-size: 36px;
+}
+
+h2 {
+    font-size: 30px;
+}
+
+h3 {
+    font-size: 26px;
+}
+
+h4 {
+    font-size: 22px;
+}
+
+h5 {
+    font-size: 18px;
+}
+
+h6 {
+    font-size: 16px;
+}
+
+p {
+    font-size: 15px;
+}
+
+a {
+    text-decoration: none;
+    font-size: 15px;
+}
+
+* {
+    margin-bottom: 0;
+}
+
+body {
+    background: #ffffff;
+    color: rgba(0, 0, 0, 0.87);
+    margin: 0;
+    padding: 0;
+    font-family: 'DM Sans', sans-serif;
+}
+
+.carousel-control-next-icon,
+.carousel-control-prev-icon {
+    width: 10px;
+    height: 10px;
+}
+
+.msg {
+    border-radius: 10px;
+}
+
+.msg.right {
+    background-color: #ccc;
+    float: right;
+}
+
+.msg.left {
+    background-color: #555;
+    color: white;
+}
+
+*,
+::after,
+::before {
+    box-sizing: border-box;
+}

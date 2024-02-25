@@ -1,0 +1,244 @@
+[global]
+project_id = ""
+location = ""
+
+datastore_location = "global"
+datastore_id = ""
+serving_config = "default_config"
+
+recs_datastore_id = ""
+recs_serving_config_id = ""
+
+[imagen]
+generation_model_name = "imagegeneration@005"
+caption_model_name = "imagetext@002"
+bucket_name = ""
+generation_negative_prompt = "nsfw, porn"
+refine_prompt_template = """{}"""
+
+[blog]
+blog_bucket = ""
+image_bucket = ""
+
+[vertex-llm]
+translate_prompt = """
+You are an expert mutlilingual developer.
+
+OBJECTIVE : Your primary task is to translate a webpage content into a specific <TARGET LANGUAGE>. You are provided the webpage in a JSON structure
+JSON DATA STRUCTURE :
+1. You are provided a JSON file which consists of a list of `blocks`.
+2. Each block dict typically consists of `id`, `type`, `data` and `tunes`
+`id` : Unique block identifier
+`type`: type of HTML block - `header`, `paragraph`, `image` and so on
+`data`: data of the block. It contains a field called `text` - this is the primary field we are performing operations on.
+
+INSTRUCTIONS : 
+1. Analyse all the blocks - specifically the `data` and `text` field. 
+2. Translate the `text` to <TARGET LANGUAGE>
+3. Overwrite the `text` field with the newly translated text.
+4. Do not modify any other fields or blocks. Do not change the order of any blocks as well.
+
+IMPORTANT: 
+You must always output a valid blocks file structure - which is a list[dict]
+
+<TARGET LANGUAGE> :
+"""
+
+
+ai_review_prompt = """
+You are an expert developer. Your primary task is to review the text content of a webpage and provide suggestions on how the existing content can be modified to make it more useful and impactful.
+
+You are provided the webpage in a JSON format
+
+JSON DATA FORMAT:
+1. You are provided a JSON file which consists of a list of "blocks".
+2. Each block dict typically consists of "id", "type", "data" and "tunes"
+"id": Unique block identifier
+"type": type of HTML block - "header", "paragraph", "image", "link"
+"data": data of the block. It contains a field called "text" - this is the primary field we are performing operations on.
+
+INSTRUCTIONS:
+1. Analyse only the "header" and "paragraph" blocks. Within these blocks, analyse specifically the "data" and "text" field.
+2. Modify the "text" field to make the content more useful and impactful.
+3. Create a clone of the existing block and add it right after the existing block. Do not make any changes to the existing block
+4. Replace the "text" field in the cloned block with the modified text. 
+5. Add a new key:value pair called `"aiSuggest" : true` within the "data" field only on the cloned block. Do not add this on the original block and preserve the original block as is.
+6. Overwrite the "text" field with the newly translated text.
+7. Do not modify any other fields or blocks. Do not change the order of any blocks as well.
+8. Ensure that you always generate a valid JSON output. Do not add any extra characters like - , . ; : " "
+9. Always provide more than 1 suggestion. This means you should always have multiple blocks with `"aiSuggest": true`
+
+EXAMPLE:
+
+INPUT:
+   { 
+    "time": 1702950510449,
+    "blocks": [
+       {
+            "id": "YTPm7jImjX",
+            "type": "paragraph",
+            "data": {
+                "text": "2. How do you assess the quality of management when evaluating potential investments?"
+            },
+            "tunes": {
+                "anyTuneName": {
+                    "alignment": "left"
+                }
+            }
+        },
+    ]
+}
+
+OUTPUT:
+    { 
+    "time": 1702950510449,
+    "blocks": [
+       {
+            "id": "YTPm7jImjX",
+            "type": "paragraph",
+            "data": {
+                "text": "2. How do you assess the quality of management when evaluating potential investments?"
+            },
+            "tunes": {
+                "anyTuneName": {
+                    "alignment": "left"
+                }
+            }
+        },
+       {
+            "id": "YTPm7jImjX",
+            "type": "paragraph",
+            "data": {
+                "text": "2. How do you assess the track record of a management team in making sound decisions and achieving goals?"
+                "aiSuggest": 
+            },
+            "tunes": {
+                "anyTuneName": {
+                    "alignment": "left"
+                }
+            }
+        },
+    ]
+}
+
+EXAMPLE 2:
+INPUT:
+    { 
+        "time": 1702950510449,
+        "blocks": [
+            {
+                "id": "wDWb-B-0ge",
+                "type": "header",
+                "data": {
+                    "text": "The Symphony of Investments: Unveiling the Magic of Asset Class Portfolio Diversification",
+                    "level": 1
+                },
+                "tunes": {
+                    "anyTuneName": {
+                        "alignment": "left"
+                    }
+                }
+            },
+            {
+                "id": "cgn9EN97TK",
+                "type": "paragraph",
+                "data": {
+                    "text": "Imagine yourself standing amidst an orchestra, surrounded by musicians, each wielding their instruments with mastery. The clarinet's graceful melody intertwines with the violin's soaring notes, while the trumpet's fanfare blends with the drums' rhythmic pulse. Together, they create a harmonious symphony, a tapestry of sounds that moves the soul."
+                },
+                "tunes": {
+                    "anyTuneName": {
+                        "alignment": "left"
+                    }
+                }
+            },
+]
+}
+
+OUTPUT:
+{ 
+        "time": 1702950510449,
+        "blocks": [
+            {
+                "id": "wDWb-B-0ge",
+                "type": "header",
+                "data": {
+                    "text": "The Symphony of Investments: Unveiling the Magic of Asset Class Portfolio Diversification",
+                    "level": 1
+                },
+                "tunes": {
+                    "anyTuneName": {
+                        "alignment": "left"
+                    }
+                }
+            },
+           {
+                "id": "wDWb-B-0ge",
+                "type": "header",
+                "data": {
+                    "text": "Harmony in Investing: Exploring the Wonders of Portfolio Diversification",
+                    "level": 1,
+                    "aiSuggest": true
+                },
+                "tunes": {
+                    "anyTuneName": {
+                        "alignment": "left"
+                    }
+                }
+            },
+                        {
+                "id": "cgn9EN97TK",
+                "type": "paragraph",
+                "data": {
+                    "text": "Imagine yourself standing amidst an orchestra, surrounded by musicians, each wielding their instruments with mastery. The clarinet's graceful melody intertwines with the violin's soaring notes, while the trumpet's fanfare blends with the drums' rhythmic pulse. Together, they create a harmonious symphony, a tapestry of sounds that moves the soul."
+                },
+                "tunes": {
+                    "anyTuneName": {
+                        "alignment": "left"
+                    }
+                }
+            },
+            {
+                "id": "cgn9EN97TK",
+                "type": "paragraph",
+                "data": {
+                    "text": "Envision yourself enveloped in an orchestra's embrace, encircled by virtuosos wielding their instruments with unparalleled mastery. The clarinet's graceful melody intertwines seamlessly with the violin's soaring notes, while the trumpet's majestic fanfare merges with the rhythmic pulse of the drums. In unison, they forge an awe-inspiring symphony—a resounding tapestry of harmonies that not only captivates the senses but also profoundly stirs the depths of the soul.",
+                    "aiSuggest": true
+                },
+                "tunes": {
+                    "anyTuneName": {
+                        "alignment": "left"
+                    }
+                }
+            },
+]
+}
+
+FINAL INPUT:
+
+"""
+
+ai_refine_prompt = """
+You are an award winning writer.
+
+INSTRUCTIONS:
+1. You are given a piece of text as INPUT_TEXT
+2. You are also given a style or tone or instructions as REFINE_PROMPT.
+3. You should modify or refine INPUT_TEXT in the tone or style of REFINE_PROMPT. 
+4. Strictly output only the refined text. Do not add any other explanation. Do not output the answer in \"\" (double or single quotes)
+
+INPUT TEXT: 
+
+"""
+
+ai_translate_inline_prompt = """
+You are an award winning writer.
+
+INSTRUCTIONS:
+1. You are given a piece of text as INPUT_TEXT
+2. You are also given a target language as TARGET_LANGUAGE.
+3. You should translate the INPUT_TEXT to the TARGET_LANGUAGE. 
+4. Strictly output only the translated text. Do not add any other explanation. Do not output the answer in \"\" (double or single quotes)
+
+INPUT_TEXT:
+
+"""

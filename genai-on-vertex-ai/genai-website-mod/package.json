@@ -1,0 +1,9 @@
+{
+    "scripts": {
+        "format": "prettier-eslint \"./**/*.js\"  --eslint-config-path=.eslintrc.yml --write"
+    },
+    "devDependencies": {
+        "prettier-eslint": "^16.3.0",
+        "prettier-eslint-cli": "^8.0.1"
+    }
+}

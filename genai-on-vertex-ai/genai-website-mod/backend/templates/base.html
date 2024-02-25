@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=<YOUR GTAG ID>"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', '<YOUR GTAG ID>');
+  </script>
+  <title>Cymbal Website Modernization</title>
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link href="{{ url_for('static', path='/css/styles.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', path='/css/magi.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', path='/css/support.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', path='/css/footnotes.css') }}" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bs-stepper/dist/js/bs-stepper.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bs-stepper/dist/css/bs-stepper.min.css" />
+  <script src="https://unpkg.com/htmx.org@1.9.6"
+    integrity="sha384-FhXw7b6AlE/jyjlZH5iHa/tTe9EpJ1Y55RjcgPbjeWMskSxZt1v9qkxLJWNJaGni"
+    crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/htmx.org/dist/ext/loading-states.js"></script>
+  <script src="https://cloud.google.com/ai/gen-app-builder/client?hl=en_US"></script>
+
+  <link href="/static/css/editor.css" rel="stylesheet">
+
+  <!-- import scripts for editorjs -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/editorjs-break-line"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script><!-- Header -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/simple-image@latest"></script><!-- Image -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/delimiter@latest"></script><!-- Delimiter -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/list@latest"></script><!-- List -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/checklist@latest"></script><!-- Checklist -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/quote@latest"></script><!-- Quote -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/code@latest"></script><!-- Code -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/embed@latest"></script><!-- Embed -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/table@latest"></script><!-- Table -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/link@latest"></script><!-- Link -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/warning@latest"></script><!-- Warning -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/marker@latest"></script><!-- Marker -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/inline-code@latest"></script><!-- Inline Code -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/image@latest"></script><!-- Image -->
+  <script src="https://cdn.jsdelivr.net/npm/editorjs-button@1.0.4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/editorjs-inline@4.1.5/dist/index.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/paragraph@2.11.3/dist/paragraph.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/editorjs-alert@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@calumk/editorjs-columns@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/editorjs-alert@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@calumk/editorjs-codeflask@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@calumk/editorjs-nested-checklist@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@calumk/editorjs-paragraph-linebreakable"></script>
+  <script src="https://cdn.jsdelivr.net/npm/editorjs-text-alignment-blocktune@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/editorjs-text-color-plugin@2.0.3/dist/bundle.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
+  <script src="/static/js/header-wm.js"></script>
+  <script src="/static/js/paragraph-wm.js"></script>
+  <script src="/static/js/WSMImage.js"></script>
+  <script src="/static/js/llm-refine-text.js"></script>
+  <script src="/static/js/simple-llm.js"></script>
+  <script src="/static/js/ai-tool-autocomplete.js"></script>
+  <script src="/static/js/annotation-bundle.js"></script> <!--https://github.com/VolgaIgor/editorjs-annotation-->
+  <script src="/static/js/WSMComment3.js"></script>
+
+</head>
+
+<body>
+  <div id="popup-overlay"></div>
+  <div id="stepper1" class="bs-stepper">
+
+    <div class="bs-stepper-content">
+      {% if read_only == 'false' %}
+      <div id="test-l-1" class="bs-stepper-pane" role="tabpanel">
+        <div class="bs-stepper-editer-header">
+          <div class="bs-stepper-btn-cnt-left">
+            <button class="btn btn-nutral" id="save-button">Save</button>
+            <button class="btn btn-nutral" id="review-button">Submit for Review</button>
+          </div>
+
+          <div class="bs-stepper-btn-cnt-right">
+            <button class="btn btn btn-nutral" id="ai-review-button"><span class="google-symbols">
+                astrophotography_mode
+              </span>&nbsp;Suggestions</button>
+            <select class="btn  btn btn-nutral" id="ai-translate-button" aria-placeholder="Select Language">
+              <option value="english">English</option>
+              <option value="spanish">Spanish</option>
+              <option value="french">French</option>
+              <option value="hindi">Hindi</option>
+              <option value="bahasa">Bahasa</option>
+              <option value="japanese">Japanese</option>
+              <option value="vietnamese">Vietnamese</option>
+            </select>
+            <select class="btn btn-nutral" id="goto-button" aria-placeholder="Select Page">
+              <option value="na">Select Page</option>
+              <option value="editor">Edit Page</option>
+              <option value="reader">View Page</option>
+              <option value="reviewer">Review Page</option>
+            </select>
+            <select class="btn btn-nutral" id="impersonate-as-button" aria-placeholder="Select Role">
+              <option value="na">Select Role</option>
+              <option value="editor">Editor</option>
+              <option value="reader">Reader</option>
+              <option value="reviewer">Reviewer</option>
+            </select>
+          </div>
+        </div>
+
+      </div>
+      {% else %}
+      <div id="test-l-1" class="bs-stepper-pane" role="tabpanel"></div>
+      <button id="edit-button"><i class="google-symbols"><span>edit</span></i></button>
+      <script>
+        // Edit button
+        editButton = document.getElementById('edit-button');
+        editButton.addEventListener('click', () => {
+          showOverlay("Loading ...");
+          const trimmedUrl = window.location.href.replace(/(review|publish)/, "");
+          window.location = (trimmedUrl.endsWith('/') ?
+            trimmedUrl.slice(0, -1) : trimmedUrl) + '/edit';
+        });
+      </script>
+      {% endif %}
+      <div id="test-l-2" class="bs-stepper-pane" role="tabpanel">
+
+        <div class="bs-stepper-editer-header">
+          <div class="bs-stepper-btn-cnt-left">
+
+            <button class="btn btn-nutral" id="publish-button">Publish</button>
+
+          </div>
+
+          <div class="bs-stepper-btn-cnt-right">
+            <!-- <span style="margin-left: 20px;margin-right: 5px;">Go To</span> -->
+            <select class="btn btn-nutral" id="goto2-button" aria-placeholder="Select Page">
+              <option value="na">Select Page</option>
+              <option value="editor">Edit Page</option>
+              <option value="reader">View Page</option>
+              <option value="reviewer">Review Page</option>
+            </select>
+            <!-- <span style="margin-left: 20px;margin-right: 5px;">Impersonate As</span> -->
+            <select class="btn btn-nutral" id="impersonate2-as-button" aria-placeholder="Select Role">
+              <option value="na">Select Role</option>
+              <option value="editor">Editor</option>
+              <option value="reader">Reader</option>
+              <option value="reviewer">Reviewer</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div id="test-l-3" class="bs-stepper-pane" role="tabpanel"></div>
+
+    </div>
+    <div class="bs-stepper-main-cnt">
+      <div class="bs-stepper-header" role="tablist">
+        <div class="step active" data-target="#test-l-1">
+          <button type="button" class="btn step-trigger">
+            <span class="bs-stepper-circle"><img src="/static/img/icons/tick-mark.svg" width="150"></span>
+            <span class="bs-stepper-label">Edit Your Draft</span>
+          </button>
+        </div>
+        <div class="line"></div>
+        <div class="step" data-target="#test-l-2">
+          <button type="button" class="btn step-trigger">
+            <span class="bs-stepper-circle">2</span>
+            <span class="bs-stepper-label">Reviewing</span>
+          </button>
+        </div>
+        <div class="line"></div>
+        <div class="step" data-target="#test-l-3">
+          <button type="button" class="btn step-trigger">
+            <span class="bs-stepper-circle">3</span>
+            <span class="bs-stepper-label">Published</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- end div of "bs-stepper-content" -->
+    {% block header %}
+    <div id="header-panel" hx-get="/static/html/header.html" hx-trigger="load" class="bs-main-nav"></div>
+    {% endblock %}
+  </div>
+  <!-- end div of "bs-stepper" -->
+
+  <div>
+    {% block page %}
+    {% endblock %}
+  </div>
+  {% block scripts %}
+  <script>
+    const stepper = new Stepper(document.querySelector('.bs-stepper'))
+    document.stepper = new Stepper(document.querySelector('.bs-stepper'))
+
+    const currentUrl = window.location.pathname;
+    if (currentUrl.endsWith('/edit')) {
+      stepper.to(2);
+      stepper.to(1);
+    } else if (currentUrl.endsWith('/review')) {
+      stepper.to(2);
+    } else if (currentUrl.endsWith('/publish')) {
+      stepper.to(3);
+    } else {
+      const stepperHeader = document.querySelector('.bs-stepper-header');
+      stepperHeader.style.display = 'none';
+    }
+
+    if (window.location.pathname === "/") {
+      window.location = window.location.href + "home";
+    }
+
+    window.onscroll = function () { myFunction() };
+
+    var header = document.getElementById("stepper1");
+    var sticky = header.offsetTop;
+
+    function myFunction() {
+      if (window.pageYOffset > sticky) {
+        header.classList.add("sticky");
+      } else {
+        header.classList.remove("sticky");
+      }
+    }
+  </script>
+  {% endblock %}
+
+  <div class="bs-footer">
+    <div class="bs-footer-inr-cnt">
+      <div class="bs-about-cnt">
+        <div class="bs-about-title">
+          <h3>About</h3>
+        </div>
+        <div class="bs-about-content">Cymbal Investments is a global investment and asset manager with a rich history
+          dating back to 1925. Founded in the United States, Cymbal has established itself as a trusted partner for
+          individuals and institutions seeking to grow their wealth.</div>
+      </div>
+
+      <div class="bs-newsletter-cnt">
+        <div class="bs-about-title txt-align-center">
+          <h3>Weekly Newsletter</h3>
+        </div>
+        <div class="txt-align-center bs-about-sub-title">Get blog articles and offers via email</div>
+        <div class="news-letter-input"><input type="text" placeholder="Your Email"></div>
+        <button class="btn btn-success width-hd" id="Subscribe-button">Subscribe</button>
+      </div>
+    </div>
+
+    <div class="bs-footer-copy-right">
+      <div class="bs-footer-copyright-txt">
+        <div class="bs-footer-copyright-txt-title">Cymbal Investments</div>
+        <div class="bs-footer-copyright-txt-sub-title">© Cymbal Investments. All Rights Reserved.</div>
+      </div>
+      <div class="bs-footer-nav">
+        <ul>
+          <li> <a href="#">Terms of Use</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Cookie Policy</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
