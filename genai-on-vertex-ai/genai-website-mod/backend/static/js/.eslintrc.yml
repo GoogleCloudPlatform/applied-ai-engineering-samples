@@ -1,0 +1,169 @@
+#
+# Copyright 2023 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+---
+extends:
+- "eslint:recommended"
+parserOptions:
+  sourceType: "module"
+  ecmaVersion: "latest"
+  ecmaFeatures:
+    jsx: true
+    modules: true
+    experimentalObjectRestSpread: true
+ignorePatterns:
+- "vite-env.d.ts"
+env:
+  es6: true
+rules:
+  no-cond-assign: "off"
+  no-irregular-whitespace: "error"
+  no-unexpected-multiline: "error"
+  valid-jsdoc:
+  - "error"
+  - requireParamDescription: false
+    requireReturnDescription: false
+    requireReturn: false
+    prefer:
+      returns: "return"
+  curly:
+  - "error"
+  - "multi-line"
+  guard-for-in: "error"
+  no-caller: "error"
+  no-extend-native: "error"
+  no-extra-bind: "error"
+  no-invalid-this: "error"
+  no-multi-spaces: "error"
+  no-multi-str: "error"
+  no-new-wrappers: "error"
+  no-throw-literal: "error"
+  no-with: "error"
+  prefer-promise-reject-errors: "error"
+  no-unused-vars:
+  - "error"
+  - args: "none"
+  array-bracket-newline: "off"
+  array-bracket-spacing:
+  - "error"
+  - "never"
+  array-element-newline: "off"
+  block-spacing:
+  - "error"
+  - "never"
+  brace-style: "error"
+  camelcase:
+  - "error"
+  - properties: "never"
+  comma-dangle:
+  - "error"
+  - "always-multiline"
+  comma-spacing: "error"
+  comma-style: "error"
+  computed-property-spacing: "error"
+  eol-last: "error"
+  func-call-spacing: "error"
+  indent:
+  - "error"
+  - 2
+  - CallExpression:
+      arguments: 2
+    FunctionDeclaration:
+      body: 1
+      parameters: 2
+    FunctionExpression:
+      body: 1
+      parameters: 2
+    MemberExpression: 2
+    ObjectExpression: 1
+    SwitchCase: 1
+    ignoredNodes:
+    - "ConditionalExpression"
+  key-spacing: "error"
+  keyword-spacing: "error"
+  linebreak-style: "error"
+  max-len:
+  - "error"
+  - code: 80
+    tabWidth: 2
+    ignoreUrls: true
+    ignorePattern: "goog.(module|require)"
+  new-cap: "error"
+  no-array-constructor: "error"
+  no-mixed-spaces-and-tabs: "error"
+  no-multiple-empty-lines:
+  - "error"
+  - max: 2
+  no-new-object: "error"
+  no-tabs: "error"
+  no-trailing-spaces: "error"
+  object-curly-spacing:
+  - "error"
+  - "always"
+  one-var:
+  - "error"
+  - var: "never"
+    let: "never"
+    const: "never"
+  operator-linebreak:
+  - "error"
+  - "after"
+  padded-blocks:
+  - "error"
+  - "never"
+  quote-props:
+  - "error"
+  - "consistent"
+  quotes:
+  - "error"
+  - "single"
+  - allowTemplateLiterals: true
+  require-jsdoc:
+  - "error"
+  - require:
+      FunctionDeclaration: true
+      MethodDefinition: true
+      ClassDeclaration: true
+  semi: "error"
+  semi-spacing: "error"
+  space-before-blocks: "error"
+  space-before-function-paren:
+  - "error"
+  - asyncArrow: "always"
+    anonymous: "never"
+    named: "never"
+  spaced-comment:
+  - "error"
+  - "always"
+  switch-colon-spacing: "error"
+  arrow-parens:
+  - "error"
+  - "always"
+  constructor-super: "error"
+  generator-star-spacing:
+  - "error"
+  - "after"
+  no-new-symbol: "error"
+  no-this-before-super: "error"
+  no-var: "error"
+  prefer-const:
+  - "error"
+  - destructuring: "all"
+  prefer-rest-params: "error"
+  prefer-spread: "error"
+  rest-spread-spacing: "error"
+  yield-star-spacing:
+  - "error"
+  - "after"

@@ -1,0 +1,240 @@
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+}
+
+/* Header */
+
+.header {
+    background-color: #f2f2f2;
+    padding: 20px;
+}
+
+.logo {
+    display: inline-block;
+    margin-right: 20px;
+}
+
+.logo img {
+    width: 100px;
+    height: auto;
+}
+
+.nav {
+    display: inline-block;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.nav li {
+    display: inline-block;
+    margin-right: 20px;
+}
+
+.nav a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+}
+
+/* Main */
+
+.main {
+    padding: 20px;
+    background-color: #fafafa;
+    margin: 0 auto; /* Centers the main content horizontally within the page */
+    max-width: 1500px; /* Sets a maximum width for the main content to prevent it from expanding beyond a certain point */
+}
+
+/* Hero Section */
+
+.hero {
+    background-color: #fafafa;
+    padding: 50px 0;
+    text-align: center;
+}
+
+.hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.hero-content h1 {
+    font-size: 36px;
+    margin-bottom: 10px;
+}
+
+.hero-content h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.hero-content p {
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.hero-btn {
+    background-color: #28a745;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+}
+
+/* About Us Section */
+
+.about-us {
+    padding: 20px 0;
+    border-top: 1px solid #ddd;
+}
+
+.about-us h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.about-us p {
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+/* Services Section */
+
+.services {
+    padding: 20px 0;
+    border-top: 1px solid #ddd;
+}
+
+.services h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.services ul {
+    list-style: disc;
+    margin-left: 20px;
+}
+
+.services li {
+    margin-bottom: 10px;
+}
+
+/* Why Choose Us Section */
+
+.why-us {
+    padding: 20px 0;
+    border-top: 1px solid #ddd;
+}
+
+.why-us h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.why-us p {
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.why-us ul {
+    list-style: disc;
+    margin-left: 20px;
+}
+
+.why-us li {
+    margin-bottom: 10px;
+}
+
+/* Contact Us Section */
+
+.contact {
+    margin: 0 auto;
+    max-width: 1200px;
+    text-align: center;
+    padding: 20px 0;
+    border-top: 1px solid #ddd;
+}
+
+.contact h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.contact p {
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.contact-btn {
+    background-color: #28a745;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+}
+
+.services,
+.why-us {
+    display: flex;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+    padding: 20px 0;
+    border-top: 1px solid #ddd;
+}
+
+.service-card,
+.why-us-card {
+    width: 20%;
+    padding: 20px;
+    border: 1px solid #ccc;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.service-card .icon,
+.why-us-card .icon {
+    font-size: 40px;
+    color: #28a745;
+    margin-bottom: 10px;
+}
+
+.service-card h3,
+.why-us-card h3 {
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.service-card p,
+.why-us-card p {
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.why-us-card {
+    text-align: left;
+}
+
+.footer {
+    background-color: #28a745;
+    padding: 20px;
+    text-align: center;
+}

@@ -1,0 +1,172 @@
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+.magi-container {
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+    /* padding: 12px; */
+    border-radius: 25px;
+    background: #fbfffc;
+    box-shadow: 0px 1px 8px 0px rgba(0, 0, 0, 0.15) inset;
+}
+
+.magi-hidden {
+    display: none;
+}
+
+.magi-content {
+    justify-content: flex-start;
+    padding: 25px;
+}
+
+.magi-actions-container {
+    display: flex;
+    flex-direction: row;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    justify-content: right;
+    border-top: solid 1px #daebde;
+    padding: 15px 25px;
+}
+
+.magi-container > div {
+    max-height: 400px;
+    overflow-y: scroll;
+    scrollbar-width: thin;
+}
+
+.magi-buttons button {
+    margin-top: 6px;
+    background-color: #2f2e41;
+    border: none;
+    height: 44px;
+    border-radius: 55px;
+    color: white;
+    width: 194px;
+}
+
+.magi-buttons button span {
+    vertical-align: middle;
+}
+.magi-buttons button:hover {
+    background-color: #09ad5b;
+}
+
+.magi-search-results li {
+    list-style: none;
+    text-align: left;
+}
+
+.magi-search-results li:hover {
+    background-color: #ffe7e7;
+    border-radius: 21px;
+}
+
+.magi-search-results li a {
+    margin-bottom: 10px;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 6px transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: darkgrey;
+    border-radius: 5px;
+    outline: 1px solid slategrey;
+}
+
+/* Style the chat container */
+.chat-container {
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Style the chat message */
+.chat-message {
+    margin: 10px 0;
+    padding: 15px;
+    border-radius: 40px; /* Make the chat bubbles rounded */
+    font-size: 16px;
+    max-width: 70%; /* Limit the width of the chat bubbles */
+    display: flex;
+}
+
+/* Style the chat message for the recipient */
+.chat-message.recipient {
+    align-self: flex-start;
+    background-color: #ffffff; /* Change to a complementary color */
+    color: #333; /* Set text color for better readability */
+}
+
+/* Style the chat message for the sender */
+.chat-message.sender {
+    align-self: flex-end;
+    display: flex;
+}
+.chat-message-sender-avatar {
+    margin-left: 10px;
+}
+
+.chat-message.sender .chat-message-content {
+    background-color: #c6eeda; /* Change to a complementary color */
+    color: #333; /* Set text color for better readability */
+    padding: 15px;
+    border-radius: 40px; /* Make the chat bubbles rounded */
+}
+
+.result-container {
+    width: 100%; /* Adjust the width as needed */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 20px; /* Spacing between cards */
+    transition: box-shadow 0.3s ease-in-out;
+    justify-content: center;
+}
+
+.result-container:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.result {
+    padding: 16px;
+}
+
+.result-content {
+    margin-bottom: 5px;
+}
+
+a {
+    /* color: #007bff; */
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+.magi-container-loading {
+    text-align: center;
+    padding-top: 20px;
+}

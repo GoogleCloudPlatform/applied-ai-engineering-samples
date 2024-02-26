@@ -1,0 +1,20 @@
+{% extends "base.html" %} {% block page %}
+
+<div
+    id="editorjs"
+    class="p-5"
+    style="max-width: 70%; margin-left: auto; margin-right: auto"></div>
+<script src="/static/js/common-editor.js"></script>
+<script>
+    const homeContent = JSON.parse('{{ home_content|tojson }}');
+
+    editor = new EditorJS({
+        holder: 'editorjs',
+        autofocus: true,
+        readOnly: '{{read_only}}' === 'true',
+        tools: main_tools,
+        data: homeContent,
+    });
+</script>
+
+{% endblock %}

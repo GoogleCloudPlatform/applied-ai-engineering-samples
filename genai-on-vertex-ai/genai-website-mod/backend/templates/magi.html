@@ -1,0 +1,59 @@
+<link href="/static/css/magi.css" rel="stylesheet" />
+<script type="module" src="/static/js/magi-GA.js"></script>
+
+<div class="magi-container" hx-ext="loading-states" data-loading-class="hidden">
+    <div>
+        <div id="magi-content" class="magi-content">
+            {{magi_reply_text|safe}} {{magi_carousel|safe}} {% for message in
+            messages%}
+            <div class="chat-container">
+                <div class="chat-message sender">
+                    <div class="chat-message-content">
+                        {{message.user|safe}}
+                    </div>
+                    <div class="chat-message-sender-avatar">
+                        <img src="/static/img/user.svg" width="55" />
+                    </div>
+                </div>
+                <div class="chat-message recipient">
+                    <div class="chat-message-content">{{message.bot|safe}}</div>
+                </div>
+            </div>
+            {% endfor %}
+            <br />
+            <h2>Search Results:</h2>
+            {% for result in search_results%}
+            <div class="result-container">
+                <div class="result">
+                    <div class="result-content">
+                        <a href="{{result.link|safe}}">
+                            <div class="result-content">
+                                [{{ loop.index }}] {{result.snippet|safe}}
+                            </div>
+                        </a>
+                    </div>
+                    <br />
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="magi-actions-container">
+        <div class="search-bar" style="background-color: white">
+            <div style="width: 100%">
+                <input type="text" id="prompt-follow-up" name="thequery" title="Search" type="search" value=""
+                    placeholder="Ask ..." aria-label="Search"
+                    hx-post="/web/magi-follow?conversation_name={{conversation_name}}" hx-indicator="#loading-initial"
+                    hx-include="#prompt-follow-up" hx-trigger="keydown[keyCode==13] from:input"
+                    hx-target="#magi-container-target" style="width: 100%" />
+            </div>
+        </div>
+        <div class="magi-buttons">
+            <button type="submit" hx-post="/web/magi-follow?conversation_name={{conversation_name}}"
+                hx-indicator="#loading-initial" hx-include="#prompt-follow-up" hx-target="#magi-container-target">
+                <span class="google-symbols"> astrophotography_mode </span>
+                Ask a follow up
+            </button>
+        </div>
+    </div>
+</div>

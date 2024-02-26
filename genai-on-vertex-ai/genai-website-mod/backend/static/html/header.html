@@ -1,0 +1,100 @@
+<style type="text/css">
+    @font-face {
+        font-family: 'Google Symbols';
+        font-style: normal;
+        font-weight: 400;
+        src: url(https://fonts.gstatic.com/s/googlesymbols/v233/HhzZU5Ak9u-oMExPeInvcuEmPosC9zyteYEFU68cPrjdKM1XLPTxlGmzczpgWvF1SbxVhQidBnv_C_ar1J9g0sLBUv3G8taXnhpB-Bw_tg.woff)
+            format('woff');
+    }
+    .google-symbols {
+        font-family: 'Google Symbols';
+        font-weight: normal;
+        font-style: normal;
+        font-size: 24px;
+        line-height: 1;
+        letter-spacing: normal;
+        text-transform: none;
+        display: inline-block;
+        white-space: nowrap;
+        word-wrap: normal;
+        direction: ltr;
+        -webkit-font-feature-settings: 'liga';
+        -webkit-font-smoothing: antialiased;
+    }
+</style>
+<script type="module" src="/static/js/header-GA.js"></script>
+
+<div>
+    <div
+        class="container-fluid d-flex header-cnt"
+        style="justify-content: space-between">
+        <a class="navbar-brand" href="/"
+            ><img
+                src="/static/img/cymbal-investment-h.png"
+                width="150"
+                alt="Cymbal Agent Workstation Logo"
+        /></a>
+        <div class="search-bar">
+            <div>
+                <input
+                    type="text"
+                    id="search-bar-query"
+                    name="thequery"
+                    title="Search"
+                    type="search"
+                    placeholder="Ask ..."
+                    hx-trigger="keydown[keyCode==13] from:input"
+                    hx-post="/web/magi"
+                    hx-indicator="#loading-initial"
+                    hx-include="#search-bar-query"
+                    hx-target="#magi-container-target"
+                    aria-label="Search" />
+            </div>
+            <div class="search-controls">
+                <div>
+                    <button hx-get="/clear-magi" hx-target="#search-bar-query">
+                        <span class="google-symbols"> close </span>
+                    </button>
+                </div>
+                <div class="search-separator"></div>
+                <div class="search-controls-magnifier">
+                    <button
+                        type="submit"
+                        hx-post="/web/magi"
+                        hx-indicator="#loading-initial"
+                        hx-include="#search-bar-query"
+                        hx-target="#magi-container-target">
+                        <span class="google-symbols"> search_spark </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <ul class="header-menu">
+            <li><a href="/">Home</a></li>
+            <li><a href="/faq">FAQ</a></li>
+            <li><a href="/allblog">All Blogs</a></li>
+        </ul>
+    </div>
+    <div id="loading-initial" class="htmx-indicator">
+        <div class="magi-container">
+            <div class="magi-container-loading">Generating ...</div>
+            <div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text"></div>
+            </div>
+            <div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="magi-container-target"></div>

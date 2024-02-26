@@ -1,0 +1,882 @@
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+.container-fluid {
+    display: flex;
+    align-items: center;
+}
+
+header {
+    text-align: center;
+    background-color: #3498db; /* Professional blue header color */
+    color: #fff;
+    padding: 10px;
+}
+
+.header-menu {
+    display: flex;
+    flex-direction: row;
+    margin-top: 30px;
+}
+
+.navbar-brand {
+    /* color: white; */
+    /* background-color: rgb(55, 153, 234); */
+    border-radius: 55px;
+}
+
+.navbar-brand:hover {
+    background-color: #eacc37;
+}
+
+.navbar-brand span {
+    display: flex;
+    justify-content: flex-end;
+    /* margin-top: -7px; */
+    font-style: italic;
+    font-size: 0.8rem;
+}
+
+#container {
+    display: flex;
+    border-top: 1px solid #e0e0e0;
+}
+
+.form-check {
+    display: flex;
+    margin-right: 0.5rem;
+    text-align: end;
+    justify-content: flex-end;
+}
+
+.form-check .form-check-label {
+    margin-right: 3rem;
+    color: #8b8b8b;
+}
+
+.search-bar {
+    display: flex;
+    flex-direction: row;
+    z-index: 3;
+    position: relative;
+    min-height: 44px;
+    background: #efefef;
+    border: 1px solid #dfe1e5;
+    box-shadow: none;
+    border-radius: 24px;
+    margin: 0.5rem;
+    width: 40em;
+    max-width: 667px;
+    flex: 1;
+    padding: 5px 8px 5px 20px;
+}
+
+.search-bar input {
+    resize: none;
+    background-color: transparent;
+    border: none;
+    margin: 0;
+    padding: 0;
+    color: rgba(0, 0, 0, 0.87);
+    word-wrap: break-word;
+    outline: none;
+    display: flex;
+    width: 560px;
+    -webkit-tap-highlight-color: transparent;
+    padding-top: 7px;
+}
+
+.search-bar button {
+    border: none;
+    background-color: transparent;
+}
+
+.search-bar button span {
+    line-height: inherit;
+}
+
+.search-separator {
+    border-left: 1px solid #dadce0;
+    height: 92%;
+}
+.search-controls {
+    display: flex;
+    flex-direction: row;
+}
+.search-controls-magnifier {
+    width: 44px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    flex: 0 0 auto;
+}
+
+/* Loading skeletons */
+
+.htmx-indicator {
+    display: none;
+}
+.htmx-request .htmx-indicator {
+    display: inline;
+}
+.htmx-request.htmx-indicator {
+    display: inline;
+}
+
+[data-loading] {
+    display: none;
+}
+
+.hidden {
+    display: none;
+}
+
+.skeleton {
+    opacity: 0.7;
+    animation: skeleton-loading 1s linear infinite alternate;
+}
+
+.skeleton-text {
+    width: 100%;
+    height: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 0.8rem;
+}
+
+.skeleton-text:first-child {
+    margin-top: 1rem;
+    width: 20%;
+}
+
+.skeleton-text:last-child {
+    margin-bottom: 0;
+    width: 80%;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-color: e9f3dc;
+    }
+
+    100% {
+        background-color: #c8d1bb;
+    }
+}
+
+#loading {
+    width: 100%;
+}
+
+/* TODO to review below CSS to remove */
+#chat {
+    width: auto;
+    min-width: 600px;
+    max-height: 100%;
+    height: 100%; /* Set a maximum height as needed */
+    padding: 0;
+    padding: 0;
+    border: 0;
+    vertical-align: baseline;
+    box-sizing: border-box;
+    background-color: #fff;
+    color: #333;
+    overflow: hidden; /*  A dd this line to enable vertical scrolling */
+    border-right: 1px solid #e0e0e0;
+    position: relative;
+}
+
+#chat-header {
+    border-bottom: 1px solid #e0e0e0;
+    bottom: 0;
+    padding-left: 15px;
+    height: 90px;
+}
+
+#chat-header h3 {
+    margin-top: 20px;
+    margin-bottom: 0;
+}
+
+#chat-header h3 {
+    padding-bottom: 0;
+}
+
+#chat-header p {
+    color: #434343;
+}
+
+#chat > a {
+    margin-left: 15px;
+}
+
+.chat-body {
+    height: 100%;
+    overflow-y: auto; /* Add this line to enable vertical scrolling */
+    position: relative;
+    flex: 1 1 auto;
+    border: 0;
+    margin: 0;
+    vertical-align: baseline;
+}
+
+#messages {
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 0 !important;
+    list-style: none;
+}
+
+#messages li {
+    list-style: none;
+    margin-top: 1rem;
+    max-width: 500px;
+}
+
+#messages img {
+    width: 100px !important;
+    height: auto;
+}
+
+#data-panel {
+    flex: 1;
+    padding: 10px;
+    box-sizing: border-box;
+    background-color: #f9f9f9; /* Slightly off-white background for the data panel */
+    /* border-right: 1px solid #e0e0e0; Light gray border for the right side of the data panel */
+}
+
+#search-panel {
+    width: 100%;
+    padding: 15px;
+    box-sizing: border-box;
+    background-color: #fff;
+    position: relative;
+}
+
+li.received {
+    display: block;
+    width: 100%;
+    text-align: left;
+    position: relative;
+    margin-left: 1rem !important;
+}
+
+li.received:before {
+    display: block;
+    clear: both;
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: -7px;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 12px 15px 12px;
+    border-color: transparent transparent #f5f5f5 transparent;
+    -webkit-transform: rotate(-37deg);
+    -ms-transform: rotate(-37deg);
+    transform: rotate(-37deg);
+}
+
+li.received div {
+    color: #000;
+    font-size: 14px;
+    line-height: 1.5;
+    font-weight: 400;
+    padding: 5px 10px;
+    background: #f5f5f5;
+    display: inline-block;
+    border-bottom-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    margin-bottom: 0;
+}
+
+li.sent {
+    display: block;
+    width: 100%;
+    text-align: right;
+    position: relative;
+    margin-right: 1rem !important;
+    align-self: flex-end;
+}
+
+li.sent:before {
+    display: block;
+    clear: both;
+    content: '';
+    position: absolute;
+    bottom: 15px;
+    right: -7px;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 12px 15px 12px;
+    border-color: transparent transparent #4b7bec transparent;
+    -webkit-transform: rotate(37deg);
+    -ms-transform: rotate(37deg);
+    transform: rotate(37deg);
+}
+
+li.sent div {
+    color: #fff;
+    font-size: 14px;
+    line-height: 1.5;
+    font-weight: 400;
+    padding: 5px 10px;
+    background: #4b7bec;
+    display: inline-block;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    margin-bottom: 0;
+}
+
+li.sent div a {
+    color: #fff;
+}
+
+li.sent:after {
+    display: block;
+    content: '';
+    clear: both;
+}
+
+.caption_span {
+    display: block;
+    color: #000;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    font-weight: 400;
+}
+
+li.sent .caption_span {
+    /* margin-top:5px; */
+    margin-right: 15px;
+}
+
+.send-btns {
+    display: flex;
+    gap: 10px;
+}
+
+.caw-collapsible-btn {
+    position: absolute;
+    bottom: 0;
+    margin-bottom: 15px;
+    background-color: white;
+    margin-left: 1rem;
+}
+
+.caw-collapsible-btn:hover {
+    background-color: #0d6efd;
+    color: white;
+}
+
+#message-form {
+    /* text-align: center;
+    position: relative; */
+    /* bottom: 0; */
+    /* width: 100%; */
+    /* background-color: #fff; */
+    padding: 15px;
+    box-sizing: border-box;
+    border-top: 1px solid #e0e0e0; /* Light gray border for the top of the message form */
+    vertical-align: baseline;
+    margin-bottom: 60px;
+}
+
+#message-input,
+#search-input,
+#search-input-sf {
+    height: auto;
+}
+
+#kb-search-tab-pane,
+#salesforce-tab-pane {
+    padding-top: 15px;
+}
+
+input {
+    width: 70%;
+    height: 30px;
+    padding: 5px;
+    border: none;
+    border-radius: 5px;
+    background-color: #f4f4f4; /* Light gray background for the input field */
+}
+
+footer {
+    margin-top: auto;
+    background-color: #28a745; /* Professional blue for the footer */
+    padding: 10px;
+    text-align: center;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    color: #e6e6e6 !important;
+    font-style: italic;
+    border-top: 1px solid #e0e0e0; /* Light gray border for the top of the footer */
+}
+
+footer ul {
+    margin-right: 35px;
+}
+
+#names-panel {
+    min-width: 15%; /* Adjust the width as needed */
+    box-sizing: border-box;
+    background-color: #fff; /* Slightly off-white background for the names panel */
+    border-right: 1px solid #e0e0e0; /* Light gray border for the right side of the names panel */
+}
+
+#name-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+#name-list li {
+    cursor: pointer;
+    padding: 10px;
+    overflow-x: auto;
+    position: relative;
+
+    /* Add other styles as needed */
+}
+
+#name-list li h3 {
+    font-size: 0.9rem;
+    margin-bottom: 0;
+}
+
+#name-list li:hover {
+    background-color: rgb(181, 222, 255);
+}
+
+.rounded-text-container {
+    text-align: center;
+    margin: 3;
+}
+
+.rounded-text {
+    display: inline-block;
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 2px solid #3498db; /* You can change the border color */
+}
+
+/* Material Design button styles */
+.rephrase-button {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    color: #fff;
+    background-color: #2196f3; /* Material Design Blue */
+    border: 2px solid #2196f3; /* Material Design Blue */
+}
+
+.rephrase-button:hover {
+    background-color: #1565c0; /* Darker shade for hover effect */
+    border-color: #1565c0;
+}
+
+/* styles.css */
+.magnifier-button {
+    border: none;
+    border-radius: 3px;
+    padding: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.magnifier-button:hover {
+    background-color: rgb(181, 222, 255);
+}
+/* Material Design Search Result Card */
+.search-result-card {
+    background-color: #fff;
+    border-radius: 2px;
+    margin: 10px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.07);
+    transition: 0.3s;
+    overflow: hidden;
+}
+
+.search-result-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.search-result-container {
+    padding: 16px;
+}
+
+.tab-content {
+    margin-bottom: 60px;
+}
+
+/* Add some styling for links and text */
+.search-result-card a {
+    text-decoration: none;
+    color: #000;
+}
+
+.search-result-card p {
+    color: #555; /* Update text color */
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-height: 8em; /* Increase max-height for a higher result card */
+    line-height: 1.2em;
+}
+
+/* Make the container scrollable */
+#search-results {
+    max-height: 400px;
+    overflow-y: auto; /* Add overflow-y property to make the container scrollable */
+}
+
+/* CSS for the search summary */
+.search-summary {
+    background-color: #f5f5f5;
+    padding: 10px;
+    border: 1px solid #ddd;
+    margin: 10px 0;
+    border-radius: 4px;
+    font-weight: bold;
+    color: #333; /* Update text color */
+}
+
+/* CSS for the result snippet */
+.result-snippet {
+    color: #555;
+}
+
+p.result-snippet b::after {
+    content: '\a';
+    white-space: pre;
+}
+
+ol,
+ul {
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+/* Conference Call Link */
+p a:link {
+    color: blue;
+    background-color: transparent;
+    text-decoration: none;
+}
+
+p a:visited {
+    color: white;
+    background-color: transparent;
+    text-decoration: none;
+}
+
+p a:hover {
+    color: red;
+    background-color: transparent;
+    text-decoration: underline;
+}
+
+p a:active {
+    color: yellow;
+    background-color: transparent;
+    text-decoration: underline;
+}
+
+/* Timestamp */
+span small {
+    font-size: 14px;
+    color: #9c9898; /* Adjust the color code to make it lighter */
+}
+
+/* Line divider */
+/* Line divider */
+.separator {
+    display: flex;
+    align-self: center;
+    color: #888; /* Adjust the color code to make it lighter */
+}
+
+.separator div::before,
+.separator div::after {
+    content: '--';
+    /* flex: 1; */
+    /* border-bottom: 1px solid #c2c2c2!important; */
+}
+
+.hero-image-wrapper {
+    bottom: 0;
+    height: 100%;
+    left: 0;
+    overflow: hidden;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 100%;
+}
+
+.sub-hero-image {
+    display: table-cell;
+    height: 100%;
+    left: 0;
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+
+.header-menu li {
+    color: grey !important;
+    list-style: none;
+    margin: 10px;
+    height: 50px;
+}
+.header-menu li a {
+    color: #363636;
+}
+
+.header-menu li a:hover {
+    color: rgb(8, 68, 137);
+}
+
+.hidden-border {
+    border: 1px solid transparent;
+}
+#header-search-box:hover {
+    cursor: pointer;
+}
+
+#home-intro-paragraph {
+    width: 30%;
+    font-size: large;
+    padding: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+}
+
+#home-products {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-top: 100px;
+}
+
+#home-products div {
+    width: 220px;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+#allblog,
+#faq {
+    margin-top: 70px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#allblog li {
+    list-style: none;
+}
+
+.txt-align-center {
+    text-align: center;
+}
+.width-hd {
+    width: 100%;
+}
+.header-cnt {
+    max-width: 1660px !important;
+}
+.bs-stepper-main-cnt {
+    background: #efefef !important;
+    padding: 10px;
+}
+.bs-stepper-editer-header {
+    display: flex;
+    justify-content: space-between;
+    max-width: 1660px;
+    margin: 0px auto;
+}
+.bs-stepper-header {
+    max-width: 1660px;
+    margin: 0px auto;
+}
+.bs-stepper-label {
+    display: block !important;
+    font-size: 12px;
+}
+.bs-stepper .step-trigger {
+    display: unset !important;
+    padding: 0px !important;
+}
+.active .bs-stepper-circle {
+    background: #4ea963 !important;
+}
+.dstepper-block {
+    background: rgb(165, 198, 249);
+    background: linear-gradient(
+        90deg,
+        rgba(165, 132, 214, 1) 0%,
+        rgba(165, 198, 249, 1) 100%
+    );
+    padding: 15px 0px;
+}
+.bs-stepper-content .btn.btn-nutral {
+    background: rgba(255, 255, 255, 0.3) !important;
+    border: none !important;
+    color: #fff !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+}
+.btn-ai-nutral {
+    background: rgb(165, 198, 249);
+    background: linear-gradient(
+        90deg,
+        rgba(165, 132, 214, 1) 0%,
+        rgba(165, 198, 249, 1) 100%
+    );
+    color: #fff !important;
+    border: none !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+}
+.bs-stepper-btn-cnt-left {
+    display: flex;
+}
+.bs-stepper-btn-cnt-right {
+    display: flex;
+}
+.bs-stepper-content .btn {
+    margin-right: 15px;
+}
+.ce-header {
+    text-align: left;
+}
+.bs-footer {
+    background: #f6f6f7;
+}
+.bs-footer-inr-cnt {
+    max-width: 1366px;
+    display: flex;
+    justify-content: space-between;
+    margin: 0px auto;
+    padding: 80px 0px;
+}
+.bs-about-cnt {
+    width: 300px;
+}
+.bs-about-content {
+    font-size: 16px;
+    line-height: 24px;
+}
+.bs-about-title {
+    font-size: 18px;
+}
+.bs-newsletter-cnt {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 40px 30px;
+    width: 390px;
+}
+.btn.btn-success {
+    border-radius: 6px;
+    background: #09ad5b;
+    padding: 12px 20px;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    color: #fff;
+}
+.news-letter-input {
+    margin-top: 20px;
+}
+.news-letter-input input {
+    background: #fff;
+    border: solid 1px #dcdddf;
+    width: 100%;
+    padding: 24px 15px !important;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+}
+.bs-footer-copy-right {
+    max-width: 1366px;
+    margin: 0px auto;
+    border-top: solid 1px #e8e8ea;
+    padding: 32px 0px;
+    display: flex;
+    justify-content: space-between;
+}
+.bs-footer-copyright-txt-title {
+    color: #141624;
+    font-size: 20px;
+}
+.bs-footer-copyright-txt-sub-title {
+    font-size: 16px;
+    color: #3b3c4a;
+}
+.bs-footer-nav {
+}
+.bs-footer-nav ul {
+    margin: 0px;
+    padding: 0px;
+}
+.bs-footer-nav ul li {
+    display: inline-block;
+    padding: 10px 20px;
+}
+.bs-footer-nav ul li:last-child {
+    padding-right: 0px;
+}
+.bs-footer-nav ul li a {
+    color: #3b3c4a;
+    font-size: 16px;
+}
+.bs-footer-nav ul li a:hover {
+    color: #09ad5b;
+}
+.bs-about-sub-title {
+    color: #696a75;
+    font-size: 16px;
+}
+.sticky {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+}
+.bs-main-nav {
+    background: #ffffff;
+}
