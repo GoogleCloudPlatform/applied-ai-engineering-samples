@@ -56,7 +56,7 @@ variable "cluster_queue_name" {
 }
 
 variable "local_queue_name" {
-  description = "The name of eh Kueue LocalQueue"
+  description = "The name of the Kueue LocalQueue"
   type        = string
   nullable    = false
 }

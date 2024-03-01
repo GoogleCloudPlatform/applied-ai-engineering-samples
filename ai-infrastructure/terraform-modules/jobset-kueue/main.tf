@@ -17,9 +17,6 @@ locals {
   jobset_manifests = "https://github.com/kubernetes-sigs/jobset/releases/download/${var.jobset_version}/manifests.yaml"
   kueue_manifests  = "https://github.com/kubernetes-sigs/kueue/releases/download/${var.kueue_version}/manifests.yaml"
 
-  cluster_queue_manifest = templatefile("${path.module}/manifest-templates/cluster_queue.yaml",
-  { cluster_queue_name = var.cluster_queue_name, tpu_flavors = var.tpu_resources })
-
   manifests_path = "${path.module}/manifest-templates"
   kueue_resources = {
     for manifest in fileset(local.manifests_path, "*yaml") :

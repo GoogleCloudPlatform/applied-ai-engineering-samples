@@ -42,8 +42,8 @@ module "wid" {
 |[namespace](variables.tf#L46)|The name of a Kubernetes namespace for the Local Queue |`string`| &check;||
 |[cluster_queue_name](variables.tf#L52)|The name of the Cluster Queue |`string`| &check;||
 |[local_queue_name](variables.tf#L58)|The name of the Local Queue |`string`| &check;||
-|[jobset_version](variables.tf#34)|The version of the JobSet API to install|`string`| &check;||
-|[kueue_version](variables.tf#40)|The version of the Kueue API to install|`string`| &check;||
+|[jobset_version](variables.tf#L34)|The version of the JobSet API to install|`string`| &check;||
+|[kueue_version](variables.tf#L40)|The version of the Kueue API to install|`string`| &check;||
 |[tpu_resources](variables.tf#L64)|The list of TPU resources available in the cluster. This list will be used to configure the `resourceGroups` section of the `ClusterQueue` resource |`list(map)`|&check; ||
 
 
