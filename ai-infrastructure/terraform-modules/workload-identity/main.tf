@@ -13,6 +13,13 @@
 # limitations under the License.
 
 
+data "google_service_account" "gsa" {
+  count      = var.google_service_account_create ? 0 : 1
+  account_id = var.wid_sa_name
+  project    = var.project_id
+}
+
+
 locals {
   wid_sa_email = (
     var.google_service_account_create
