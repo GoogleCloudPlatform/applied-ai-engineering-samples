@@ -37,7 +37,7 @@ module "wid" {
 | Name | Description | Type | Required | Default |
 |---|---|---|---|---|
 |[project_id](variables.tf#L28)| The project ID|`string`| &check; ||
-|[cluster_name](variables.tf#16) | The name of a GKE cluster |`string`| &check;||
+|[cluster_name](variables.tfL#16) | The name of a GKE cluster |`string`| &check;||
 |[location](variables.tf#L22)| The location of a GKE cluster |`string`|&check;||
 |[namespace](variables.tf#L46)|The name of a Kubernetes namespace for the Local Queue |`string`| &check;||
 |[cluster_queue_name](variables.tf#L52)|The name of the Cluster Queue |`string`| &check;||
