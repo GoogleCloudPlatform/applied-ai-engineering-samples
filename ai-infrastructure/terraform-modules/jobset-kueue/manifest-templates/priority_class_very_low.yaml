@@ -18,6 +18,5 @@ kind: PriorityClass
 metadata:
   name: verylow
 value: 100
-globalDefault: false
 description: "Very Low"
 

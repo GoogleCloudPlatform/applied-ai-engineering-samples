@@ -137,6 +137,9 @@ When configuring TPU node pools, ensure that you set the TPU type to one of the 
 
 | TPU type name | Slice type | Slice topology | TPU VM type | Number of VMs in a slice | Number of chips in a VM |
 | ------------- | -----------|----------------|-------------|--------------------------| ------------------------|
+|v5litepod-1|tpu-v5-lite-podslice|1x1|ct5lp-hightpu-1|1|1|
+|v5litepod-4|tpu-v5-lite-podslice|2x2|ct5lp-hightpu-4t|1|4|
+|v5litepod-8|tpu-v5-lite-podslice|2x4|ct5lp-hightpu-4t|1|8|
 |v5litepod-16|tpu-v5-lite-podslice|4x4|ct5lp-hightpu-4t|4|4|
 |v5litepod-32|tpu-v5-lite-podslice|4x8|ct5lp-hightpu-4t|8|4|
 |v5litepod-64|tpu-v5-lite-podslice|8x8|ct5lp-hightpu-4t|16|4|

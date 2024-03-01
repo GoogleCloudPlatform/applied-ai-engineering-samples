@@ -17,5 +17,4 @@ kind: PriorityClass
 metadata:
   name: medium
 value: 500
-globalDefault: false
 description: "Medium"

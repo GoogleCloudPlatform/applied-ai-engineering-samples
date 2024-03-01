@@ -17,5 +17,4 @@ kind: PriorityClass
 metadata:
   name: high
 value: 750
-globalDefault: false
 description: "High"

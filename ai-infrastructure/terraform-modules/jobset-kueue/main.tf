@@ -58,12 +58,16 @@ resource "time_sleep" "wait_for_kueue" {
   create_duration = "60s"
 }
 
-resource "local_file" "test" {
-  for_each        = local.kueue_resources
-  file_permission = "0644"
-  filename        = "test/${each.key}"
-  content         = each.value
+resource "kubernetes_manifest" "kueue_manifests" {
+  for_each = local.kueue_resources
+  manifest = yamldecode(each.value)
+  timeouts {
+    create = "10m"
+  }
+
+  depends_on = [time_sleep.wait_for_kueue]
 }
+
 
 
 
