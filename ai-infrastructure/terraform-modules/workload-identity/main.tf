@@ -13,24 +13,10 @@
 # limitations under the License.
 
 
-data "google_client_config" "default" {}
-
 data "google_service_account" "gsa" {
   count      = var.google_service_account_create ? 0 : 1
   account_id = var.wid_sa_name
   project    = var.project_id
-}
-
-data "google_container_cluster" "gke_cluster" {
-  project  = var.project_id
-  name     = var.cluster_name
-  location = var.location
-}
-
-provider "kubernetes" {
-  host                   = "https://${data.google_container_cluster.gke_cluster.endpoint}"
-  token                  = data.google_client_config.default.access_token
-  cluster_ca_certificate = base64decode(data.google_container_cluster.gke_cluster.master_auth[0].cluster_ca_certificate)
 }
 
 
