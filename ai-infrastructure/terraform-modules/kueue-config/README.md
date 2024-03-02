@@ -1,137 +1,51 @@
-#  GKE for Large Model Training and Serving 
+# Kueue Configuration
 
-This Terraform module configures a GKE-based infrastructure environment specifically designed for training and serving large and extremely large deep learning models, including the most recent Generative AI models.
+This Terraform module configures the [Kueue](https://github.com/kubernetes-sigs/kueue) resources in your GKE cluster.  Kueue is a set of APIs and controller for job queueing. It is a job-level manager that decides when a job should be admitted to start (as in pods can be created) and when it should stop (as in active pods should be deleted). 
 
-The central element of this environment is a VPC-native GKE Standard cluster.  Users of the module can decide whether to deploy the cluster within an existing VPC or create a new VPC specifically for the cluster. The cluster can be configured with multiple CPU, GPU or TPU node pools. The node pools use a custom service account. This service account can be an existing one or a newly created account.
+The module configures Kueue with a single [Cluster Queue](https://kueue.sigs.k8s.io/docs/concepts/cluster_queue/) and a single [Local Queue](https://kueue.sigs.k8s.io/docs/concepts/local_queue/). Additionally, it sets up a set of [PriorityClass](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/#priorityclass) and [Resource Flavor](https://kueue.sigs.k8s.io/docs/concepts/resource_flavor/) resources. Currently, the module configures Resource Flavors for common Cloud TPU v4, v5e, and v5p configurations.
 
-Beyond the cluster, users have the option to create additional services such as Artifact Registry or Cloud Storage buckets.
+The module assumes that Kueue API has been already installed on the GKE cluster.
 
 
-The module carries out the following tasks:
-- If a reference to an existing VPC is not provided, it will create a network, a subnet, and IP ranges for GKE pods and services.
-- Optionally, it can provision [Cloud NAT](https://cloud.google.com/nat/docs/overview)
-- If a reference to an existing service account is not provided, the module will create a new service account and assign it to a user-defined set of security roles.
-- Deploys a standard, VPC-native GKE cluster that is configured to utilize Workload Identity.
-- Creates a user defined number of CPU node pools
-- Creates a user defined number of TPU node pools
-- Creates a user defined number of GPU node pools
-- The node pools are configured to use a custom service account
-- Optionally, it can create an Artifact Registry.
-- Creates the specified number of user-defined Cloud Storage buckets.
-
-## Examples
-
-### GKE TPU training environment
-
-This example demonstrates how to configure an environment optimized for executing large-scale training workloads on TPUs. In this sample, a new VPC, a new service account, and a new Artifact Registry are created. All resources are generated using default values for the majority of the settings.
+## Examples 
 
 ```
-module "tpu-training-cluster" {
-    source     = "github.com/GoogleCloudPlatform/applied-ai-engineering-samples//ai-infrastructure/terraform-modules/gke-aiml
-    project_id = "project_id"
-    region     = "us-central2"
-    vpc_config = {
-        network_name = "gke-cluster-network"
-        subnet_name  = "gke-cluster-subnetwork"
+module "wid" {
+  source             = "github.com/GoogleCloudPlatform/applied-ai-engineering-samples//ai-infrastructure/terraform-modules/jobset-kueue"
+  cluster_name       = "gke-cluster" 
+  location           = "us-central1"
+  namespace          = "tpu-training"
+  cluster_queue_name = "cluster-queue"
+  local_queue_name   = "local-queue"
+  tpu_resources      = [
+    {
+        name      = "v5litepod-16",
+        num_chips = 32
+    },
+    {
+        name      = "v5litepod-256"
+        num_chips = 256
     }
-    node_pool_sa = {
-        name = "gke-node-pool-sa"
-    }
-    cluster_config = {
-        name = "gke-tpu-training-cluster"
-    }
-    cpu_node_pools = {
-        default-cpu-node-pool = {
-            zones  = ["us-central2-a"]
-            labels = {
-                default-node-pool=true
-            }
-        }
-    }
-    tpu_node_pools = {
-        tpu-v4-16-podslice-1 = {
-            zones    = ["us-central2-b"]
-            tpu_type = "v4-16"
-        }
-        tpu-v4-16-podslice-2 = {
-           zones    = ["us-central2-b"]
-            tpu_type = "v4-16"
-        }
-    }
-    gcs_configs = {
-      training-artifacts-bucket = {} 
-    }
-    registry_config = {
-        name     = "training-images"
-        location = "us"
-    }
+  ] 
+  
 }
 ```
 
-### GKE GPU training environment
-
-This example demonstrates how to configure an environment optimized for executing large-scale training workloads on GPUs. In this sample, a new VPC, a new service account, and a new Artifact Registry are created. All resources are generated using default values for the majority of the settings. You can use all the GPU machine types and accelerator types available to you. Those are the ones supported: [GPU doc](https://cloud.google.com/compute/docs/gpus)
 
 
-```
-module "gpu-training-cluster" {
-    source     = "github.com/GoogleCloudPlatform/applied-ai-engineering-samples//ai-infrastructure/terraform-modules/gke-aiml
-    project_id = "project_id"
-    region     = "us-central1"
-    vpc_config = {
-        network_name = "gke-cluster-network"
-        subnet_name  = "gke-cluster-subnetwork"
-    }
-    node_pool_sa = {
-        name = "gke-node-pool-sa"
-    }
-    cluster_config = {
-        name = "gke-gpu-training-cluster"
-    }
-    gpu_node_pools = {
-    l4-gpu-node-pool = {
-      zones          = ["us-central1-a"]
-      min_node_count = 1
-      max_node_count = 2
-      machine_type   = "g2-standard-4"
-      accelerator_type = "nvidia-l4"
-      accelerator_count=1
-      disk_size_gb   = 200
-      taints         = {}
-      labels         = {}
-    }
-  }
-    gcs_configs = {
-      training-artifacts-bucket = {} 
-    }
-    registry_config = {
-        name     = "training-images"
-        location = "us"
-    }
-}
-```
-
-## Variables
+## Input variables
 
 | Name | Description | Type | Required | Default |
 |---|---|---|---|---|
-|[project_id](variables.tf#L16)| Environment project ID|`string`| &check; ||
-|[region](variables.tf#L22)| Environment region|`string`|&check;||
-|[deletion_protection](variables.tf#L28)|Prevent Terraform from destroying data storage resources (storage buckets, GKE clusters). When this field is set, a terraform destroy or terraform apply that would delete data storage resources will fail.|`string`||`true`|
-|[cluster_config](variables.tf#L106)|Cluster level configurations|`object({...})`||`{...}`|
-|[vpc_config](variables.tf#L90)|Network configurations of a VPC to create. Must be specified if vpc_reg is null|`object({...})`||`{...}`|
-|[vpc_ref](variables.tf#L78)|Settings for the  existing VPC to use for the environment. If null, a new VPC based on the `vpc_config` will be created|`object({...})`||`{...}`|
-|[node_pool_sa](variables.tf#L57)|Settings for a node pool service account|`object({...})`||`{...}`|
-|[cpu_node_pools](variables.tf#L125)|Settings for CPU node pools|`map(object({...}))`||`{...}`|
-|[tpu_node_pools](variables.tf#L156)|Settings for TPU node pools. See below for more information about TPU slice types|`map(object({...}))`||`{...}`|
-|[gpu_node_pools](variables.tf#L193)|Settings for GPU node pools|`map(object({...}))`||`{...}`|
-|[gcs_configs](variables.tf#L35)|Settings for Cloud Storage buckets|`map(object({...}))`||`{...}`|
-|[registry_config](variables.tf#L47)|Settings for Artifact Registry|`object({...})`||`{...}`|
+|[cluster_name](variables.tf#L16) | The name of a GKE cluster |`string`| &check;||
+|[location](variables.tf#L22)| The location of a GKE cluster |`string`|&check;||
+|[namespace](variables.tf#L46)|The name of a Kubernetes namespace for the Local Queue |`string`| &check;||
+|[cluster_queue_name](variables.tf#L52)|The name of the Cluster Queue |`string`| &check;||
+|[local_queue_name](variables.tf#L58)|The name of the Local Queue |`string`| &check;||
+|[tpu_resources](variables.tf#L64)|The list of TPU resources available in the cluster. This list will be used to configure the `resourceGroups` section of the `ClusterQueue` resource |`list(map)`|&check; ||
 
 
-### Specifying TPU type
-
-When configuring TPU node pools, ensure that you set the TPU type to one of the following values:
+The `name` field in the `tpu_resources` variable specifies a TPU slice type as defined in the table below. The `num_chips` field should be set to the total number of chips available for a given TPU slice type.
 
 
 
@@ -253,18 +167,7 @@ When configuring TPU node pools, ensure that you set the TPU type to one of the 
 |v5p-13824|tpu-v5p-slice|12x24x24|ct5p-hightpu-4t|1728|4|
 |v5p-17920|tpu-v5p-slice|16x20x28|ct5p-hightpu-4t|2240|4|
 
-
 ## Outputs
 
-| Name | Description | 
-|---|---|
-|[node_pool_sa_email](outputs.tf#L16)|The email of the node pool sa|
-|[cluster_name](outputs.tf#L21)|The name of the GKE cluster|
-|[cluster_region](outputs.tf#L26)|The region of the GKE cluster|
-|[gcs_buckets](outputs.tf#L31)|The names and locations of the created GCS buckets|
-|[artifact_registry_id](outputs.tf#L38)|The full ID of the created Arifact Registry|
-|[artifact_registry_image_path](outputs.tf#L43)|Artifact Registry path|
-
-
-
+The module does not have any outputs
 
