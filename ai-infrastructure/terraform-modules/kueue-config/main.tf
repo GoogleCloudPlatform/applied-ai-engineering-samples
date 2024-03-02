@@ -32,8 +32,6 @@ resource "kubernetes_manifest" "kueue_manifests" {
   timeouts {
     create = "10m"
   }
-
-  depends_on = [time_sleep.wait_for_kueue]
 }
 
 
