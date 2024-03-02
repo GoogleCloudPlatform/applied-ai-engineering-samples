@@ -4,6 +4,8 @@ This Terraform module configures the [Kueue](https://github.com/kubernetes-sigs/
 
 The module configures Kueue with a single [Cluster Queue](https://kueue.sigs.k8s.io/docs/concepts/cluster_queue/) and a single [Local Queue](https://kueue.sigs.k8s.io/docs/concepts/local_queue/). Additionally, it sets up a set of [PriorityClass](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/#priorityclass) and [Resource Flavor](https://kueue.sigs.k8s.io/docs/concepts/resource_flavor/) resources. Currently, the module configures Resource Flavors for common Cloud TPU v4, v5e, and v5p configurations.
 
+The module assumes that Kueue API has been already installed on the GKE cluster.
+
 
 ## Examples 
 
