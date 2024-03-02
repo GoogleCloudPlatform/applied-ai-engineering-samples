@@ -25,24 +25,6 @@ variable "location" {
   nullable    = false
 }
 
-variable "project_id" {
-  description = "The GCP Project Id."
-  nullable    = false
-  type        = string
-}
-
-variable "jobset_version" {
-  description = "The version of the JobSet API"
-  type        = string
-  nullable    = false
-}
-
-variable "kueue_version" {
-  description = "The version of the Kueue API"
-  type        = string
-  nullable    = false
-}
-
 variable "namespace" {
   description = "The namespace for Kueue local queue."
   type        = string

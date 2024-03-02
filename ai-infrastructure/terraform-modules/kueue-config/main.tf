@@ -14,9 +14,6 @@
 
 
 locals {
-  jobset_manifests = "https://github.com/kubernetes-sigs/jobset/releases/download/${var.jobset_version}/manifests.yaml"
-  kueue_manifests  = "https://github.com/kubernetes-sigs/kueue/releases/download/${var.kueue_version}/manifests.yaml"
-
   manifests_path = "${path.module}/manifest-templates"
   kueue_resources = {
     for manifest in fileset(local.manifests_path, "*yaml") :
@@ -27,32 +24,6 @@ locals {
       namespace          = var.namespace
     })
   }
-}
-
-resource "terraform_data" "install_jobset" {
-  triggers_replace = [
-    var.jobset_version
-  ]
-
-  provisioner "local-exec" {
-    command = "kubectl apply --server-side -f ${local.jobset_manifests}"
-  }
-}
-
-resource "terraform_data" "install_kueue" {
-  triggers_replace = [
-    var.jobset_version
-  ]
-
-  provisioner "local-exec" {
-    command = "kubectl apply --server-side -f ${local.kueue_manifests}"
-  }
-}
-
-resource "time_sleep" "wait_for_kueue" {
-  depends_on = [terraform_data.install_kueue]
-
-  create_duration = "60s"
 }
 
 resource "kubernetes_manifest" "kueue_manifests" {

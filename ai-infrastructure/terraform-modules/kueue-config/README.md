@@ -1,8 +1,8 @@
-# JobSet and Kueue Configuration
+# Kueue Configuration
 
-This Terraform module configures [JobSet](https://github.com/kubernetes-sigs/jobset) and [Kueue](https://github.com/kubernetes-sigs/kueue) Kubernetes APIs. JobSet is a Kubernetes-native API for managing a group of k8s Jobs as a unit. It aims to offer a unified API for deploying HPC (e.g., MPI) and AI/ML training workloads (PyTorch, Jax, Tensorflow etc.) on Kubernetes. Kueue is a set of APIs and controller for job queueing. It is a job-level manager that decides when a job should be admitted to start (as in pods can be created) and when it should stop (as in active pods should be deleted). Together, JobSet and Kueue offer flexible and robust job management for large-scale machine learning training workloads that necessitate large clusters of GPUs or TPUs.
+This Terraform module configures the [Kueue](https://github.com/kubernetes-sigs/kueue) resources in your GKE cluster.  Kueue is a set of APIs and controller for job queueing. It is a job-level manager that decides when a job should be admitted to start (as in pods can be created) and when it should stop (as in active pods should be deleted). 
 
-The module first installs both APIs and then proceeds to configure Kueue with a single [Cluster Queue](https://kueue.sigs.k8s.io/docs/concepts/cluster_queue/) and a single [Local Queue](https://kueue.sigs.k8s.io/docs/concepts/local_queue/). Additionally, it sets up a set of [PriorityClass](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/#priorityclass) and [Resource Flavor](https://kueue.sigs.k8s.io/docs/concepts/resource_flavor/) resources. Currently, the module configures Resource Flavors for common Cloud TPU v4, v5e, and v5p configurations.
+The module configures Kueue with a single [Cluster Queue](https://kueue.sigs.k8s.io/docs/concepts/cluster_queue/) and a single [Local Queue](https://kueue.sigs.k8s.io/docs/concepts/local_queue/). Additionally, it sets up a set of [PriorityClass](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/#priorityclass) and [Resource Flavor](https://kueue.sigs.k8s.io/docs/concepts/resource_flavor/) resources. Currently, the module configures Resource Flavors for common Cloud TPU v4, v5e, and v5p configurations.
 
 
 ## Examples 
@@ -12,7 +12,6 @@ module "wid" {
   source             = "github.com/GoogleCloudPlatform/applied-ai-engineering-samples//ai-infrastructure/terraform-modules/jobset-kueue"
   cluster_name       = "gke-cluster" 
   location           = "us-central1"
-  project_id         = "project-id"
   namespace          = "tpu-training"
   cluster_queue_name = "cluster-queue"
   local_queue_name   = "local-queue"
@@ -36,14 +35,11 @@ module "wid" {
 
 | Name | Description | Type | Required | Default |
 |---|---|---|---|---|
-|[project_id](variables.tf#L28)| The project ID|`string`| &check; ||
 |[cluster_name](variables.tf#L16) | The name of a GKE cluster |`string`| &check;||
 |[location](variables.tf#L22)| The location of a GKE cluster |`string`|&check;||
 |[namespace](variables.tf#L46)|The name of a Kubernetes namespace for the Local Queue |`string`| &check;||
 |[cluster_queue_name](variables.tf#L52)|The name of the Cluster Queue |`string`| &check;||
 |[local_queue_name](variables.tf#L58)|The name of the Local Queue |`string`| &check;||
-|[jobset_version](variables.tf#L34)|The version of the JobSet API to install|`string`| &check;||
-|[kueue_version](variables.tf#L40)|The version of the Kueue API to install|`string`| &check;||
 |[tpu_resources](variables.tf#L64)|The list of TPU resources available in the cluster. This list will be used to configure the `resourceGroups` section of the `ClusterQueue` resource |`list(map)`|&check; ||
 
 
