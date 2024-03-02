@@ -25,50 +25,29 @@ variable "location" {
   nullable    = false
 }
 
-variable "project_id" {
-  description = "The project id of existing or created project."
-  nullable    = false
-  type        = string
-}
-
 variable "namespace" {
-  description = "The namespace for the service account."
+  description = "The namespace for Kueue local queue."
   type        = string
   nullable    = false
 }
 
-variable "namespace_create" {
-  description = "Create Kubernetes namespace"
-  type        = bool
-  default     = true
-}
-
-variable "ksa_name" {
-  description = "The name for the Kubernetes Service Account"
+variable "cluster_queue_name" {
+  description = "The name of the Kueue ClusterQueue."
   type        = string
   nullable    = false
 }
 
-variable "kubernetes_service_account_create" {
-  description = "Create Kubernetes Service Account to be used for benchmark"
-  type        = bool
-  default     = true
-}
-
-variable "wid_sa_name" {
-  description = "The name for the workload identity Google Service Account"
+variable "local_queue_name" {
+  description = "The name of the Kueue LocalQueue"
   type        = string
   nullable    = false
 }
 
-variable "google_service_account_create" {
-  description = "Create Google service account to bind to a Kubernetes service account."
-  type        = bool
-  default     = true
-}
-
-variable "wid_sa_roles" {
-  description = "The roles to assign to a Google service account"
-  type        = list(string)
-  default     = []
+variable "tpu_resources" {
+  description = "TPU resources for Kueue."
+  type = list(object({
+    name      = string,
+    num_chips = number
+  }))
+  default = []
 }
