@@ -120,6 +120,7 @@ You also need a GCS bucket that will be used for managing Terraform state and ot
 - `storage.admin`
 - `artifactregistry.admin`
 - `aiplatform.user`
+- `serviceusage.serviceUsageConsumer`
 
 If you lack administrative-level permissions to enable GCP services or to create and configure service accounts in your project, your project administrator must perform these tasks. However, if you are a project owner, you can enable the services and create and configure the automation service account as part of the [Configure automation settings](#configure-automation-settings) step.
 
@@ -328,6 +329,7 @@ If you want to change these defaults, create a `terraform.tfvars` file in the `2
 To initiate the build, execute the following command:
 
 ```
+export PROJECT_ID=<PROJECT_ID>
 export AUTOMATION_BUCKET=<YOUR_AUTOMATION_BUCKET>
 export AUTOMATION_ACCOUNT=<YOUR_AUTOMATION_ACCOUNT>
 export ENV_NAME=<TF_STATE_FOLDER> 
@@ -335,6 +337,7 @@ export JOBSET_API_VERSION=v0.3.0
 export KUEUE_API_VERSION=v0.5.3 
 
 gcloud builds submit \
+  --project $PROJECT_ID \
   --config cloudbuild.provision.yaml \
   --substitutions _JOBSET_API_VERSION=$JOBSET_API_VERSION,_KUEUE_API_VERSION=$KUEUE_API_VERSION,_AUTOMATION_BUCKET=$AUTOMATION_BUCKET,_ENV_NAME=$ENV_NAME,_AUTOMATION_ACCOUNT=$AUTOMATION_ACCOUNT \
   --timeout "2h" \
@@ -342,6 +345,7 @@ gcloud builds submit \
 ```
 
 Replace the following values:
+- `<PROJECT_ID>` with your project ID
 - `<YOUR_AUTOMATION_BUCKET>` with your automation bucket
 - `<YOUR_AUTOMATION_ACCOUNT>` with you automation service account
 - `<TF_STATE_FOLDER>` with the name of the folder within your automation bucket where Terraform state and other artifacts will be managed
@@ -363,11 +367,12 @@ The [`examples`](examples/) folder contains code samples that demonstrate how to
 To destroy the environment and clean up all the provisioned resources:
 
 ```bash
-
+export PROJECT_ID=<PROJECT_ID>
 export AUTOMATION_BUCKET=<YOUR_AUTOMATION_BUCKET>
 export ENV_NAME=<TF_STATE_FOLDER>
 
 gcloud builds submit \
+  --project $PROJECT_ID \
   --config cloudbuild.destroy.yaml \
   --substitutions _AUTOMATION_BUCKET=$AUTOMATION_BUCKET,_ENV_NAME=$ENV_NAME \
   --timeout "2h" \

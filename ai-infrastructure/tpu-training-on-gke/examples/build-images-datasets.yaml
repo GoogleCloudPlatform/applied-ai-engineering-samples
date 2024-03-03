@@ -28,6 +28,7 @@ steps:
     args:
       - -c
       - |
+          gcloud config set auth/impersonate_service_account $_AUTOMATION_ACCOUNT
           ./download_dataset.sh $PROJECT_ID $_DATASETS_URI 
 
   - id: build the Maxtext image 

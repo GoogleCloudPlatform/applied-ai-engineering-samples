@@ -18,11 +18,12 @@ NOTE: Ensure you are working from  the `examples` directory
 export PROJECT_ID=<PROJECT_ID>
 export ARTIFACT_BUCKET=gs://<ARTIFACT_BUCKET>
 export ARTIFACT_REGISTRY_PATH=<ARTIFACT_REGISTRY_PATH>
+export AUTOMATION_ACCOUNT=<AUTOMATION_SERVICE_ACCOUNT>
 
 gcloud builds submit \
   --project $PROJECT_ID \
   --config build-images-datasets.yaml \
-  --substitutions _ARTIFACT_BUCKET=$ARTIFACT_BUCKET,_ARTIFACT_REGISTRY_PATH=$ARTIFACT_REGISTRY_PATH \
+  --substitutions _ARTIFACT_BUCKET=$ARTIFACT_BUCKET,_ARTIFACT_REGISTRY_PATH=$ARTIFACT_REGISTRY_PATH,_AUTOMATION_ACCOUNT=$AUTOMATION_ACCOUNT \
   --machine-type=e2-highcpu-32 \
   --quiet
 ```
@@ -31,6 +32,7 @@ Replace the following values:
 - `<PROJECT_ID>` - your project ID.
 - `<ARTIFACT_BUCKET>` - the name of the Google Cloud Storage (GCS) bucket where you want to manage training artifacts like datasets and checkpoints. Recall that if you haven't made any changes to the defaults during the environment setup, the name should be `<YOUR_PREFIX>-artifact-repository`.
 - `<ARTIFACT_REGISTRY_PATH>` - the path to the Artifact Registry that you intend to use for pushing the Maxtext  container image. Keep in mind that the default path, as established during the setup process, is `us-docker.pkg.dev/<YOUR_PROJECT_ID>/<YOUR_PREFIX>-training-images`. If you made any modifications to these defaults, please make the necessary updates  accordingly.
+- `<AUTOMATION_SERVICE_ACCOUNT>` - your automation service account. Refer to the environment setup section.
 
 ### Set up your development environment
 
