@@ -12,14 +12,47 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-project_id = "your-project-id"
-deletion_protection = true 
+deletion_protection      = true 
+create_automation_sa     = true
+create_automation_bucket = true
+enable_apis              = true
 
+project_id = "your-project-id"
 automation_bucket = {
-  name = "your-automation-bucket-name"
-  location = "the-location-for-your-bucket"
+  name     = "your-automation-bucket-name"
+  location = "us"
 }
 
-automation_sa_name = "your-automation-sa-name"
+automation_sa_name = "your-automation-account-name"
 
+services = [
+  "accesscontextmanager.googleapis.com",
+  "artifactregistry.googleapis.com",
+  "cloudbuild.googleapis.com",
+  "cloudkms.googleapis.com",
+  "cloudresourcemanager.googleapis.com",
+  "container.googleapis.com",
+  "compute.googleapis.com",
+  "container.googleapis.com",
+  "iam.googleapis.com",
+  "iamcredentials.googleapis.com",
+  "serviceusage.googleapis.com",
+  "sourcerepo.googleapis.com",
+  "stackdriver.googleapis.com",
+  "storage-component.googleapis.com",
+  "storage.googleapis.com",
+  "sts.googleapis.com",
+  "tpu.googleapis.com",
+  "aiplatform.googleapis.com",
+]
 
+roles = [
+  "roles/iam.securityAdmin",
+  "roles/iam.serviceAccountAdmin",
+  "roles/compute.networkAdmin",
+  "roles/container.admin",
+  "roles/iam.serviceAccountUser",
+  "roles/storage.admin",
+  "roles/artifactregistry.admin",
+  "roles/aiplatform.user",
+]

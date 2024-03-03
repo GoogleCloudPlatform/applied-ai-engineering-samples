@@ -59,28 +59,6 @@ variable "node_pool_sa" {
   }
 }
 
-variable "wid_sa" {
-  description = "The config for a workload identity service account"
-  type = object({
-    name          = string
-    description   = string
-    roles         = list(string)
-    ksa_namespace = string
-    ksa_name      = string
-  })
-  default = {
-    name          = "gke-wid-sa"
-    description   = "GKE Wid service account"
-    ksa_namespace = "tpu-training"
-    ksa_name      = "wid-sa"
-    roles = [
-      "storage.objectAdmin",
-      "logging.logWriter",
-      "aiplatform.user",
-      "artifactregistry.reader",
-    ]
-  }
-}
 
 variable "create_artifact_registry" {
   description = "Whether to create an Artifact Registry"
@@ -95,7 +73,7 @@ variable "registry_config" {
     location = string
   })
   default = {
-    name     = "training-images"
+    name     = "ml-images"
     location = "us"
   }
 }
@@ -137,12 +115,14 @@ variable "tpu_node_pools" {
     tpu_type     = string
     disk_size_gb = optional(number, 200)
     autoscaling  = optional(bool, false)
+    spot         = optional(bool, false)
   }))
   validation {
     condition = alltrue([
       for tpu_type in [for name, node_pool in var.tpu_node_pools : node_pool.tpu_type] :
       contains(
         [
+          "v5litepod-4",
           "v5litepod-16",
           "v5litepod-32",
           "v5litepod-64",
@@ -285,4 +265,22 @@ variable "tensorboard_config" {
   })
   nullable = true
   default  = null
+}
+
+variable "automation" {
+  description = "Automation configs"
+  type = object({
+    outputs_bucket = string
+  })
+  default = {
+    outputs_bucket = null
+  }
+  nullable = false
+}
+
+variable "env_name" {
+  description = "The name of the folder in the automation bucket where auto.tfvars, setting files, etc will be stored."
+  type        = string
+  nullable    = false
+  default     = "environment"
 }

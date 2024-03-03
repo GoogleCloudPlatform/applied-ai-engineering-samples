@@ -13,108 +13,72 @@
 # limitations under the License.
 
 steps:
-  - id: log parameters 
+  - id: Prepare base infrastructure stage 
     name: gcr.io/cloud-builders/gke-deploy
     entrypoint: /bin/bash 
+    dir: 1-base-infrastructure
     args:
       - -c
       - |
-          echo BUILD SETTINGS:
-          cat 1-base-infrastructure/terraform.tfvars 
-          echo _JOBSET_API_VERSION=$_JOBSET_API_VERSION
-          echo _KUEUE_API_VERSION=$_KUEUE_API_VERSION
-
-  - id: tf init
+        gsutil cp gs://${_AUTOMATION_BUCKET}/providers/* .
+        gsutil cp gs://${_AUTOMATION_BUCKET}/tfvars/0-bootstrap.auto.tfvars.json .
+        sed -i "s/<FOLDER-NAME>/${_ENV_NAME}\/tfstate\/base_infra/g" backend.tf
+        echo '{"env_name":"${_ENV_NAME}"}' > env-name.auto.tfvars.json
+        
+  - id: Provision base infra - tf init
     name: hashicorp/terraform
     dir: 1-base-infrastructure
     args: 
     - init 
 
-  - id: tf plan
-    name: hashicorp/terraform
-    dir: 1-base-infrastructure 
-    args: 
-    - plan 
-    - -out=tfplan
-
-  - id: tf apply
+  - id: Provision base infra -tf apply
     name: hashicorp/terraform
     dir: 1-base-infrastructure 
     args: 
     - apply
     - -auto-approve
-    - tfplan 
 
-  - id: tf output
-    name: hashicorp/terraform
-    entrypoint: sh
-    dir: 1-base-infrastructure  
-    args:
-    - -c
-    - |
-      touch params.env
-      echo "CLUSTER_NAME=$(terraform output cluster_name)" >> params.env 
-      echo "CLUSTER_REGION=$(terraform output cluster_region)" >> params.env
-      echo "KSA_NAME=$(terraform output wid_ksa_name)" >> params.env
-      echo "KSA_NAMESPACE=$(terraform output wid_ksa_namespace)" >> params.env
-      echo "GSA_EMAIL=$(terraform output wid_gsa_email)" >> params.env
-
-  - id: 'Deploy JobSet'
+  - id: Prepare GKE setup stage 
     name: gcr.io/cloud-builders/gke-deploy
-    entrypoint: /bin/bash
-    dir: 1-base-infrastructure  
+    entrypoint: /bin/bash 
+    dir: 2-gke-config
     args:
       - -c
       - |
-        set -o  allexport; source params.env; set +o allexport
-        echo $$CLUSTER_NAME
-        echo $$CLUSTER_REGION
-        gcloud container clusters get-credentials $$CLUSTER_NAME --region $$CLUSTER_REGION
+        # Install JobSet and Kueue
+        ## This is a mitigation to address issues with using Terraform to install CRDs.
+        wget -O jq https://github.com/jqlang/jq/releases/download/jq-1.7.1/jq-linux-amd64
+        chmod 755 jq
+        gsutil cp gs://${_AUTOMATION_BUCKET}/${_ENV_NAME}/settings/1-base-infra-settings.json .
+        CLUSTER_NAME=$(cat 1-base-infra-settings.json | ./jq -r '.cluster_name') 
+        CLUSTER_LOCATION=$(cat 1-base-infra-settings.json | ./jq -r '.cluster_location') 
+        gcloud config set auth/impersonate_service_account $_AUTOMATION_ACCOUNT
+        gcloud container clusters get-credentials $$CLUSTER_NAME --region $$CLUSTER_LOCATION 
         kubectl apply --server-side -f "https://github.com/kubernetes-sigs/jobset/releases/download/$_JOBSET_API_VERSION/manifests.yaml" 
-#
-  - id: 'Deploy Kueue'
-    name: gcr.io/cloud-builders/gke-deploy
-    entrypoint: /bin/bash
-    args:
-      - -c
-      - |
         kubectl apply --server-side -f "https://github.com/kubernetes-sigs/kueue/releases/download/$_KUEUE_API_VERSION/manifests.yaml"
 
-  - id: 'Config Kueue'
-    name: gcr.io/cloud-builders/gke-deploy
-    entrypoint: /bin/bash
-    dir: 2-kubernetes-config 
-    args:
-      - -c
-      - |
-        ### Install new version of Kustomize
-        curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
+        # Prepare tfvars and providers for the Terraform gke-config stage
+        gsutil cp gs://${_AUTOMATION_BUCKET}/tfvars/0-bootstrap.auto.tfvars.json .
+        gsutil cp gs://${_AUTOMATION_BUCKET}/providers/* .
+        gsutil cp gs://${_AUTOMATION_BUCKET}/${_ENV_NAME}/tfvars/1-base-infra.auto.tfvars.json .
+        sed -i "s/<FOLDER-NAME>/${_ENV_NAME}\/tfstate\/gke_config/g" backend.tf
+        echo '{"env_name":"${_ENV_NAME}"}' > env-name.auto.tfvars.json
 
-        set -o  allexport; source ../1-base-infrastructure/params.env; set +o allexport
-        cp ../1-base-infrastructure/templates/cluster_queue.yaml . 
-        ./kustomize edit set namespace $$KSA_NAMESPACE 
-        ./kustomize edit remove configmap wid-config
-        ./kustomize edit add configmap wid-config --from-literal=ksa_name=$$KSA_NAME --from-literal=gsa_email=$$GSA_EMAIL --from-literal=cluster_queue=$_CLUSTER_QUEUE_NAME
+  - id: Configure GKE - tf init
+    name: hashicorp/terraform
+    dir: 2-gke-config
+    args: 
+    - init 
 
-        max_attempts=5
-        attempt_num=1
-        success=false
+  - id: Configure GKE - tf apply
+    name: hashicorp/terraform
+    dir: 2-gke-config 
+    args: 
+    - apply
+    - -auto-approve
 
-        while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
-          echo Sleep for a few seconds to avoid timeouts from Kueue
-          sleep 45 
-          echo Attempting deployment of Kueue CRDs
-          kubectl apply -k .
-          if [ $? -eq 0 ]; then
-            success=true
-            echo Deployment of CRDs successful
-          else
-            echo "Deployment of CRDs failed"
-            attempt_num=$(( attempt_num + 1 ))
-          fi
-        done
 
+  
 substitutions:
-  _JOBSET_API_VERSION: v0.3.0
-  _KUEUE_API_VERSION: v0.5.1
-  _CLUSTER_QUEUE_NAME: cluster-queue
+  _JOBSET_API_VERSION: v0.4.0
+  _KUEUE_API_VERSION: v0.5.3
