@@ -87,8 +87,8 @@ Replace the following values:
 
 For your convenience, we have supplied two template files:
 
-- `parameters.env.single_slice` with example settings tailored for a single slice job on a TPU v4-16 slice.
-- `parameters.env.multi_slice` with example settings configured for a multi-slice job spanning two TPU v4-16 slices.
+- `parameters.env.single_slice` with example settings tailored for a single slice job on a TPU v5e-16 slice.
+- `parameters.env.multi_slice` with example settings configured for a multi-slice job spanning two TPU v5e-16 slices.
 
 
 ### Run the job
