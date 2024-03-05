@@ -13,20 +13,6 @@
 # limitations under the License.
 
 
-terraform {
-  required_version = ">=1.5.1"
-  required_providers {
-    google = {
-      source  = "hashicorp/google"
-      version = ">= 5.6.0, < 6.0.0"
-    }
-    google-beta = {
-      source  = "hashicorp/google-beta"
-      version = ">= 5.6.0, < 6.0.0"
-    }
-  }
-}
-
 
 data "google_project" "project" {
   project_id = var.project_id
@@ -44,12 +30,6 @@ locals {
     : var.node_pool_sa
   )
 
-  wid_sa = (
-    var.prefix != ""
-    ? merge(var.wid_sa, { name = "${var.prefix}-${var.wid_sa.name}" })
-    : var.wid_sa
-  )
-
   gcs_configs = (
     var.prefix != ""
     ? { for name, config in var.gcs_configs :
@@ -65,7 +45,7 @@ locals {
 
   vpc_config = (
     var.prefix != ""
-    ? merge(var.cluster_config, {
+    ? merge(var.vpc_config, {
       network_name = "${var.prefix}-${var.vpc_config.network_name}"
     subnet_name = "${var.prefix}-${var.vpc_config.subnet_name}" })
     : var.vpc_config
@@ -88,12 +68,13 @@ locals {
       zones          = node_pool.zones
       max_node_count = 1
       min_node_count = node_pool.autoscaling ? 0 : 1
+      spot           = node_pool.spot
     }
   }
 }
 
 module "base_environment" {
-  source              = "github.com/GoogleCloudPlatform/applied-ai-engineering-samples//ai-infrastructure/terraform-modules/gke-aiml"
+  source              = "github.com/GoogleCloudPlatform/applied-ai-engineering-samples//ai-infrastructure/terraform-modules/gke-aiml?ref=main"
   project_id          = var.project_id
   region              = var.region
   deletion_protection = var.deletion_protection
