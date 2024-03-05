@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: scheduling.k8s.io/v1
-kind: PriorityClass
-metadata:
-  name: veryhigh
-value: 1000
-globalDefault: false
-description: "Very high"
 
+terraform {
+  backend "gcs" {
+    bucket                      = "jk-automation-bucket"
+    impersonate_service_account = "jk-automation-sa@ai-infra-genai-sa.iam.gserviceaccount.com"
+    # Set the prefix to the folder for Terraform state
+    prefix = "jk101/tfstate/gke_config"
+  }
+}

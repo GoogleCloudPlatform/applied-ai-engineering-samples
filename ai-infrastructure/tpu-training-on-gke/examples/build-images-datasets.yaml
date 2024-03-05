@@ -28,6 +28,7 @@ steps:
     args:
       - -c
       - |
+          gcloud config set auth/impersonate_service_account $_AUTOMATION_ACCOUNT
           ./download_dataset.sh $PROJECT_ID $_DATASETS_URI 
 
   - id: build the Maxtext image 
@@ -38,7 +39,7 @@ steps:
       - |
           cd /workspace/maxtext
           chmod 755 docker_build_dependency_image.sh
-          ./docker_build_dependency_image.sh MODE=stable
+          ./docker_build_dependency_image.sh MODE=${_MODE} JAX_VERSION=${_JAX_VERSION}
           docker build --build-arg BASEIMAGE=maxtext_base_image -f ./maxtext_runner.Dockerfile -t ${_MAXTEXT_IMAGE_URI} .
           
 
@@ -51,6 +52,8 @@ substitutions:
   _MAXTEXT_IMAGE_URI: '${_ARTIFACT_REGISTRY_PATH}/${_MAXTEXT_IMAGE_NAME}:${_MAXTEXT_IMAGE_TAG}' 
   _DATASETS_FOLDER: 'datasets'
   _DATASETS_URI: '${_ARTIFACT_BUCKET}/${_DATASETS_FOLDER}'
+  _MODE: 'stable'
+  _JAX_VERSION: 'NONE'
 
 options:
   dynamic_substitutions: true

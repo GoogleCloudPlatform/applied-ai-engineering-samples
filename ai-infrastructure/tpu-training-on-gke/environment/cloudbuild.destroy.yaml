@@ -13,24 +13,57 @@
 # limitations under the License.
 
 steps:
-  - id: log parameters 
-    name: hashicorp/terraform
-    entrypoint: sh 
+  - id: 'Destroy GKE config - prepare'
+    name: gcr.io/cloud-builders/gke-deploy
+    entrypoint: /bin/bash
+    dir: 2-gke-config
     args:
       - -c
       - |
-          echo DESTROY SETTINGS:
-          cat 1-base-infrastructure/terraform.tfvars
+        gsutil cp gs://${_AUTOMATION_BUCKET}/providers/* .
+        sed -i "s/<FOLDER-NAME>/${_ENV_NAME}\/tfstate\/gke_config/g" backend.tf
+        gsutil cp gs://${_AUTOMATION_BUCKET}/tfvars/0-bootstrap.auto.tfvars.json .
+        gsutil cp gs://${_AUTOMATION_BUCKET}/${_ENV_NAME}/tfvars/1-base-infra.auto.tfvars.json .
+        echo '{"env_name":"${_ENV_NAME}"}' > env-name.auto.tfvars.json
+        
+  - id: 'Destroy GKE config - tf init'
+    name: hashicorp/terraform
+    dir: 2-gke-config
+    args: 
+    - init 
 
-  - id: 'tf init'
+  - id: 'Destroy GKE config - tf destroy'
+    name: hashicorp/terraform
+    dir: 2-gke-config
+    args: 
+    - destroy 
+    - -auto-approve 
+
+
+  - id: 'Destroy base infra - prepare'
+    name: gcr.io/cloud-builders/gke-deploy
+    entrypoint: /bin/bash
+    dir: 1-base-infrastructure
+    args:
+      - -c
+      - |
+        gsutil cp gs://${_AUTOMATION_BUCKET}/providers/* .
+        sed -i "s/<FOLDER-NAME>/${_ENV_NAME}\/tfstate\/base_infra/g" backend.tf
+        gsutil cp gs://${_AUTOMATION_BUCKET}/tfvars/0-bootstrap.auto.tfvars.json .
+        echo '{"env_name":"${_ENV_NAME}"}' > env-name.auto.tfvars.json
+
+  - id: 'Destroy base infra - tf init'
     name: hashicorp/terraform
     dir: 1-base-infrastructure
     args: 
     - init 
 
-  - id: 'tf destroy'
+  - id: 'Destroy base infra - tf destroy'
     name: hashicorp/terraform
     dir: 1-base-infrastructure
     args: 
     - destroy 
     - -auto-approve 
+
+
+  
