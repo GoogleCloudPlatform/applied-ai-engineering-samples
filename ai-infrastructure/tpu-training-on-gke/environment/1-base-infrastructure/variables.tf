@@ -247,12 +247,16 @@ variable "tpu_node_pools" {
 variable "vpc_config" {
   description = "VPC configuration"
   type = object({
-    network_name = string
-    subnet_name  = string
+    network_name           = string
+    subnet_name            = string
+    pods_ip_cidr_range     = string
+    services_ip_cidr_range = string
   })
   default = {
-    network_name = "gke-cluster-network"
-    subnet_name  = "gke-cluster-subnet"
+    network_name           = "gke-cluster-network"
+    subnet_name            = "gke-cluster-subnet"
+    pods_ip_cidr_range     = "192.168.64.0/18"
+    services_ip_cidr_range = "192.168.128.0/20"
   }
 }
 

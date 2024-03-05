@@ -139,7 +139,7 @@ kubectl delete -k .
 
 ## MaxText pre-training 
 
-The [`maxtext`](maxtext/) folder contains examples of pre-training a MaxText 6.5 billion parameters model on the [English C4 dataset](https://www.tensorflow.org/datasets/catalog/c4#c4en_default_config).
+The [`maxtext`](maxtext/) folder contains examples of pre-training a MaxText 8 billion parameters model on the [English C4 dataset](https://www.tensorflow.org/datasets/catalog/c4#c4en_default_config).
 
 The `maxtext/jobset-spec-patch.yaml` file includes overrides for the base JobSet configuration. This file configures a JobSet resource with two job templates: one named `slice` for starting the MaxText trainer and another named `tensorboard` for launching the [TensorBoard uploader](https://cloud.google.com/vertex-ai/docs/experiments/tensorboard-upload-existing-logs). 
 
@@ -228,9 +228,9 @@ The necessary parameters are configured through the `RUN_NAME`, `BASE_OUTPUT_DIR
 
 For both single slice and multi-slice job types, you can use the `ARGS` field to adjust training regimen parameters, including training steps, batch size, ICI  settings, DCN  parallelization settings, and parameters governing the model architecture.
 
-We've included example settings for a pretraining task for a ~6.5 billion parameter model on TPU v4-16 pods. These settings have undergone thorough testing to ensure high model flops utilization (MFU). We also encourage you to experiment with your own settings.
+We've included example settings for a pretraining task for a ~8 billion parameter model on TPU v5e-16 pods. We also encourage you to experiment with your own settings. 
 
-The example settings for a single slice training job are found in the `parameters.env.single_slice_6B` file, while the example settings for a multi-slice training job are provided in the `parameters.env.multi_slice_6B` file.
+The example settings for a single slice training job are found in the `parameters.env.single_slice_8B` file, while the example settings for a multi-slice training job are provided in the `parameters.env.multi_slice_8B` file.
 
 > [!WARNING]
 > If you use the templates, do not forget to update them with the settings matching your environment.

@@ -45,7 +45,7 @@ locals {
 
   vpc_config = (
     var.prefix != ""
-    ? merge(var.cluster_config, {
+    ? merge(var.vpc_config, {
       network_name = "${var.prefix}-${var.vpc_config.network_name}"
     subnet_name = "${var.prefix}-${var.vpc_config.subnet_name}" })
     : var.vpc_config

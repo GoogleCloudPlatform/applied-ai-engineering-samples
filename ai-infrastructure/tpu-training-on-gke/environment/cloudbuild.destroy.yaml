@@ -40,30 +40,30 @@ steps:
     - -auto-approve 
 
 
-#  - id: 'Destroy base infra - prepare'
-#    name: gcr.io/cloud-builders/gke-deploy
-#    entrypoint: /bin/bash
-#    dir: 1-base-infrastructure
-#    args:
-#      - -c
-#      - |
-#        gsutil cp gs://${_AUTOMATION_BUCKET}/providers/* .
-#        sed -i "s/<FOLDER-NAME>/${_ENV_NAME}\/tfstate\/base_infra/g" backend.tf
-#        gsutil cp gs://${_AUTOMATION_BUCKET}/tfvars/0-bootstrap.auto.tfvars.json .
-#        echo '{"env_name":"${_ENV_NAME}"}' > env-name.auto.tfvars.json
-#
-#  - id: 'Destroy base infra - tf init'
-#    name: hashicorp/terraform
-#    dir: 1-base-infrastructure
-#    args: 
-#    - init 
-#
-#  - id: 'Destroy base infra - tf destroy'
-#    name: hashicorp/terraform
-#    dir: 1-base-infrastructure
-#    args: 
-#    - destroy 
-#    - -auto-approve 
-#
-#
-#  
+  - id: 'Destroy base infra - prepare'
+    name: gcr.io/cloud-builders/gke-deploy
+    entrypoint: /bin/bash
+    dir: 1-base-infrastructure
+    args:
+      - -c
+      - |
+        gsutil cp gs://${_AUTOMATION_BUCKET}/providers/* .
+        sed -i "s/<FOLDER-NAME>/${_ENV_NAME}\/tfstate\/base_infra/g" backend.tf
+        gsutil cp gs://${_AUTOMATION_BUCKET}/tfvars/0-bootstrap.auto.tfvars.json .
+        echo '{"env_name":"${_ENV_NAME}"}' > env-name.auto.tfvars.json
+
+  - id: 'Destroy base infra - tf init'
+    name: hashicorp/terraform
+    dir: 1-base-infrastructure
+    args: 
+    - init 
+
+  - id: 'Destroy base infra - tf destroy'
+    name: hashicorp/terraform
+    dir: 1-base-infrastructure
+    args: 
+    - destroy 
+    - -auto-approve 
+
+
+  
