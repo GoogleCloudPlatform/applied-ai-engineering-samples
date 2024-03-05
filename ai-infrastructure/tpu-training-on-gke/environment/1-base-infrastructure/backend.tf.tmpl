@@ -17,8 +17,7 @@ terraform {
   backend "gcs" {
     bucket                      = "your-automation-bucket"
     impersonate_service_account = "your-automation-account-name@your-project.iam.gserviceaccount.com"
-    # remove the newline between quotes and set the prefix to the folder for Terraform state
-    prefix = "
-    "
+    # Set the prefix to the folder for Terraform state
+    prefix = "<FOLDER>"
   }
 }

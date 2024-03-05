@@ -136,14 +136,14 @@ In this section we provide instructions for running parallelism experiments simi
 
 To run a configuration for a single slice workload with Interchip Interconnect (ICI) sharding using Fully Sharded Data Parallelism (FSDP), follow the steps below:
 
-- Create a workload script. Make sure to modify the `--ici_fsdp_parallelism` parameter to match your TPU type. In the below example, the  `--ici_fsdp_parallelism=8`setting is configured for a TPU slice with 8 chips. E.g. v4-16 or v5p-16
+- Create a workload script. Make sure to modify the `--ici_fsdp_parallelism` parameter to match your TPU type. In the below example, the  `--ici_fsdp_parallelism=16`setting is configured for a TPU slice with 16 chips. E.g. v4-32, v5e-16 or v5p-32
 
 ```bash
 cat <<EOF >./ici-fsdp.sh
 #!/bin/bash
 set -e
 
-python3 pedagogical_examples/shardings.py --ici_fsdp_parallelism=8 --batch_size=131072 --embedding_dimension=2048
+python3 pedagogical_examples/shardings.py --ici_fsdp_parallelism=16 --batch_size=131072 --embedding_dimension=2048
 
 EOF
 ```
@@ -180,7 +180,7 @@ cat <<EOF >./dcn-dp-ici-fsdp.sh
 #!/bin/bash
 set -e
 
-python3 pedagogical_examples/shardings.py --dcn_data_parallelism=2 --ici_fsdp_parallelism=8 --batch_size=131072 --embedding_dimension=2048
+python3 pedagogical_examples/shardings.py --dcn_data_parallelism=2 --ici_fsdp_parallelism=16 --batch_size=131072 --embedding_dimension=2048
 
 EOF
 ```
@@ -207,7 +207,7 @@ xpk workload delete \
 
 ## Running MaxText pretraining workloads
 
-In this section we provide instructions for running MaxText pretraining for a 6.5B parameters model using the same configuration settings as in the [`examples\jobset\maxtext`](../jobset/README.md#example-2-maxtext-pre-training-examples).
+In this section we provide instructions for running MaxText pretraining for a 8B parameters model using the same configuration settings as in the [`examples\jobset\maxtext`](../jobset/README.md#example-2-maxtext-pre-training-examples).
 
 ### Single slice pretraining
 
@@ -218,21 +218,20 @@ In this section we provide instructions for running MaxText pretraining for a 6.
 > Also, update the `ici_fsdp_parallelism` parameter to the number of chips in your TPU type.
 
 ```bash
-cat <<EOF >./single-slice-6b.sh
+cat <<EOF >./single-slice-8b.sh
 #!/bin/bash
 set -e
 
-export LIBTPU_INIT_ARGS="--xla_enable_async_all_gather=true TPU_MEGACORE=MEGACORE_DENSE"
+export LIBTPU_INIT_ARGS="--xla_tpu_enable_data_parallel_all_reduce_opt=true --xla_tpu_data_parallel_opt_different_sized_ops=true --xla_tpu_enable_async_collective_fusion=true --xla_tpu_enable_async_collective_fusion_fuse_all_gather=true --xla_tpu_enable_async_collective_fusion_multiple_steps=true --xla_tpu_overlap_compute_collective_tc=true --xla_enable_async_all_gather=true"
 
 python3 MaxText/train.py MaxText/configs/base.yml \
 run_name=<RUN_NAME> \
 dataset_path=<DATASET_PATH> \
 base_output_directory=<BASE_OUTPUT_DIRECTORY> \
-steps=200 log_period=50 save_period=100 \
-per_device_batch_size=16 \
-dcn_data_parallelism=1 ici_fsdp_parallelism=8 \
-remat_policy=full \
-base_emb_dim=4096 base_num_heads=16 base_mlp_dim=16384 head_dim=256 base_num_decoder_layers=32
+steps=150 log_period=50 \
+per_device_batch_size=6 global_parameter_scale=8 \
+enable_checkpointing=false enable_profiler=false remat_policy=full \
+dcn_data_parallelism=1 ici_fsdp_parallelism=16 
 
 EOF
 ```
@@ -246,7 +245,7 @@ xpk workload create \
 --cluster <CLUSTER_NAME> \
 --tpu-type <TPU_TYPE>  \
 --num-slices 1 \
---command "bash single-slice-6b.sh" 
+--command "bash single-slice-8b.sh" 
 ```
 
 - To delete the workload execute:
@@ -266,21 +265,20 @@ xpk workload delete \
 > Also, update the `ici_fsdp_parallelism` parameter to the number of chips in your TPU type.
 
 ```bash
-cat <<EOF >./multi-slice-6b.sh
+cat <<EOF >./multi-slice-8b.sh
 #!/bin/bash
 set -e
 
-export LIBTPU_INIT_ARGS="--xla_enable_async_all_gather=true TPU_MEGACORE=MEGACORE_DENSE"
+export LIBTPU_INIT_ARGS="--xla_tpu_enable_data_parallel_all_reduce_opt=true --xla_tpu_data_parallel_opt_different_sized_ops=true --xla_tpu_enable_async_collective_fusion=true --xla_tpu_enable_async_collective_fusion_fuse_all_gather=true --xla_tpu_enable_async_collective_fusion_multiple_steps=true --xla_tpu_overlap_compute_collective_tc=true --xla_enable_async_all_gather=true"
 
 python3 MaxText/train.py MaxText/configs/base.yml \
-run_name=<RUN_NAME>  \
-dataset_path=<DATASET_PATH>  \
+run_name=<RUN_NAME> \
+dataset_path=<DATASET_PATH> \
 base_output_directory=<BASE_OUTPUT_DIRECTORY> \
-steps=200 log_period=50 save_period=100 \
-per_device_batch_size=16 \
-dcn_data_parallelism=2 ici_fsdp_parallelism=8 \
-remat_policy=full \
-base_emb_dim=4096 base_num_heads=16 base_mlp_dim=16384 head_dim=256 base_num_decoder_layers=32
+steps=150 log_period=50 \
+per_device_batch_size=6 global_parameter_scale=8 \
+enable_checkpointing=false enable_profiler=false remat_policy=full \
+dcn_data_parallelism=2 ici_fsdp_parallelism=16 
 
 EOF
 ```
@@ -294,7 +292,7 @@ xpk workload create \
 --cluster <CLUSTER_NAME> \
 --tpu-type <TPU_TYPE>  \
 --num-slices 2 \
---command "bash multi-slice-6b.sh" 
+--command "bash multi-slice-8b.sh" 
 ```
 
 - To delete the workload execute:

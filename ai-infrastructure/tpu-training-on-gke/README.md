@@ -120,26 +120,36 @@ You also need a GCS bucket that will be used for managing Terraform state and ot
 - `storage.admin`
 - `artifactregistry.admin`
 - `aiplatform.user`
+- `serviceusage.serviceUsageConsumer`
+
+If you lack administrative-level permissions to enable GCP services or to create and configure service accounts in your project, your project administrator must perform these tasks. However, if you are a project owner, you can enable the services and create and configure the automation service account as part of the [Configure automation settings](#configure-automation-settings) step.
 
 
-#### Configuring the prerequisites using the bootstrap Terraform 
+#### Configure automation settings 
 
-The prerequisites may need to be configured by your GCP organization administrator. If you have access to a project where you are a project owner, you can configure the prerequisites using the Terraform configuration in the `environment/0-bootstrap` folder.
+During this step, Terraform is configured to utilize the specified automation bucket and service account. Optionally, if configured, it can also enable the necessary services and create both the automation service account and the automation bucket.
+
 
 1. Clone this repo
-2. Change the current folder to `ai-infrastructureenvironment/tpu-training-on-gke/environment/0-bootstrap`
-3. Copy the `terraform.tfvars.tmpl` file to `terraform.tfvars`
+2. Change the current folder to [environment/0-bootstrap](environment/0-bootstrap/)
+3. Copy the [terraform.tfvars.tmpl](environment/0-bootstrap/terraform.tfvars.tmpl) file to `terraform.tfvars`
 4. Modify the `terraform.tfvars` file to reflect your environment
-  - Set `project_id` to your project ID
-  - Set `automation_bucket` to the name of a bucket you want to create in your project
-  - Set `location` to a location where you want to create the automation bucket
-  - Set `automation_sa_name` to the automation service account name in your environment
+  - `project_id` - your project ID
+  - `deletion_protection` - Set to `true` to protect you cluster and GCS buckets from accidental deletion by Terraform apply/destroy commands. Unless this field is set to false, a terraform destroy or terraform apply that would delete the cluster or non-empty GCS buckets will fail.
+  - `create_automation_bucket` - set to `true` if you want to create a new automation bucket; set to `false` if you want to use an existing bucket
+  - `automation_bucket` - the name and location of a bucket you want to use for automation. If you use an existing bucket the `location` field will be ignored
+  - `create_automation_sa` - set to `true` if you want to create a new automation service account; set to `false` if you want to use an existing service account
+  - `automation_sa_name` - the name of an automation service account to be used by Terraform for impersonation
+  - `enable_apis` - set to `true` if you want to enable the services listed in the `services` variable
+  - `services` - the list of services to enable in your project
+  - `roles` - the list of roles to assign to an automation services account. These roles will only be assigned to a newly created account. If you are using an existing account, this list will be ignored.
 5. Execute the `terraform init` command
 6. Execute the `terraform apply` command
 
-Besides enabling the necessary services and setting up an automation service account and an automation GCS bucket, the Terraform configuration has generated prepopulated template files for configuring the Terraform backend and providers, which can be utilized in the following setup stages. These template files are stored in the `gs://<YOUR-AUTOMATION-BUCKET/providers` folder.
+The Terraform configuration generates prepopulated template files for configuring the Terraform backend and providers, which can be utilized in the following setup stages. These template files are stored in the `gs://<YOUR-AUTOMATION-BUCKET/providers` and `gs://<YOUR-AUTOMATION-BUCKET/tfvars` folders. 
 
-#### Granting Cloud Build impersonating rights
+
+#### Grant Cloud Build impersonating rights
 
 To be able to impersonate the automation service account, the Cloud Build service account needs to have the `iam.serviceAccountTokenCreator` rights on the automation service account.
 
@@ -167,20 +177,17 @@ Change the current directory, to `ai-infrastructure/tpu-training-on-gke/environm
 
 #### Configure build parameters
 
-If you used the `bootstrap` configuration to configure the prerequisites, copy the `providers\providers.tf` and `providers\backend.tf` files from the `providers` folder in your automation bucket to the `1-base-environment` folder. Modify the `backend.tf` by setting the `prefix` field to the name of a folder in the automation bucket where you want to store your Terraform configuration's state. For example, if you want to manage the Terraform state in the `tf_state/gke_tpu_training` subfolder of the automation bucket set the `prefix` field to `tf_state/gke_tpu_training`.
-
-If the automation bucket and the automation service account were provided to you by your administrator, rename the `backend.tf.tmpl` and the `providers.tf.tmpl` files to `backend.tf` and `providers.tf` and update them with your settings.
-
-To configure the Terraform steps in the build, rename the `terraform.tfvars.tmpl` file in the `1-base-infrastructure` folder to `terraform.tfvars`. Make modifications to the `terraform.tfvars` file to align it with your specific environment. At the very least, you should set the following variables:
+To configure the Terraform steps in the build, copy the [terraform.tfvars.tmpl](environment/1-base-infrastructure/terraform.tfvars.tmpl) template file in the [1-base-infrastructure](environment/1-base-infrastructure/) folder to `terraform.tfvars`. Make modifications to the `terraform.tfvars` file to align it with your specific environment. At the very least, you should set the following variables:
 
 - `project_id` - your project ID
 - `region` - your region for a VPC and a GKE cluster
 - `prefix` - the prefix that will be added to the default names of resources provisioned by the configuration
 - `tensorboard_config.region` - the region of a TensorBoard instance
+- `create_artifact_registry` - set to `true` to create a new artifact registry
 - `cpu_node_pools` - The `terraform.tfvars.tmpl` template provides an example configuration for a single autoscaling node pool.  
-- `tpu_node_pools` - The  template shows an example configuration for two TPU node pools with  v4-16 pod slices. Modify the `tpu_node_pools` variable to provision different TPU node pool configurations, as described below.
+- `tpu_node_pools` - The  template shows an example configuration for two TPU node pools: one with a single v5e-4 pod slice and the other with a single v5e-16 pod slice. Modify the `tpu_node_pools` variable to provision different TPU node pool configurations, as described below.
 
-If you wish to modify other default settings, such as the default name suffixes for a cluster or GCS bucket names, you can override the defaults specified in the `variables.tf` file within your `terraform.tfvars` file.
+If you wish to modify other default settings, such as the default name suffixes for a cluster or GCS bucket names, you can override the defaults specified in the [variables.tf](environment/1-base-infrastructure/variables.tf) file within your `terraform.tfvars` file.
 
 When configuring TPU node pools, ensure that you set the TPU type to one of the following values:
 
@@ -189,6 +196,7 @@ When configuring TPU node pools, ensure that you set the TPU type to one of the 
 
 | TPU type name | Slice type | Slice topology | TPU VM type | Number of VMs in a slice | Number of chips in a VM |
 | ------------- | -----------|----------------|-------------|--------------------------| ------------------------|
+|v5litepod-4|tpu-v5-lite-podslice|2x2|ct5lp-hightpu-4t|1|4|
 |v5litepod-16|tpu-v5-lite-podslice|4x4|ct5lp-hightpu-4t|4|4|
 |v5litepod-32|tpu-v5-lite-podslice|4x8|ct5lp-hightpu-4t|8|4|
 |v5litepod-64|tpu-v5-lite-podslice|8x8|ct5lp-hightpu-4t|16|4|
@@ -302,30 +310,48 @@ When configuring TPU node pools, ensure that you set the TPU type to one of the 
 |v5p-13824|tpu-v5p-slice|12x24x24|ct5p-hightpu-4t|1728|4|
 |v5p-17920|tpu-v5p-slice|16x20x28|ct5p-hightpu-4t|2240|4|
 
-##### Set JobSet and Kueue API versions
+##### Modify Workload Identity and Kueue configurations
 
-You also need to set a couple of parameters that configure the installation and configuration of the **JobSet** and **Kueue** APIs.
+By default the following names and identifiers are used when configuring Workload Identity Federation and Kueue
+- The IAM service account for WID - `<prefix>-wid-sa`
+- The Kubernetes service account - `wid-ksa`
+- The Cluster Queue name - `cluster-queue`
+- The Local Queue name - `tpu-training-jobs`
+- The Namespace for WID Kubernetes accoutn and Local Queue - `tpu-training`
 
-These parameters are passed to Cloud Build through [Cloud Build substitutions](https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values). 
+If you want to change these defaults, create a `terraform.tfvars` file in the `2-gke-config` and override the default values from the [environment/2-gke-config/variables.tf](environment/2-gke-config/variables.tf) file.
 
-- `JOBSET_API_VERSION` - the version of the [JobSet API](https://github.com/kubernetes-sigs/jobset/releases) to install. The examples in this repo have been tested with `v0.3.0`
-- `KUEUE_API_VERSION` - the version of the [Kueue API](https://github.com/kubernetes-sigs/kueue/releases) to install. The examples have been test with `v0.5.1`
 
 
 #### Submit the build
 
+
 To initiate the build, execute the following command:
 
 ```
+export PROJECT_ID=<PROJECT_ID>
+export AUTOMATION_BUCKET=<YOUR_AUTOMATION_BUCKET>
+export AUTOMATION_ACCOUNT=<YOUR_AUTOMATION_ACCOUNT>
+export ENV_NAME=<TF_STATE_FOLDER> 
 export JOBSET_API_VERSION=v0.3.0
-export KUEUE_API_VERSION=v0.5.1 
+export KUEUE_API_VERSION=v0.5.3 
 
 gcloud builds submit \
+  --project $PROJECT_ID \
   --config cloudbuild.provision.yaml \
-  --substitutions _JOBSET_API_VERSION=$JOBSET_API_VERSION,_KUEUE_API_VERSION=$KUEUE_API_VERSION \
+  --substitutions _JOBSET_API_VERSION=$JOBSET_API_VERSION,_KUEUE_API_VERSION=$KUEUE_API_VERSION,_AUTOMATION_BUCKET=$AUTOMATION_BUCKET,_ENV_NAME=$ENV_NAME,_AUTOMATION_ACCOUNT=$AUTOMATION_ACCOUNT \
   --timeout "2h" \
   --machine-type=e2-highcpu-32 
 ```
+
+Replace the following values:
+- `<PROJECT_ID>` with your project ID
+- `<YOUR_AUTOMATION_BUCKET>` with your automation bucket
+- `<YOUR_AUTOMATION_ACCOUNT>` with you automation service account
+- `<TF_STATE_FOLDER>` with the name of the folder within your automation bucket where Terraform state and other artifacts will be managed
+
+The examples in this repo have been tested with `v0.4.0` version of the JobSet API and `v0.5.3` version of the Kueue API.
+
 
 To track the progress of the build, you can either follow the link displayed in Cloud Shell or visit the Cloud Build page on the [Google Cloud Console](https://console.cloud.google.com/cloud-build).
 
@@ -341,8 +367,14 @@ The [`examples`](examples/) folder contains code samples that demonstrate how to
 To destroy the environment and clean up all the provisioned resources:
 
 ```bash
+export PROJECT_ID=<PROJECT_ID>
+export AUTOMATION_BUCKET=<YOUR_AUTOMATION_BUCKET>
+export ENV_NAME=<TF_STATE_FOLDER>
+
 gcloud builds submit \
+  --project $PROJECT_ID \
   --config cloudbuild.destroy.yaml \
+  --substitutions _AUTOMATION_BUCKET=$AUTOMATION_BUCKET,_ENV_NAME=$ENV_NAME \
   --timeout "2h" \
   --machine-type=e2-highcpu-32 
 ```

@@ -13,12 +13,12 @@
 # limitations under the License.
 
 
-output "automation_gcs" {
+output "automation_bucket_name" {
   description = "GCS bucket where Terraform automation artifacts are managed"
-  value       = module.automation_bootstrap.automation_gcs
+  value       = module.automation_bootstrap.automation_bucket_name
 }
 
-output "automation_sa" {
+output "automation_sa_email" {
   description = "The email of the automation service account"
-  value       = module.automation_bootstrap.automation_sa
+  value       = module.automation_bootstrap.automation_sa_email
 }

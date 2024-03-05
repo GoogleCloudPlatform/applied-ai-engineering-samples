@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-project_id          = "your-project-id"
-region              = "us-central2-b"
-prefix              = "prefix"
-deletion_protection = true
+deletion_protection      = true
+project_id               = "your-project-id"
+region                   = "us-central2-b"
+prefix                   = "prefix"
+create_artifact_registry = "false"
 
 cpu_node_pools = {
   cpu-node-pool = {
@@ -27,14 +28,14 @@ cpu_node_pools = {
 }
 
 tpu_node_pools = {
-  tpu-v4-16-node-pool-1 = {
-    zones    = ["us-central2-b"]
-    tpu_type = "v4-16"
+  tpu-v5litepod-4-node-pool-1 = {
+    zones    = ["us-west1-c"]
+    tpu_type = "v5litepod-4"
   }
 
-  tpu-v4-16-node-pool-2 = {
-    zones    = ["us-central2-b"]
-    tpu_type = "v4-16"
+  tpu-v5litepod-16-node-pool-2 = {
+     zones    = ["us-west1-c"]
+     tpu_type = "v5litepod-16"
   }
 }
 

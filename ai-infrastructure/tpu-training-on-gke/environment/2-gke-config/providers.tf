@@ -12,9 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: wid-ksa 
-  annotations:
-    iam.gke.io/gcp-service-account: wid_sa@project-id.iam.gserviceaccount.com
+
+provider "google" {
+  impersonate_service_account = "jk-automation-sa@ai-infra-genai-sa.iam.gserviceaccount.com"
+}
+provider "google-beta" {
+  impersonate_service_account = "jk-automation-sa@ai-infra-genai-sa.iam.gserviceaccount.com"
+}
+
