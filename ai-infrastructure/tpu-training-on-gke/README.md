@@ -332,7 +332,7 @@ To initiate the build, execute the following command:
 export PROJECT_ID=<PROJECT_ID>
 export AUTOMATION_BUCKET=<YOUR_AUTOMATION_BUCKET>
 export AUTOMATION_ACCOUNT=<YOUR_AUTOMATION_ACCOUNT>
-export ENV_NAME=<TF_STATE_FOLDER> 
+export ENV_NAME=<ENV_STATE_FOLDER> 
 export JOBSET_API_VERSION=v0.3.0
 export KUEUE_API_VERSION=v0.5.3 
 
@@ -348,7 +348,7 @@ Replace the following values:
 - `<PROJECT_ID>` with your project ID
 - `<YOUR_AUTOMATION_BUCKET>` with your automation bucket
 - `<YOUR_AUTOMATION_ACCOUNT>` with you automation service account
-- `<ENV_NAME>` with the name of the folder within your automation bucket where Terraform state and other artifacts will be managed
+- `<ENV_STATE_FOLDER>` with the name of the folder within your automation bucket where Terraform state and other artifacts will be managed
 
 The examples in this repo have been tested with `v0.4.0` version of the JobSet API and `v0.5.3` version of the Kueue API.
 
