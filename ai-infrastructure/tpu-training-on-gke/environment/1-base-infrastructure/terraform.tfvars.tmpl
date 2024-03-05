@@ -14,13 +14,13 @@
 
 deletion_protection      = true
 project_id               = "your-project-id"
-region                   = "us-central2-b"
+region                   = "us-west1"
 prefix                   = "prefix"
-create_artifact_registry = "false"
+create_artifact_registry = "true"
 
 cpu_node_pools = {
   cpu-node-pool = {
-    zones = ["us-central2-a"]
+    zones = ["us-west1-a"]
     labels = {
       default-node-pool = true
     }
@@ -40,5 +40,5 @@ tpu_node_pools = {
 }
 
 tensorboard_config = {
-  region = "us-central1"
+  region = "us-west1"
 }
