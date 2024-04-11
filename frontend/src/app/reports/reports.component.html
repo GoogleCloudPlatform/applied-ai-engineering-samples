@@ -1,0 +1,39 @@
+
+ <div class="container" > 
+    <div  class=" ml-2">
+        <p class="p-style">*** Page under development  ***</p>
+         <button style="margin-right:12px" class="btnSave mat-elevation-z8"  type="submit"><img width ="20" src="assets/images/add-icon.svg">Create</button>
+
+
+
+  </div>
+  <!-- <div style="width: 350px;" > -->
+    <table mat-table [dataSource]="dataSource" class="mat-elevation-z0">
+
+      
+        <!-- Name Column -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef> Name </th>
+          <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+        </ng-container>
+      
+        <!-- Owned By Column -->
+        <ng-container matColumnDef="ownedBy">
+          <th mat-header-cell *matHeaderCellDef> Owned by anyone </th>
+          <td mat-cell *matCellDef="let element"> {{element.ownedBy}} </td>
+        </ng-container>
+      
+        <!-- Symbol Column -->
+        <ng-container matColumnDef="lastOpened">
+          <th mat-header-cell *matHeaderCellDef> Last opened by me </th>
+          <td mat-cell *matCellDef="let element"> {{element.lastOpened}} </td>
+        </ng-container>
+      
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+      <!-- </div> -->
+ </div> 
+
+
+

@@ -1,0 +1,83 @@
+
+// Custom Theming for Angular Material
+// For more information: https://material.angular.io/guide/theming
+
+@use '@angular/material' as mat;
+
+@import url('https://fonts.googleapis.com/icon?family=Google+Sans');
+@import "prismjs/themes/prism.css";
+
+
+
+// Plus imports for other components in your app.
+
+// Include the common styles for Angular Material. We include this here so that you only
+// have to load a single css file for Angular Material in your app.
+// Be sure that you only ever include this mixin once!
+@include mat.core();
+
+// Define the palettes for your theme using the Material Design palettes available in palette.scss
+// (imported above). For each palette, you can optionally specify a default, lighter, and darker
+// hue. Available color palettes: https://material.io/design/color/
+$genai-csm-primary: mat.define-palette(mat.$indigo-palette);
+$genai-csm-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
+
+// The warn palette is optional (defaults to red).
+$genai-csm-warn: mat.define-palette(mat.$red-palette);
+
+// Create the theme object. A theme consists of configurations for individual
+// theming systems such as "color" or "typography".
+$genai-csm-theme: mat.define-light-theme((
+  color: (
+    primary: $genai-csm-primary,
+    accent: $genai-csm-accent,
+    warn: $genai-csm-warn,
+  )
+));
+
+// Include theme styles for core and each component used in your app.
+// Alternatively, you can import and @include the theme mixins for each component
+// that you are using.
+@include mat.all-component-themes($genai-csm-theme);
+
+/* You can add global styles to this file, and also import other style files */
+
+html, body { height: 100%; }
+body { margin: 0;}
+
+    
+
+
+
+$gap : 4vh;
+$padding : 4vh;
+
+
+$bp : (
+ mobile : 480px,
+ tablet : 768px,
+ desktop : 1440px,
+);
+
+
+@mixin query($display){
+   @each $key, $value in $bp{
+    
+     //  defining max-width
+     @if ($display == $key){
+       @media (max-width: $value){@content;}
+     }
+   }
+ }
+
+
+ .container{
+   display: flex;
+  //to lay .block-* classes in a column
+   flex-direction: column;
+  //Setting gap between the .block-* classes
+   gap: $gap;
+  
+ // to set some padding & border inside
+   padding: $padding;
+ }

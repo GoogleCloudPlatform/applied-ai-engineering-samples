@@ -1,0 +1,61 @@
+<div class="grid-container">
+  <mat-toolbar style="border-bottom: 1px solid #b0b0b0;">
+    <button *ngIf="isMobile" mat-icon-button aria-label="Menu icon" (click)="toggleMenu()">
+      <mat-icon>menu</mat-icon>
+    </button>
+
+    <img src="assets/images/cymbal-customer-service-logo.svg" alt="Cymbal Customer Service Logo">
+    <img src="assets/images/cymbal-text-logo.svg" alt="Cymbal Text Logo">
+    <app-header class="ms-5"></app-header>
+    <span class="flex-expand"></span>
+    <form>
+
+      <select class="form-control-sm mr-10" name="selectAction" (change)="changeDb($event)"
+        [formControl]="organizationCtrl">
+        <option *ngFor="let op of organisation" [value]="op.table_schema">
+          {{op.table_schema}}
+        </option>
+      </select>
+
+    </form>
+
+    <app-user-photo></app-user-photo>
+  </mat-toolbar>
+
+  <div class="row">
+    <div class="content col-xxl-12">
+
+      <mat-sidenav-container fullscreen>
+        <mat-sidenav [mode]="isMobile ? 'over' : 'side'" [opened]="isMobile ? 'false' : 'true'" class="no-border">
+          <app-menu (selectedTab)="checkSideNavTAb($event)"></app-menu>
+        </mat-sidenav>
+        <mat-sidenav-content [ngStyle]="checkStyle?{'background-color': '#FFF'} : {'background-color': '#F3F6FC'}">
+          <app-business-user *ngIf="userType === 'Business' && checkSideNav === 'Query'"
+            (updateStyleEvent)="updateBackgroundStyle($event)"></app-business-user>
+          <app-business-user *ngIf="userType === 'Operational'"
+            (updateStyleEvent)="updateBackgroundStyle($event)"></app-business-user>
+          <app-results *ngIf="checkSideNav === 'Reports'"></app-results>
+          <app-history *ngIf="checkSideNav === 'History'"></app-history>
+          <app-saved-queries *ngIf="checkSideNav === 'Saved'"></app-saved-queries>
+          <app-technical-user *ngIf="userType === 'Technical'"></app-technical-user>
+
+          <router-outlet></router-outlet>
+
+
+        </mat-sidenav-content>
+      </mat-sidenav-container>
+
+
+      <!-- </mat-tab>
+			<mat-tab label="Technical" class="ml-4 ">
+				<mat-divider></mat-divider>
+				<div class="main  pl-4" style="margin: 20px 0.5rem;">
+					<div>
+					
+					</div>
+				</div>
+			</mat-tab>
+		</mat-tab-group> -->
+    </div>
+  </div>
+</div>

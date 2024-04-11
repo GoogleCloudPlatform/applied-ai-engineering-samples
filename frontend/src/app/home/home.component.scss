@@ -1,0 +1,167 @@
+h1 {
+  padding: 0 1rem;
+}
+
+h2 {
+  padding: 1rem;
+}
+
+mat-toolbar {
+  position: fixed;
+  top: 0;
+  z-index: 2;
+}
+
+
+// Move the content down so that it won't be hidden by the toolbar
+.content {
+  padding-top: 3.5rem;
+
+  @media screen and (min-width: 600px) {
+      padding-top: 4rem;
+  }
+}
+
+.flex-expand {
+  flex: 1 1 auto;
+}
+
+.addProductBtn {
+  border-radius: 100px;
+  background: #4D88FF;
+  width: 145px;
+  height: 40px;
+  flex-shrink: 0;
+  color: #FFF;
+  text-align: center;
+  font-family: Roboto;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0.1px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+}
+
+/* Styles for tab labels */
+::ng-deep .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
+  color: #4D88FF !important;
+  text-align: center;
+  font-feature-settings: 'clig' off, 'liga' off;
+  font-family: Google Sans;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px;
+  /* 125% */
+  //letter-spacing: -0.154px;
+}
+
+/* Styles for the active tab label */
+::ng-deep .mat-mdc-tab .mdc-tab__text-label {
+  // color: rgba(77, 136, 255, 0.50) !important;
+  text-align: center;
+  font-feature-settings: 'clig' off, 'liga' off;
+  font-family: Google Sans;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px;
+  /* 125% */
+  letter-spacing: -0.154px;
+}
+
+/* Styles for the ink bar */
+::ng-deep .mat-mdc-tab.mdc-tab--active .mdc-tab-indicator__content--underline {
+  stroke-width: 3px;
+  stroke: #4D88FF !important;
+  border-color:#4D88FF !important
+}
+
+.translate{
+  margin-right : 20px;
+  margin-top : 20px;
+}
+
+.align-arrow-right {
+  position: absolute;
+  right: 0; //change as per requirement
+  top: 16px; //change as per requirement
+}
+
+
+.flex-parent-element {
+  display: flex;
+  width: 50%;
+}
+
+.flex-child-element {
+  flex: 1;
+  margin: 10px 10px 25px 10px;
+}
+
+.flex-child-element:first-child {
+  margin-right: 20px;
+  border-right: 1px solid #b0b0b0;
+}
+::ng-deep .mat-form-field.mat-focused .mat-form-field-underline {
+  display: none;
+}
+.mat-form-field-appearance-legacy .mat-form-field-underline {
+  background-color: blue;
+}
+
+ .mat-mdc-form-field-focus-overlay {
+  background-color: red;
+}
+.mdc-text-field--filled:not(.mdc-text-field--disabled) {
+  background-color: red
+}
+::ng-deep .mat-form-field-underline {
+  display: none;
+}
+mat-form-field mat-select {
+  border: none;
+}
+.mdc-text-field--outlined{
+  border-color: red;
+}
+optgroup { font-size:40px; }
+.mr-10{
+    margin-right: 7rem !important;
+}
+mat-sidenav-container {
+    height:100%;
+    position: absolute;
+}
+
+// Move the content down so that it won't be hidden by the toolbar
+mat-sidenav {
+    padding-top: 3.5rem;
+    @media screen and (min-width: 600px) {
+      padding-top: 4rem;
+    }
+
+    .entry{
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding:0.75rem;
+    }
+  }
+
+// Move the content down so that it won't be hidden by the toolbar
+mat-sidenav-content{
+    padding-top: 3.5rem;
+    @media screen and (min-width: 600px) {
+        padding-top: 4rem;
+    }
+}
+.no-border
+{
+    border: none;
+
+}

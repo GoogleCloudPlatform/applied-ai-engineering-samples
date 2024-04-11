@@ -1,0 +1,39 @@
+<div class="container  col-10 ml-8" > 
+    <h1 class="h1-ref" > Welcome to NL2SQL</h1>
+    <div class="container-fluid"> 
+
+ <form [formGroup]="sqlSearchForm" >
+      <div>
+         <div class="input-flex"><input type="text" class="form-control name" id="name" placeholder="Type" formControlName="name" required>
+            <mat-icon class="voice-ref">settings_voice</mat-icon>
+
+            <img class="cursor-ref" src="assets/images/q-search-icon.svg"  class="ml-2" alt="suggestion">
+ 
+        </div>
+      </div>
+
+  </form>
+<div class=" d-flex mt-3">
+    <div class="sql-suggestion"> <label>Search Known SQLs - type table name <br>
+        Shows a list of SQL queries</label></div>
+        <div class="sql-suggestion"><label>Search table embedding info <br>
+            List all the details in the embedding</label></div>
+             <div class="sql-suggestion"><label>Extract popular SQLs executed in that dataset</label></div>
+</div>
+<div  class=" ml-2 mt-4">
+    <p class="sql-suggestion"> Data exploration</p>
+    <button style="margin-right:12px" class="btnSave"  type="submit">Select Data Source</button>
+
+
+
+</div>
+</div>
+
+</div>
+
+
+
+
+
+
+

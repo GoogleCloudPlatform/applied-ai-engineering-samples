@@ -1,0 +1,158 @@
+<div class="container  col-10 ml-8" > 
+    <h1 class="h1-ref" *ngIf="!showResult"> Welcome to NL2SQL</h1>
+    <div class="container-fluid"> 
+
+ <form [formGroup]="sqlSearchForm" (ngSubmit)="onSubmit()">
+      <div>
+         <div class="input-flex"><input type="text" class="form-control name" id="name" placeholder="Type" formControlName="name" required>
+            <mat-icon class="voice-ref">settings_voice</mat-icon>
+
+            <img class="cursor-ref" src="assets/images/q-search-icon.svg" (click)="generate()" class="ml-2" alt="suggestion">
+ 
+        </div>
+      </div>
+
+  </form>
+  <div *ngIf="isSuggestions" class="summarize-results  mt-3">
+
+    <span class="insight-results" > <img src="assets/images/suggestion-icon.svg" alt="suggestion"> Suggestions</span>
+    <!-- <div *ngFor="let res of suggestionList ; let ind = index" class="insight-results"> -->
+        <span *ngFor="let res of suggestionList?.slice(0, 10); let ind = index"  class="suggestion-ref">
+            <a  href ="javascript:void(0);" style = "white-space: nowrap ;
+            " (click)="suggestionResult(res)"> {{res.example_user_question}}</a> </span>
+            
+    <!-- </div> -->
+    <div *ngIf="showProgressPreviewBar" class="spinner_loading-preview-table" >
+        <mat-spinner diameter="20"></mat-spinner>
+    </div>
+    <div  *ngIf= "errMsg !== ''"><label class="query-ref">{{errMsg}}</label></div>
+
+</div>
+<div *ngIf = "showResult" class="container mt-4 wrap-bbackground">
+
+  <div   class="row mt-4" style=" display: flex;align-items: center;align-content: center;justify-content: center;">
+
+  <div class=" form-outline">
+
+    <input type="text" class="form-control label" [(ngModel)]= "generatedSql.example_user_question" id="name" placeholder="" [disabled]="true"> <img src="assets/images/edit-icon.svg" alt="suggestion">
+  </div>
+<!-- <div class="col-4 wrap-up">
+
+  <div class="insight-results" > <img src="assets/images/suggestion-icon.svg" alt="suggestion"> Suggestions</div>
+  <span ><label class="label-ref"  style="text-decoration:none" > {{generatedSql.example_user_question}}</label> </span>
+</div> -->
+
+
+</div>
+
+  <div *ngIf = "showResult" >
+
+		<mat-tab-group dynamicHeight mat-stretch-tabs="false" style="margin-left: 15px;" [(selectedIndex)]="selectedIndex" (selectedTabChange)= "generateResultData($event)">
+			<mat-tab label="Result" > 
+                
+
+    <div class="card mt-4">
+      
+      <mat-card >
+        <div  *ngIf="resultLoader" class="spinner_loading-result-table" >
+            <mat-spinner diameter="20"></mat-spinner>
+        </div>
+          <mat-card-content *ngIf="!resultLoader">
+            <div style="width: 350px;" *ngIf= "emptyMsg === ''">
+                
+            <mat-table *ngIf="dataSource && displayedColumns"[dataSource]="dataSource" border="1">
+
+
+              <!-- Name Column -->
+              <ng-container  *ngFor="let col of displayedColumns; index as i;" [matColumnDef]="col">
+                <mat-header-cell *matHeaderCellDef> {{col | uppercase}}</mat-header-cell>
+                <mat-cell *matCellDef="let element"> {{element[col]}} </mat-cell>
+              </ng-container>
+              
+
+              <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+              <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+            </mat-table></div>
+            
+            <div style="width: 350px;" *ngIf= "emptyMsg !== ''"><label class="query-ref">{{emptyMsg}}</label></div>
+  </mat-card-content>
+
+        <!-- <mat-card-actions>
+          <button mat-button>LIKE</button>
+          <button mat-button>SHARE</button>
+        </mat-card-actions> -->
+      </mat-card>
+
+      <!-- <div class="tableP" > -->
+
+    <!-- </div> -->
+
+    </div>
+				</mat-tab>
+			<mat-tab label="Generated SQL">
+				<div class="main" style="margin: 20px 0.5rem;">
+          <mat-card><span class="query-ref">{{generatedSql.example_generated_sql}}</span>
+						</mat-card></div>
+			</mat-tab>
+      <mat-tab label="Data Sources">
+
+        <div class="card mt-4" id ="dataSources">
+
+          <mat-card >
+            <!-- <mat-card-content>
+              <div style="width: 350px;">
+                <mat-table [dataSource]="dataSource" border="1">
+                  <ng-container matColumnDef="firstname">
+                    <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{element.firstname}} </mat-cell>
+                  </ng-container>
+                  <ng-container matColumnDef="lastname">
+                    <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{element.lastname}} </mat-cell>
+                  </ng-container>
+
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                  <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+                </mat-table></div>
+    </mat-card-content> -->
+    </mat-card>
+				</div>
+			</mat-tab>
+		</mat-tab-group>
+
+
+
+
+
+  </div>
+  <div  *ngIf = "showResult" class="row ml-2"
+      style=" display: flex;align-items: center;align-content: center;justify-content: center;margin-left: 15px;">
+
+      <div class="col-12" style= "display:flex;">
+
+          <button style="margin-right:12px" class="btnSave"  type="submit">Save Query</button>
+
+          <button style="margin-right:12px" class="btnSave"  type="submit">Create Report</button>
+          <img src="assets/images/share.svg" class="ml-2 mt-2 cursor-ref" alt="up" (click)=thumbsUp(generatedSql)>
+          <!-- <a class ="createReport" style="margin-right:12px" href="javascript:void(0)"  type="submit">Create Report</a> -->
+<div class= "img-align">
+<img src="assets/images/thumbs-up-icon.svg" class="ml-2 cursor-ref" alt="up" (click)=thumbsUp(generatedSql)><img src="assets/images/thumbs-down-icon.svg" class="ml-2 cursor-ref" alt="down">
+</div>
+</div>
+
+
+  </div>
+  </div>
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+

@@ -1,7 +1,0 @@
-nameReference:
-- kind: ConfigMap
-  version: v1
-  fieldSpecs:
-  - kind: JobSet
-    version: v1alpha2
-    path: spec/replicatedJobs/template/spec/template/spec/containers/envFrom/configMapRef/name

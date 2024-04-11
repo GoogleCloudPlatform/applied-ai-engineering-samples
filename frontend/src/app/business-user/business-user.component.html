@@ -1,0 +1,167 @@
+<div class="container col-12" style="padding: 25px;">
+  <h1 class="h1-ref" *ngIf="!showResult"> Welcome to NL2SQL</h1>
+  <div class="container-fluid">
+
+    <form [formGroup]="sqlSearchForm" (ngSubmit)="onSubmit()">
+      <div>
+        <div class="input-flex"><input type="text" [ngClass]="{'name-err' : setErrorCSS, 'name':!setErrorCSS}"
+            class="form-control" id="name" placeholder="Type" formControlName="name" required>
+          <img class="cursor-ref" src="assets/images/q-search-icon.svg" style="flex: 0 1 8em;cursor: pointer;"
+            (click)="generate()" class="ml-2" alt="suggestion">
+        </div>
+      </div>
+    </form>
+
+    <div *ngIf="isSuggestions" class="summarize-results  mt-3">
+      <div class="insight-results-err text-danger" *ngIf="setErrorCSS"> Access restricted: you dont have sufficient
+        permissions to access this data source</div>
+      <span class="insight-results"> <img src="assets/images/suggestion-icon.svg" alt="suggestion"> Suggestions</span>
+      <span *ngFor="let res of suggestionList?.slice(0, 10); let ind = index" class="suggestion-ref">
+        <a href="javascript:void(0);" style="white-space: nowrap;" (click)="suggestionResult(res)">
+          {{res.example_user_question}}</a> </span>
+      <div *ngIf="showProgressPreviewBar" class="spinner_loading-preview-table">
+        <mat-spinner [diameter]="70"></mat-spinner>
+      </div>
+      <div *ngIf="errMsg !== ''">
+        <label class="query-ref">{{errMsg}}</label>
+      </div>
+    </div>
+
+    <div *ngIf="showResult" class="container mt-4 wrap-bbackground">
+      <div class="row mt-4" style=" display: flex;align-items: center;align-content: center;justify-content: center;">
+        <div class=" form-outline">
+          <input type="text" class="form-control label" [(ngModel)]="generatedSql.example_user_question" id="name"
+            placeholder="" [disabled]="true"> <img src="assets/images/edit-icon.svg" alt="suggestion">
+        </div>
+      </div>
+
+      <div *ngIf="showResult">
+        <mat-tab-group dynamicHeight mat-stretch-tabs="false" style="margin-left: 15px;"
+          [(selectedIndex)]="selectedIndex" (selectedTabChange)="generateResultData($event)">
+          <mat-tab label="Result">
+            <div class=" mt-4 resut-content">
+              <div *ngIf="resultLoader" class="spinner_loading-result-table">
+                <mat-spinner diameter="20"></mat-spinner>
+              </div>
+              <div class="table-prep" *ngIf="!resultLoader">
+                <span class="material-symbols-outlined" style="padding: 10px; float: right;">
+                  content_copy
+                </span>
+                <table mat-table *ngIf="dataSource && displayedColumns" [dataSource]="dataSource"
+                  class="mat-elevation-z0">
+
+                  <ng-container *ngFor="let col of displayedColumns ; index as i;" [matColumnDef]="col">
+                    <th mat-header-cell *matHeaderCellDef> {{col | uppercase}} </th>
+                    <td mat-cell *matCellDef="let element"> {{element[col]}} </td>
+                  </ng-container>
+
+                  <tr mat-header-row *matHeaderRowDef="displayedColumns;sticky:true;"></tr>
+                  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                </table>
+                <mat-paginator *ngIf="dataSource.length >10" [length]="dataSource.length" [hidePageSize]="true"
+                  [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page">
+                </mat-paginator>
+              </div>
+
+              <div *ngIf="showLoader">
+                <mat-spinner [diameter]="30"></mat-spinner>
+              </div>
+
+              <div class="g-container chart_prep" *ngIf="showChart">
+                <div id="chart_div" style="width:400; height:300"></div>
+                <div id="chart_div_1" style="width:400; height:300 ; margin-top:20px"></div>
+              </div>
+              <div style="width: 350px;" *ngIf="emptyMsg !== ''">
+                <label class="card query-ref">{{emptyMsg}}</label>
+              </div>
+            </div>
+
+          </mat-tab>
+          <mat-tab label="Generated SQL">
+            <div class="main" style="margin: 20px 0.5rem;">
+              <mat-card>
+                <!-- <span class="query-ref">{{generatedSql.example_generated_sql}}</span> -->
+                <div>
+                  <button [cdkCopyToClipboard]="generatedSql.example_generated_sql" class="copyBtn"
+                    (click)="showContentCopiedMsg()">
+                    <span class="material-symbols-outlined" style="padding: 10px;">
+                      content_copy
+                    </span></button>
+                  <app-prism [code]="generatedSql.example_generated_sql" language="sql"></app-prism>
+                </div>
+              </mat-card>
+            </div>
+          </mat-tab>
+          <mat-tab label="Data Sources">
+            <div class="mt-4" id="dataSources">
+              <div class="datasource-prep">
+
+                <div class="d-flex gap-2 w-100 ">
+                  <p class="left-text"> Source </p>
+                  <span class="right-text"> Postgres (CloudSQL)</span>
+                </div>
+
+                <div class="d-flex  w-100 ">
+                  <p class="left-text"> Owner </p>
+                  <span class="right-text"> nl2sql_test</span>
+                </div>
+                <div class="d-flex gap-2 w-100 ">
+                  <p class="left-text"> Project ID </p>
+                  <span class="right-text"> steveswalker-sandbox</span>
+                </div>
+                <div class="d-flex gap-2 w-100 ">
+                  <p class="left-text"> Dataset ID </p>
+                  <span class="right-text"> {{dataSet}}</span>
+                </div>
+              </div>
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+      </div>
+      <div *ngIf="showResult" class="row ml-2"
+        style=" display: flex;align-items: center;align-content: center;justify-content: center;margin-left: 15px;">
+
+        <div class="col-12" class="btns">
+          <button class="btnSave" (click)="visualizeBtn()" *ngIf="res_data">Visualize</button>
+
+          <img src="assets/images/share.svg" class="ml-2 mt-2 cursor-ref share" alt="up">
+          <!-- <a class ="createReport" style="margin-right:12px" href="javascript:void(0)"  type="submit">Create Report</a> -->
+          <div class="img-align">
+            <img src="assets/images/thumbs-up-icon.svg" class="ml-2 cursor-ref" alt="up"
+              (click)="thumbsUp(generatedSql)" cdkOverlayOrigin #trigger="cdkOverlayOrigin">
+            <ng-template cdkConnectedOverlay [cdkConnectedOverlayOrigin]="trigger" [cdkConnectedOverlayOpen]="isOpen">
+              <div class="container mt-4 wrap-bbackground feedback-grad">
+                <label class="chart-label"> Provide Feedback
+                  <span class="material-symbols-outlined" style="float: right;" (click)="closeFeedback()">
+                    close
+                  </span>
+                </label>
+                <div style="display: inline-block;">
+                  <span [ngClass]="selectedFeedbackOption=='Correct answer'? 'feedback-ref-clicked' : 'feedback-ref'">
+                    <a style="white-space: nowrap ;" (click)="feedbackOption(0)"> Correct
+                      answer
+                    </a>
+                  </span>
+
+                  <span
+                    [ngClass]="selectedFeedbackOption=='Easy to understand'? 'feedback-ref-clicked' : 'feedback-ref'">
+                    <a style="white-space: nowrap ;" (click)="feedbackOption(1)"> Easy to understand </a>
+                  </span>
+
+                  <span [ngClass]="selectedFeedbackOption=='Quick results'? 'feedback-ref-clicked' : 'feedback-ref'">
+                    <a style="white-space: nowrap ;" (click)="feedbackOption(2)"> Quick results </a>
+                  </span>
+                </div>
+                <textarea rows="2" cols="25" class="form-control" id="name" placeholder=" Type"></textarea>
+                <a href="javascript:void(0);" (click)="submitFeedback()" class="feedback-button">Submit</a>
+              </div>
+            </ng-template>
+
+            <img src="assets/images/thumbs-down-icon.svg" class="ml-2 cursor-ref" alt="down" (click)="thumbsDown()"
+              cdkOverlayOrigin #trigger="cdkOverlayOrigin">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

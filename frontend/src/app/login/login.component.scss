@@ -1,0 +1,272 @@
+.search {
+    // display: flex;
+    // justify-content: start;
+    // align-items: start;
+    // padding: 10px;
+    color: #FFFFFF;
+}
+
+.login-user {
+    // position: absolute;
+    // display: flex;
+    // flex-direction: column;
+    // justify-content: center;
+    // align-items: center;
+    // left: 1450px;
+    // top: 30px;
+    float: right;
+    padding-right: 20px;
+}
+
+.login-container .mat-mdc-dialog-container .mdc-dialog__surface {
+    border-radius: 44px !important;
+}
+
+.login-btn {
+    /* Auto layout */
+    position: absolute;
+    left: 1400px;
+    top: 30px;
+    /* M3/sys/light/surface-container-low */
+    background: #F7F2FA;
+    /* M3/Elevation Light/1 */
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+    border-radius: 100px;
+    /* Auto layout */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 24px;
+    gap: 8px;
+
+    /* Inside auto layout */
+    flex: none;
+    order: 0;
+    align-self: stretch;
+    flex-grow: 1;
+    /* label-text */
+
+    width: 39px;
+    height: 20px;
+
+    /* M3/label/large */
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 20px;
+    /* identical to box height, or 143% */
+    letter-spacing: 0.1px;
+    /* M3/sys/light/primary */
+    color: #6750A4;
+}
+
+.welcome {
+    padding-left: 75px;
+    /* Applied AI Engineering */
+
+    /* Welcome to */
+    margin-top: 1.5em;
+    color: #FFFFFF;
+    // width: 350px;
+    height: 40px;
+    left: 159px;
+    top: 213px;
+
+    font-family: 'Google Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 40px;
+    line-height: 40px;
+    /* identical to box height, or 62% */
+    display: flex;
+    align-items: center;
+    letter-spacing: 0.5px;
+}
+
+.login-page-background {
+    background-image: radial-gradient(grey, black) !important;
+    min-width: 100%;
+    min-height: 100%
+}
+
+.csm {
+    /* Customer Service Modernization */
+    padding-left: 75px;
+    color: #FFFFFF;
+    width: 1328px;
+    height: 115px;
+    left: 159px;
+    top: 280px;
+
+    font-family: 'Google Sans';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 61px;
+    line-height: 100px;
+
+    /* or 102% */
+    display: flex;
+    align-items: center;
+    letter-spacing: 0.5px;
+    margin-top: 77px;
+}
+
+.demo {
+    /* Demo */
+
+    padding-left: 77px;
+    width: 176px;
+    height: 40px;
+    left: 159px;
+    margin-top: -25px;
+
+    font-family: 'Google Sans';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 40px;
+    line-height: 40px;
+    /* identical to box height, or 62% */
+    display: flex;
+    align-items: center;
+    letter-spacing: 0.5px;
+    color: #FFFFFF;
+}
+
+.userJourney {
+
+    /* User Journey | Architecture Diagram | GCP Console Demo */
+
+    padding-left: 75px;
+    // width: 649px;
+    height: 40px;
+    left: 159px;
+    margin-top: 22px;
+
+    font-family: 'Google Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 24px;
+    line-height: 40px;
+    /* identical to box height, or 167% */
+    display: flex;
+    align-items: center;
+    letter-spacing: 0.5px;
+    color: #FFFFFF;
+}
+
+.desc {
+
+    /* User Journey | Architecture Diagram | GCP Console Demo */
+
+
+    /* This is a functioning solution demo is for CEs/FSRs to present to prospects to demonstrate the capabilities of Google Cloud AI products. It is not an officially supported Google Cloud product or service and is provided without any guarantees of performance or maintenance. Because of the tool's limited and experimental nature, we may need to make modifications to, including potentially taking down, the tool on short, or no, notice. You may provide feedback and suggestions about this tool to Google, and Google and its Affiliates may use any feedback or suggestions provided without restriction and without obligation to you. Your use of the tool must always comply with our Terms of Service (including the Acceptable Use Policy), or the offline variant of the terms that govern your use of the Google Cloud Platform Services. During your use of the tool, information is provided for informational purposes only. The data inputed are dummy data. */
+    padding-left: 75px;
+    color: #FFFFFF;
+    width: 959px;
+    // height: 305px;
+    left: 164px;
+    margin-top: 23px;
+
+    /* GM3/body/medium */
+    font-family: 'Google Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 20px;
+    /* or 143% */
+}
+
+.check {
+    /* By checking this box, you accept and agree to the above terms and conditions of this tool. */
+
+    padding-left: 75px;
+    //   width: 573px;
+    //   height: 20px;
+    left: 194px;
+    top: 1051px;
+
+    /* GM3/body/medium */
+    font-family: 'Google Sans';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 20px;
+    /* identical to box height, or 143% */
+    color: #FFFFFF;
+
+}
+
+.checkboxCss {
+    /* check_box_outline_blank
+            
+            blank, box, button, check, component, control, deselected, empty, form, outline, select, selection, square, tick, toggle, ui
+            */
+    // width: 24px;
+    // height: 24px;
+    left: 164px;
+    top: 1049px;
+
+    padding-left: 75px;
+
+    /* icon */
+
+    // position: absolute;
+    left: 0%;
+    right: 0%;
+    top: 0%;
+    bottom: 0%;
+
+    font-family: 'Google Symbols';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 24px;
+    line-height: 50px;
+    /* or 208% */
+    // display: flex;
+    align-items: center;
+    text-align: center;
+
+    color: #FFFFFF;
+
+}
+
+
+.acceptButton{
+    /* padding-left: 75px; */
+    display: flex;
+    /* flex-direction: column; */
+    align-items: center;
+    /* padding: 8px 24px; */
+    gap: 10px;
+    margin-left: 70px;
+    width: 168px;
+    height: 36px;
+    left: 164px;
+    top: 1114px;
+    background: #1A73E8;
+    border-radius: 4px;
+    width: 200px;
+    height: 40px;
+    font-family: "Google Sans";
+    font-style: normal;
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 20px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    letter-spacing: 0.25px;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+    color: #FFFFFF;
+    border: none !important;
+}
+//sign in background gray
+::ng-deep .cdk-overlay-backdrop.cdk-overlay-backdrop-showing {
+    opacity: 70 !important;
+    background : rgba(0, 0, 0, 0.70)
+}

@@ -1,0 +1,25 @@
+<mat-nav-list class="app-sidenav pr-4 " >
+	<mat-list-item style="cursor: pointer"routerLink="javascript:void(0)" [ngClass]="{active: clickedItem === 'Query'}" (click)="onClick('Query')" >
+		<img src="assets/images/query.svg"><span class="ms-2">Query</span>
+  </mat-list-item>
+  <mat-list-item routerLink="javascript:void(0);" [ngClass]="{active: clickedItem === 'Reports'}" (click)="onClick('Reports')">
+    <img src="assets/images/reports.svg"><span class="ms-2">Reports</span>
+	</mat-list-item>
+  <mat-list-item [ngClass]="{active: clickedItem === 'Saved'}" (click)="onClick('Saved')">
+		<mat-icon>star_border</mat-icon><span class="ms-2">Saved Queries</span>
+	</mat-list-item>
+  <mat-list-item routerLink="#" [ngClass]="{active: clickedItem === 'History'}" (click)="onClick('History')">
+		<mat-icon>history</mat-icon><span class="ms-2">History</span>
+	</mat-list-item>
+    <mat-list-item  style = "position: absolute;bottom: 15px;" >
+        <mat-slide-toggle
+        class="example-margin"
+        [color]="color"
+        [checked]="checked"
+        [disabled]="disabled">
+    </mat-slide-toggle>
+<span class="ms-2">Operations Mode</span>
+	</mat-list-item>
+
+
+</mat-nav-list>
