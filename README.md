@@ -31,6 +31,8 @@ It is built on a modular design and currently supports the following components:
 * **ResponseAgent:** the ResponseAgent utilizes the users' natural language question along with the result of the final SQL run to generate an answer in natural language. 
 * **VisualizeAgent:** the VisualizeAgent generates two google charts (suggested by LLM) code based on the inputs of SQL, User Question and SQL Results to display on web UI (Javascript)
 
+**Note:** the library was formerly named Talk2Data. You may still find artifacts with the old naming in this repository. 
+
 Architecture
 -------------
 <p align="center">
@@ -524,7 +526,7 @@ Documentation
 -------------
 
 * [Open Data QnA Source Code (GitHub)](<https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples/tree/opendataqna>)
-* [NL2SQL usage notebooks](/notebooks)
+* [Open Data QnA usage notebooks](/notebooks)
 
 
 
