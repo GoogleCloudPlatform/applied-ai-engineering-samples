@@ -112,9 +112,10 @@ Setup
 
 (If you are using cloud shell IDE you would have these already setup)
     
-### 1. Clone the repository
+### 1. Clone the repository and switch to the correct branch 
    
-    git clone git@github.com:google-cloud-nl2sql/Talk2Data.git
+    git clone git@github.com:GoogleCloudPlatform/applied-ai-engineering-samples.git
+    git checkout opendataqna 
 
 
 ### 2. Install dependencies
