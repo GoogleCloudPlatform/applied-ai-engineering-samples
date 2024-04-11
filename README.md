@@ -523,7 +523,7 @@ Test if the endpoints are working with below command. This should return the dat
 Documentation
 -------------
 
-* [Open Data QnA Source Code (GitHub)](<https://github.com/google-cloud-nl2sql/NL2SQL>)
+* [Open Data QnA Source Code (GitHub)](<https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples/tree/opendataqna>)
 * [NL2SQL usage notebooks](/notebooks)
 
 
@@ -537,7 +537,7 @@ Quotas and limits
 License
 -------
 
-Open Data QnA is distributed with the [Apache-2.0 license](<https://github.com/google-cloud-nl2sql/NL2SQL/blob/main/LICENSE>).
+Open Data QnA is distributed with the [Apache-2.0 license](<LICENSE>).
 
 It also contains code derived from the following third-party packages:
 
