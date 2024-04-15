@@ -10,4 +10,4 @@ If you're new to Vertex AI Extentions these notebooks will help you get started.
 * [Business Analyst Workflow](notebooks/business_analyst_workflow_vertexai_extensions.ipynb) - Using the Code Interpreter and Vertex AI Search extensions to complete a housing investment opportunities research report for business stakeholders.
 * [Gaming Reviews](notebooks/game_review_analysis_vertexai_extensions.ipynb) - Using Vertex AI Extensions to complete a review analysis of a steam game.
 * [Working with Large Datasets Using Code Interpreter and Pandas](notebooks/pandas_code_interpreter.ipynb) - Using the Code Interpreter extension with pandas dataframes.
-* [Web Developer Workflow](notebooks/web_developer_workflow_vertexai_extensions.ipynb) -- Using the Code Interpreter extensions to build and deploy a static web application.
+* [Web Developer Workflow](notebooks/web_developer_workflow_vertexai_extensions.ipynb) - Using the Code Interpreter extensions to build and deploy a static web application.
