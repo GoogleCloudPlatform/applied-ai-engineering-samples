@@ -1,0 +1,9 @@
+fastapi
+pydantic
+uvicorn
+pandas
+protobuf
+torch
+transformers
+sentencepiece  
+httpie

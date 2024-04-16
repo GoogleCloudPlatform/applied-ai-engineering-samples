@@ -12,8 +12,49 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Copyright 2023 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 steps:
-  - id: Prepare destroy 
+  - id: 'Destroy GKE config - prepare'
+    name: gcr.io/cloud-builders/gke-deploy
+    entrypoint: /bin/bash
+    dir: 2-gke-config
+    args:
+      - -c
+      - |
+        gsutil cp gs://${_AUTOMATION_BUCKET}/providers/* .
+        sed -i "s/<FOLDER-NAME>/${_ENV_NAME}\/tfstate\/gke_config/g" backend.tf
+        gsutil cp gs://${_AUTOMATION_BUCKET}/tfvars/0-bootstrap.auto.tfvars.json .
+        gsutil cp gs://${_AUTOMATION_BUCKET}/${_ENV_NAME}/tfvars/1-base-infra.auto.tfvars.json .
+        echo '{"env_name":"${_ENV_NAME}"}' > env-name.auto.tfvars.json
+        
+  - id: 'Destroy GKE config - tf init'
+    name: hashicorp/terraform
+    dir: 2-gke-config
+    args: 
+    - init 
+
+  - id: 'Destroy GKE config - tf destroy'
+    name: hashicorp/terraform
+    dir: 2-gke-config
+    args: 
+    - destroy 
+    - -auto-approve 
+
+
+  - id: 'Destroy base infra - prepare'
     name: gcr.io/cloud-builders/gke-deploy
     entrypoint: /bin/bash
     dir: 1-base-infrastructure
@@ -21,23 +62,19 @@ steps:
       - -c
       - |
         gsutil cp gs://${_AUTOMATION_BUCKET}/providers/* .
-        sed -i "s/<FOLDER-NAME>/${_BASE_INFRA_STATE}/g" backend.tf
-        cat backend.tf
+        sed -i "s/<FOLDER-NAME>/${_ENV_NAME}\/tfstate\/base_infra/g" backend.tf
+        gsutil cp gs://${_AUTOMATION_BUCKET}/tfvars/0-bootstrap.auto.tfvars.json .
+        echo '{"env_name":"${_ENV_NAME}"}' > env-name.auto.tfvars.json
 
-  - id: 'Destroy - tf init'
+  - id: 'Destroy base infra - tf init'
     name: hashicorp/terraform
     dir: 1-base-infrastructure
     args: 
     - init 
 
-  - id: 'Destroy - tf destroy'
+  - id: 'Destroy base infra - tf destroy'
     name: hashicorp/terraform
     dir: 1-base-infrastructure
     args: 
     - destroy 
     - -auto-approve 
-
-
-substitutions:
-  _AUTOMATION_BUCKET: "automation-bucket"
-  _BASE_INFRA_STATE: "base-infra-state"

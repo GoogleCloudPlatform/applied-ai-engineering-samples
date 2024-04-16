@@ -12,7 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-namespace     = "kubernetes-namespace"
-ksa_name      = "ksa-name"
-wid_sa_name   = "wid_sa_name"
-wid_sa_roles  = ["storage.Admin"]
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap
+  namespace: saxml
+data:
+  publish.conf: |
+    model=/sax/test/gemma2bfp16
+    model_path=saxml.server.pax.lm.params.gemma.Gemma2BFP16
+    checkpoint=gs://jk102-saxml-model-repository/checkpoints/gemma_2b-it/checkpoint_00000000
+    replicas=1

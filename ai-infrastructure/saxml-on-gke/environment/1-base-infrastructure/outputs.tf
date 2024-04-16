@@ -17,6 +17,7 @@ locals {
     cluster_name     = module.base_environment.cluster_name
     cluster_location = module.base_environment.cluster_region
     project_id       = var.project_id
+    prefix           = var.prefix
   }
 
   environment_settings = {
@@ -26,7 +27,7 @@ locals {
     cluster_endpoint             = module.base_environment.cluster_endpoint
     gcs_buckets                  = module.base_environment.gcs_buckets
     node_pool_sa_email           = module.base_environment.node_pool_sa_email
-    artifact_registry_image_path = try(module.base_environment.artifact_registry_image_path, null)
+    artifact_registry_image_path = module.base_environment.artifact_registry_image_path
     metrics_dataset_id           = try(module.performance_metrics_infra[0].performance_metrics_dataset_id, null)
     metrics_table_id             = try(module.performance_metrics_infra[0].performance_metrics_table_id, null)
     metrics_topic_id             = try(module.performance_metrics_infra[0].performance_metrics_topic_id, null)
@@ -55,7 +56,7 @@ output "gcs_buckets" {
 
 output "artifact_registry_image_path" {
   description = "The URI of an Artifact Registry if created"
-  value       = try(module.base_environment[0].artifact_registry_image_path, null)
+  value       = module.base_environment.artifact_registry_image_path
 }
 
 output "metrics_dataset_id" {
@@ -85,14 +86,14 @@ output "metrics_bq_subscription" {
 
 resource "google_storage_bucket_object" "tfvars" {
   for_each = var.automation.outputs_bucket == null ? {} : { 1 = 1 }
-  name     = "tfvars/1-base-infra.auto.tfvars.json"
+  name     = "${var.env_name}/tfvars/1-base-infra.auto.tfvars.json"
   bucket   = var.automation.outputs_bucket
   content  = jsonencode(local.tfvars)
 }
 
 resource "google_storage_bucket_object" "environment_settings" {
   for_each = var.automation.outputs_bucket == null ? {} : { 1 = 1 }
-  name     = "settings/1-base-infra-settings.json"
+  name     = "${var.env_name}/settings/1-base-infra-settings.json"
   bucket   = var.automation.outputs_bucket
   content  = jsonencode(local.environment_settings)
 }

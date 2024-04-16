@@ -12,16 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-variable "automation" {
-  description = "Automation configs"
-  type = object({
-    outputs_bucket = string
-  })
-  default = {
-    outputs_bucket = null
-  }
-  nullable = false
-}
 
 variable "project_id" {
   description = "The GCP project ID"
@@ -142,17 +132,6 @@ variable "tpu_node_pools" {
           "v5litepod-64",
           "v5litepod-128",
           "v5litepod-256",
-          "v4-8",
-          "v4-16",
-          "v4-32",
-          "v4-64",
-          "v4-128",
-          "v4-256",
-          "v4-512",
-          "v4-1024",
-          "v4-1536",
-          "v4-2048",
-          "v4-4096",
         ],
         tpu_type
     )])
@@ -203,3 +182,20 @@ variable "bq_config" {
   default  = {}
 }
 
+variable "automation" {
+  description = "Automation configs"
+  type = object({
+    outputs_bucket = string
+  })
+  default = {
+    outputs_bucket = null
+  }
+  nullable = false
+}
+
+variable "env_name" {
+  description = "The name of the folder in the automation bucket where auto.tfvars, setting files, etc will be stored."
+  type        = string
+  nullable    = false
+  default     = "environment"
+}

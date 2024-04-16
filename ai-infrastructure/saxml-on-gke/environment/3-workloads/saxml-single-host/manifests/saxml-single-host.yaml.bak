@@ -1,0 +1,89 @@
+# Copyright 2023 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: saxml-stateful-set
+  namespace: saxml
+spec:
+  replicas: 1
+  selector: 
+    matchLabels:
+      app: saxml-statefulset
+  template:
+    metadata:
+      labels:
+        app: saxml-statefulset
+    spec:
+      serviceAccountName: saxml-ksa 
+      nodeSelector:
+        cloud.google.com/gke-tpu-topology: 1x1
+        cloud.google.com/gke-tpu-accelerator: tpu-v5-lite-podslice
+      containers:
+      - name: sax-admin-server
+        # image: us-docker.pkg.dev/tpu-vm-gke-testing/jk11-serving-images/sax-admin-server:v1.2.0
+        image: gcr.io/tpu-vm-gke-testing/saxml-lws-testing-modified:latest
+        securityContext:
+          privileged: true
+        ports:
+        - containerPort: 10000
+        env:
+        - name: SAX_REPLICA_NAME
+          valueFrom:
+            fieldRef: 
+              fieldPath: metadata.name 
+        - name: GSBUCKET
+          value: jk11-saxml-admin
+      - name: sax-model-server
+        #image: us-docker.pkg.dev/tpu-vm-gke-testing/jk11-serving-images/sax-model-server:v1.2.0
+        args: ["--port=10001", "--platform_chip=tpuv5e", "--platform_topology=1x1", "--jax_platforms=tpu"]
+        ports:
+        - containerPort: 10001
+        - containerPort: 8471
+        securityContext:
+          privileged: true
+        env:
+        - name: REPLICA_NAME
+          valueFrom:
+            fieldRef: 
+              fieldPath: metadata.name 
+        - name: SAX_ROOT 
+          value: "gs://jk11-saxml-admin/$(REPLICA_NAME)/sax-root"
+        resources:
+          requests:
+            google.com/tpu: 1
+          limits:
+            google.com/tpu: 1
+      - name: sax-http
+        image: us-docker.pkg.dev/tpu-vm-gke-testing/jk11-serving-images/sax-http:v1.2.0
+        ports:
+        - containerPort: 8888
+        env:
+        - name: REPLICA_NAME
+          valueFrom:
+            fieldRef: 
+              fieldPath: metadata.name 
+        - name: SAX_ROOT
+          value: "gs://jk11-saxml-admin/$(REPLICA_NAME)/sax-root"
+      - name: publisher
+        image: gcr.io/tpu-vm-gke-testing/saxml-lws-testing-modified/publisher:latest
+        volumeMounts:
+          - name: publish-config
+            mountPath: /publish/config 
+      volumes:
+      - name: publish-config
+        configMap:
+          name: configmap

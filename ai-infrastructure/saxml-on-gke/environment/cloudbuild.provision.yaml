@@ -13,7 +13,7 @@
 # limitations under the License.
 
 steps:
-  - id: Prepare base infrastructure stage 
+  - id: Provision base infrastructure - prepare
     name: gcr.io/cloud-builders/gke-deploy
     entrypoint: /bin/bash 
     dir: 1-base-infrastructure
@@ -22,32 +22,34 @@ steps:
       - |
         gsutil cp gs://${_AUTOMATION_BUCKET}/providers/* .
         gsutil cp gs://${_AUTOMATION_BUCKET}/tfvars/0-bootstrap.auto.tfvars.json .
-        sed -i "s/<FOLDER-NAME>/${_BASE_INFRA_STATE}/g" backend.tf
+        sed -i "s/<FOLDER-NAME>/${_ENV_NAME}\/tfstate\/base_infra/g" backend.tf
+        echo '{"env_name":"${_ENV_NAME}"}' > env-name.auto.tfvars.json
         
-  - id: Provision base infra - tf init
+  - id: Provision base infrastructure - tf init
     name: hashicorp/terraform
     dir: 1-base-infrastructure
     args: 
     - init 
 
-  - id: Provision base infra -tf apply
+  - id: Provision base infrastructue -tf apply
     name: hashicorp/terraform
     dir: 1-base-infrastructure 
     args: 
     - apply
     - -auto-approve
 
-  - id: Prepare GKE setup stage 
+  - id: Configure GKE - prepare 
     name: gcr.io/cloud-builders/gke-deploy
     entrypoint: /bin/bash 
     dir: 2-gke-config
     args:
       - -c
       - |
-        gsutil cp gs://${_AUTOMATION_BUCKET}/providers/* .
         gsutil cp gs://${_AUTOMATION_BUCKET}/tfvars/0-bootstrap.auto.tfvars.json .
-        gsutil cp gs://${_AUTOMATION_BUCKET}/tfvars/1-base-infra.auto.tfvars.json .
-        sed -i "s/<FOLDER-NAME>/${_GKE_CONFIG_STATE}/g" backend.tf
+        gsutil cp gs://${_AUTOMATION_BUCKET}/providers/* .
+        gsutil cp gs://${_AUTOMATION_BUCKET}/${_ENV_NAME}/tfvars/1-base-infra.auto.tfvars.json .
+        sed -i "s/<FOLDER-NAME>/${_ENV_NAME}\/tfstate\/gke_config/g" backend.tf
+        echo '{"env_name":"${_ENV_NAME}"}' > env-name.auto.tfvars.json
 
   - id: Configure GKE - tf init
     name: hashicorp/terraform
@@ -62,9 +64,3 @@ steps:
     - apply
     - -auto-approve
 
-
-substitutions:
-  _AUTOMATION_BUCKET: "automation-bucket"
-  _BASE_INFRA_STATE: "base-infra-state"
-  _GKE_CONFIG_STATE: "gke-config-state"
-  

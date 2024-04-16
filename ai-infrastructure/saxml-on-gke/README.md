@@ -112,7 +112,7 @@ If you lack administrative-level permissions to enable GCP services or to create
 
 #### Configure automation settings 
 
-During this step, Terraform is configured to utilize the specified automation bucket and service account. Optionally, if configured, it can also enable the necessary services and create both the automation service account and the automation bucket.
+During this step, Terraform is configured to utilize the specified automation bucket and service account. Optionally, you can also enable the necessary services and create both the automation service account and the automation bucket.
 
 
 1. Clone this repo
@@ -120,6 +120,7 @@ During this step, Terraform is configured to utilize the specified automation bu
 3. Copy the [terraform.tfvars.tmpl](environment/0-bootstrap/terraform.tfvars.tmpl) file to `terraform.tfvars`
 4. Modify the `terraform.tfvars` file to reflect your environment
   - `project_id` - your project ID
+  - `deletion_protection` - Set to `true` to protect you cluster and GCS buckets from accidental deletion by Terraform apply/destroy commands. Unless this field is set to false, a terraform destroy or terraform apply that would delete the cluster or non-empty GCS buckets will fail.
   - `create_automation_bucket` - set to `true` if you want to create a new automation bucket; set to `false` if you want to use an existing bucket
   - `automation_bucket` - the name and location of a bucket you want to use for automation. If you use an existing bucket the `location` field will be ignored
   - `create_automation_sa` - set to `true` if you want to create a new automation service account; set to `false` if you want to use an existing service account
@@ -130,7 +131,7 @@ During this step, Terraform is configured to utilize the specified automation bu
 5. Execute the `terraform init` command
 6. Execute the `terraform apply` command
 
-The Terraform configuration generates prepopulated template files for configuring the Terraform backend and providers, which can be utilized in the following setup stages. These template files are stored in the `gs://<YOUR-AUTOMATION-BUCKET/providers` and `gs://<YOUR-AUTOMATION-BUCKET/tfvars` folders. 
+The Terraform configuration generates prepopulated template and `.tfvars` files for configuring the Terraform backend and providers, which can be utilized in the following setup stages. These template files are stored in the `gs://<YOUR-AUTOMATION-BUCKET/providers` and `gs://<YOUR-AUTOMATION-BUCKET/tfvars` folders. 
 
 
 #### Granting Cloud Build impersonating rights
@@ -144,7 +145,7 @@ CLOUD_BUILD_SERVICE_ACCOUNT=<PROJECT_NUMBER>@cloudbuild.gserviceaccount.com
 gcloud iam service-accounts add-iam-policy-binding $AUTOMATION_SERVICE_ACCOUNT --member="serviceAccount:$CLOUD_BUILD_SERVICE_ACCOUNT" --role='roles/iam.serviceAccountTokenCreator'
 ```
 
-Replace <PROJECT_NUMBER> with your project number. Replace <AUTOMATION_SERVICE_ACCOUNT_EMAIL> with the email of your automation service account. If you created the automation service account using the bootstrap Terraform you can retrieve its email by executing the `terraform output automation_sa` command from the [environment\0-bootstrap](environment/0-bootstrap/) folder.
+Replace <PROJECT_NUMBER> with your project number. Replace <AUTOMATION_SERVICE_ACCOUNT_EMAIL> with the email of your automation service account. 
 
 ### Deploy base infrastructure 
 
@@ -166,7 +167,7 @@ To configure the Terraform steps in the build, copy the [terraform.tfvars.tmpl](
 - `region` - your region for a VPC and a GKE cluster
 - `prefix` - the prefix that will be added to the default names of resources provisioned by the configuration
 - `tpu_node_pools` - The  template shows an example configuration for one TPU node pool with a single `v5litepod-4` slice. Modify the `tpu_node_pools` variable to provision different TPU node pool configurations, as described below.
-- `cput_node_pools` - The template shows an example configuration for a number of CPU node pools as outlined in the [High Level Architecture section](#high-level-architecture)  
+- `cpu_node_pools` - The template shows an example configuration for a number of CPU node pools as outlined in the [High Level Architecture section](#high-level-architecture)  
 - `create_artifact_registry` - set to `true` to create a new artifact registry
 - `create_performance_testing_infrastructure` - set to `true` if you want to provision and configure Pubsub and BigQuery resources to support tracking and managing performance metrics.
 
@@ -187,11 +188,6 @@ When configuring TPU node pools, ensure that you set the TPU type to one of the 
 |v5litepod-64|tpuv5e|tpu-v5-lite-podslice|8x8|ct5lp-hightpu-4t|16|4|
 |v5litepod-128|tpuv5e|tpu-v5-lite-podslice|8x16|ct5lp-hightpu-4t|32|4|
 |v5litepod-256|tpuv5e|tpu-v5-lite-podslice|16x16|ct5lp-hightpu-4t|64|4|
-|v4-8|tpuv4|tpu-v4-podslice|2x2x1|ct4p-hightpu-4t|1|4|
-|v4-16|tpuv4|tpu-v4-podslice|2x2x2|ct4p-hightpu-4t|2|4|
-|v4-32|tpuv4|tpu-v4-podslice|2x2x4|ct4p-hightpu-4t|4|4|
-|v4-64|tpuv4|tpu-v4-podslice|2x4x4|ct4p-hightpu-4t|8|4|
-|v4-128|tpuv4|tpu-v4-podslice|4x4x4|ct4p-hightpu-4t|16|4|
 
 ----------
 
@@ -200,33 +196,25 @@ When configuring TPU node pools, ensure that you set the TPU type to one of the 
 To initiate the build, execute the following command from the [environment](environment/) folder:
 
 ```
+export PROJECT_ID=<PROJECT_ID>
 export AUTOMATION_BUCKET=<YOUR_AUTOMATION_BUCKET>
+export ENV_NAME=<TF_STATE_FOLDER> 
 
 gcloud builds submit \
+  --project $PROJECT_ID \
   --config cloudbuild.provision.yaml \
   --timeout "2h" \
-  --substitutions=_AUTOMATION_BUCKET=$AUTOMATION_BUCKET \
+  --substitutions=_AUTOMATION_BUCKET=$AUTOMATION_BUCKET,_ENV_NAME=$ENV_NAME \
   --machine-type=e2-highcpu-32 
 ```
 
+Replace the following values:
+- `<PROJECT_ID>` with your project ID
+- `<YOUR_AUTOMATION_BUCKET>` with your automation bucket
+- `<ENV_NAME>` with the name of the folder within your automation bucket where Terraform state and other artifacts will be managed
+
 
 To track the progress of the build, you can either follow the link displayed in Cloud Shell or visit the Cloud Build page on the [Google Cloud Console](https://console.cloud.google.com/cloud-build).
-
-The Cloud Build runs are annotated with the `saxml-infra-deployment` tags.
-
-If you need to access the build logs after the build completes you can use this tag for filtering.
-
-To list the builds:
-
-```
-gcloud builds list --filter "tags='saxml-infra-deployment'"
-```
-
-To retrieve the logs for a build:
-
-```
-gcloud builds log <BUILD_ID>
-```
 
 
 ### Deploy Saxml components 
@@ -306,12 +294,15 @@ From the [environment](environment/) folder.
 
 ```
 
+export PROJECT_ID=<PROJECT_ID>
 export AUTOMATION_BUCKET=<YOUR_AUTOMATION_BUCKET>
+export ENV_NAME=<TF_STATE_FOLDER>
 
 gcloud builds submit \
+  --project $PROJECT_ID \
   --config cloudbuild.destroy.yaml \
+  --substitutions _AUTOMATION_BUCKET=$AUTOMATION_BUCKET,_ENV_NAME=$ENV_NAME \
   --timeout "2h" \
-  --substitutions=_AUTOMATION_BUCKET=$AUTOMATION_BUCKET \
   --machine-type=e2-highcpu-32 
 ```
 

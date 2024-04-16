@@ -12,6 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+variable "prefix" {
+  description = "Prefix used for resource names."
+  type        = string
+  default     = ""
+  nullable    = false
+}
 
 variable "cluster_name" {
   description = "Name of the GKE cluster."
@@ -55,7 +61,7 @@ variable "wid_sa_name" {
 variable "wid_sa_roles" {
   description = "Roles to assign to a wid service account"
   type        = list(string)
-  default     = ["storage.objectAdmin", "logging.logWriter"]
+  default     = ["storage.admin", "logging.logWriter"]
 }
 
 variable "automation" {
@@ -67,4 +73,11 @@ variable "automation" {
     outputs_bucket = null
   }
   nullable = false
+}
+
+variable "env_name" {
+  description = "The name of the folder in the automation bucket where auto.tfvars, setting files, etc will be stored."
+  type        = string
+  nullable    = false
+  default     = "environment"
 }

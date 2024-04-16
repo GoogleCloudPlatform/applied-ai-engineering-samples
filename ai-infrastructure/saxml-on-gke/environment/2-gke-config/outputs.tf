@@ -40,7 +40,7 @@ output "iam_sa_email" {
 
 resource "google_storage_bucket_object" "gke_settings" {
   for_each = var.automation.outputs_bucket == null ? {} : { 1 = 1 }
-  name     = "settings/2-gke-setup-setting.json"
+  name     = "${var.env_name}/settings/2-gke-setup-setting.json"
   bucket   = var.automation.outputs_bucket
   content  = jsonencode(local.gke_settings)
 }
