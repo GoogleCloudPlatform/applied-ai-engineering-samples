@@ -201,11 +201,10 @@ class PgConnector(DBConnector, ABC):
                     FROM table_details_embeddings
                     WHERE 1 - (embedding <=> $1) > $2
                     AND table_schema = $4
-                    LIMIT $3
+                    ORDER BY similarity ASC LIMIT $3
                     )
-                    SELECT string_agg(content,' | ') as schema_dt
+                    SELECT content as tables_content
                     FROM vector_matches
-                    group by table_name, table_schema
                 """
                 
 
@@ -217,9 +216,9 @@ class PgConnector(DBConnector, ABC):
                     FROM tablecolumn_details_embeddings
                     WHERE 1 - (embedding <=> $1) > $2
                     AND table_schema = $4
-                    LIMIT $3
+                    ORDER BY similarity ASC LIMIT $3
                     )
-                    SELECT content as table_schema_det
+                    SELECT content as columns_content
                     FROM vector_matches
                 """
 
@@ -227,15 +226,14 @@ class PgConnector(DBConnector, ABC):
                 sql = """
                     WITH vector_matches AS (
                     SELECT table_schema, example_user_question, example_generated_sql,
-                    (embedding <> $1) AS similarity
+                    (embedding <=> $1) AS similarity
                     FROM example_prompt_sql_embeddings
                     WHERE 1 - (embedding <=> $1) > $2
                     AND table_schema = $4
-                    LIMIT $3
+                    ORDER BY similarity ASC LIMIT $3
                     )
-                    SELECT example_user_question, example_generated_sql
+                    SELECT example_user_question, example_generated_sql,similarity
                     FROM vector_matches
-                    group by example_user_question, example_generated_sql
                 """
 
             else: 
@@ -257,20 +255,21 @@ class PgConnector(DBConnector, ABC):
                 print("Did not find any results. Adjust the query parameters.")
 
             if mode == 'table': 
-                name_txt = 'Schema(values):'
+                name_txt = ''
                 for r in results:
-                    name_txt=name_txt+r["schema_dt"]+" | "
+                    name_txt=name_txt+r["tables_content"]+"\n\n"
 
             elif mode == 'column': 
-                name_txt = 'Column name(type):' 
+                name_txt = '' 
                 for r in results:
-                    name_txt=name_txt+r["table_schema_det"]+" | "
+                    name_txt=name_txt+r["columns_content"]+"\n\n "
 
             elif mode == 'example': 
                 name_txt = ''
                 for r in results:
                     example_user_question=r["example_user_question"]
                     example_sql=r["example_generated_sql"]
+                    # print(example_user_question+"\nThreshold::"+str(r["similarity"]))
                     name_txt = name_txt + "\n Example_question: "+example_user_question+ "; Example_SQL: "+example_sql
 
             else: 
@@ -434,17 +433,17 @@ class PgConnector(DBConnector, ABC):
     
     def return_table_schema_sql(self, schema): 
         """
-        This SQL returns a df containing the cols table_schema, table_name, table_description, table_column (with cols in the table)
+        This SQL returns a df containing the cols table_schema, table_name, table_description, table_columns (with cols in the table)
         for the schema specified above, e.g. 'retail'
         - table_schema: e.g. retail 
         - table_name: name of the table inside the schema, e.g. products 
         - table_description: text descriptor, can be empty 
-        - table_column: aggregate of the col names inside the table 
+        - table_columns: aggregate of the col names inside the table 
         """
 
 
         table_schema_sql = f'''
-        SELECT table_schema, table_name,table_description, array_to_string(array_agg(column_name), ' , ') as table_column
+        SELECT table_schema, table_name,table_description, array_to_string(array_agg(column_name), ' , ') as table_columns
         FROM
         (select c.table_schema,c.table_name,c.column_name,c.ordinal_position,c.column_default,c.data_type,d.description, obj_description(c1.oid) as table_description
         from information_schema.columns c

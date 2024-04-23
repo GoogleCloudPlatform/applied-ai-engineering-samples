@@ -18,14 +18,27 @@ export class UserJourneyComponent {
   subscription: Subscription | undefined;
   showProgressPreviewBar: boolean = false
   color: ThemePalette = 'accent';
-
+  loginError = false;
+  loginErrorMessage: any;
   constructor(public _router: Router, public loginService: LoginService, public homeService: HomeService) {
     this.subscription = this.loginService.getUserDetails().subscribe(message => {
       this.photoURL = message?.photoURL
     });
   }
   ngOnInit() {
-    this.homeService.DBType = 'BigQuery';
+    if (!this.photoURL) {
+      this._router.navigate(['']);
+    }
+    // this.loginService.getLoginError().subscribe((res: any) => {
+    //   this.loginErrorMessage = res
+    //   this.loginError = true;
+    //   if(this.loginError){
+    //     this._router.navigate(['']);
+    //   }
+    // });
+    else {
+      this.homeService.DBType = 'BigQuery';
+    }
   }
 
   userJourneyList: any = [{
@@ -61,16 +74,16 @@ export class UserJourneyComponent {
     if (userTitle === 'Business User') {
       this.homeService.checkuserType = 'Business';
       this.showProgressPreviewBar = true;
-     // new Promise<any>(async res => {
-       this.homeService.getAvailableDatabases().subscribe((res: any) => {
-          console.log(res)
-          if (res && res.ResponseCode === 200) {
-            this.homeService.setAvailableDBList(res.KnownDB);
-            this.showProgressPreviewBar = false;
-            this._router.navigate(['home']);
-          }
-        })
-    //  })
+      // new Promise<any>(async res => {
+      this.homeService.getAvailableDatabases().subscribe((res: any) => {
+        console.log(res)
+        if (res && res.ResponseCode === 200) {
+          this.homeService.setAvailableDBList(res.KnownDB);
+          this.showProgressPreviewBar = false;
+          this._router.navigate(['home']);
+        }
+      })
+      //  })
     }
     if (userTitle === 'Opertaional User') {
       this.homeService.checkuserType = 'Operational';

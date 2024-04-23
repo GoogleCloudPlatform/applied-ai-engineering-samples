@@ -58,7 +58,7 @@ AUTO_ADD_KNOWNGOOD_SQL=True
 # Palm Models to use
 MODEL='gemini-pro' # @param {type:"string"}
 CHAT_MODEL='codechat-bison-32k' # @param {type:"string"}
-embeddings_model='textembedding-gecko@001'
+embeddings_model='textembedding-gecko@002'
 
 
 # PGVECTOR (Cloud SQL Postgres) Info.

@@ -11,7 +11,7 @@ class EmbedderAgent(Agent, ABC):
 
     agentType: str = "EmbedderAgent"
 
-    def __init__(self, mode, embeddings_model='textembedding-gecko@001'): 
+    def __init__(self, mode, embeddings_model='textembedding-gecko@002'): 
         if mode == 'vertex': 
             self.mode = mode 
             self.model = TextEmbeddingModel.from_pretrained(embeddings_model)

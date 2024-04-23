@@ -5,7 +5,7 @@
 </p>
 <p align="center">
     <a href="https://sites.google.com/corp/google.com/genai-solutions/home?authuser=0">
-        <img src="utilities/imgs/talktodata.png" alt="logo" width="400" height="auto">
+        <img src="utilities/imgs/opendataqna.png" alt="logo" width="400" height="auto">
     </a>
 </p>
 <h1 align="center">Open Data QnA - Chat with your SQL Database</h1> 
@@ -73,16 +73,21 @@ Repository Structure
   └── __init__.py
   └── retrieve_embeddings.py
   └── store_embeddings.py
+  └──kgq_embeddings.py
 └── frontend
 └── notebooks
-  └── 1_setup_envs.ipynb
-  └── 2_run_Talk2Data.ipynb
+  └── 0_CopyDataToBigQuery.ipynb
+  └── 0_CopyDataToBigQuery.ipynb
+  └── 1_SetUpVectorStore.ipynb
+  └── 2_RunOpenDataQnA.ipynb
+  └── 3_LoadKnownGoodSQL.ipynb
 └── scripts
   └── bq_to_pg.py
   └── cache_known_sql.py
   └── known_good_sql.csv
 └── utilities
   └── __init__.py
+  └── policy.yaml
 └── Dockerfile
 └── main.py
 └── pyproject.toml
@@ -93,7 +98,8 @@ Repository Structure
 - [`/dbconnectors`](/dbconnectors): Source code for backend APIs.
 - [`/embeddings`](/embeddings): Source code for creating and storing embeddings.
   - [`/retrieve_embeddings.py`](/embeddings/retrieve_embeddings.py): Source code for retrieving table schema and embedding creation. 
-  - [`/store_embeddings.py`](/embeddings/store_embeddings.py): Source code for storing table schema embeddings in Vector Store. 
+  - [`/store_embeddings.py`](/embeddings/store_embeddings.py): Source code for storing table schema embeddings in Vector Store.
+  - [`/kgq_embeddings.py`](/embeddings/kgq_embeddings.py): Source code for loading good sqls and creating embeddings in the Vector Store) 
 - [`/notebooks`](/notebooks): Sample notebooks demonstrating the usage of this library.  
 - [`/scripts`](/scripts): Additional scripts for initial setup.
   - [`/bq_to_pg.py`](/scripts/bq_to_pg.py): Source code for exporting BigQuery tables to PostgreSQL on Google Cloud SQL. 
@@ -104,86 +110,88 @@ Repository Structure
 - [`/frontend`](/frontend) : Angular based frontend code to deploy demo app using the API developed with [`/main.py`](/main.py)
 
 
-Setup 
--------------
-
-### Prerequisites:
-* Google Cloud CLI to be installed
-
-(If you are using cloud shell IDE you would have these already setup)
     
 ### 1. Clone the repository and switch to the correct branch 
    
     git clone git@github.com:GoogleCloudPlatform/applied-ai-engineering-samples.git
+    cd applied-ai-engineering-samples 
     git checkout opendataqna 
 
 
-### 2. Install dependencies
+### 2. Run the [Vector Store Setup Notebook](/notebooks/1_SetUpVectorStore.ipynb)
 
-   Open the folder in a IDE
+   If your IDE doesn't have Jupyter+Python extensions, when you try changing the kernel it will prompt you to install the same. Please go ahead and install.
+.   
+   Follow the instructions in the notebook
+
    
-   To install the dependencies, switch to the directory of your newly cloned repository, and run the following command in the terminal: 
-    
-   **Poetry:** (recommended)  
+### 3. Run the [OpenDataQnA Notebook](/notebooks/2_RunOpenDataQnA.ipynb)
+
+   Don't forget to switch your notebook kernel to the newly generated .venv environment after running the poetry command similarly as above.
+
+### 4. [Loading Known Good SQL Examples](/notebooks/2_RunOpenDataQnA.ipynb)
+   
+   In case you want to seperately load Known Good SQLs please run this notebook once the config variables are setup in config.ini file. This can be run multiple times just to load the known good sql queries and create embeddings for it.
+
+
+### 5. Create Endpoints
+
+   Here we are going to create publicly accessible endpoints (no authentication) .
+
+   If you're working on a managed GCP project, it is common that there would be Domain Restricted Sharing Org Policies that will not allow the creation of a public facing endpoint.
+
+   So we can allow all the domains and re-enable the same policy so that we don’t change the existing policy.
+
+   Please run the below command before proceeding ahead. You need to have Organization Policy Admin rights to run the below commands.
 
 ```
-pip install poetry #install poetry
+export PROJECT_ID=<PROJECT_ID>
 
-poetry lock #resolve dependecies (also auto create poetry venv if not exists)
-
-poetry install #installs dependencies
-
-poetry shell #verify and activate the venv auto created by the poetry
-
+gcloud resource-manager org-policies set-policy --project=$PROJECT_ID utilities/policy.yaml #This command will create policy that overrides to allow all domain
 
 ```
 
-   Alternatively, you can skip to step 4 to install the required dependencies directly from the notebooks. 
+Create the service account and add roles to run the solution backend for the APIs
 
-### 3. Activate your virtual environment after running poetry
-   
-   If you installed the dependencies with poetry install, don't forget to activate the newly created .venv environment for your project.
-   
-   Tip: some IDE's will identify the new environment and display a popup window asking if you want to switch. Or you can select manually by selecting the interpreter path for Python
+```
+gcloud iam service-accounts create opendataqna
+gcloud projects add-iam-policy-binding $PROJECT_ID --member=serviceAccount:opendataqna@$PROJECT_ID.iam.gserviceaccount.com --role='roles/cloudsql.client' --quiet
+gcloud projects add-iam-policy-binding $PROJECT_ID --member=serviceAccount:opendataqna@$PROJECT_ID.iam.gserviceaccount.com --role='roles/bigquery.admin' --quiet
+gcloud projects add-iam-policy-binding $PROJECT_ID --member=serviceAccount:opendataqna@$PROJECT_ID.iam.gserviceaccount.com --role='roles/aiplatform.user' --quiet
 
-   ```
-   poetry shell #this command should already activate it if not rerun again
-
-   ```
-   
-
-### 4. Run the [Environment Setup Notebook](/notebooks/1_setup_envs.ipynb)
-   
-### 5. Run the [Talk2Data Notebook](/notebooks/2_run_Talk2Data.ipynb)
+```
 
 
-### 6. Create Endpoints
 
 **Technologies**
 
 * **Programming language:** Python
 * **Framework:** Flask
 
-***NOTE***
-*Your Endpoints are created using the config details present in the config.ini file (same config.ini used before in the previous steps). So double check if all the variables are set correctly before proceeding ahead. Incase if you have different values for postgres instance or bigquery dataset place go ahead and update the config.ini file before proceeding ahead*
+**Before you start :** Ensure all variables in your config.ini file are correct, especially those for your Postgres instance and BigQuery dataset. If you need to change the Postgres instance or BigQuery dataset values, update the config.ini file before proceeding.   
 
-The endpoints deployed here are completely customized for the UI built in this demo solution. Feel free to customize the endpoint if needed for different UI/frontend. The gcloud run deploy command creates a cloud build that uses the Dockerfile in the Talk2Data folder
+
+   The endpoints deployed here are completely customized for the UI built in this demo solution. Feel free to customize the endpoint if needed for different UI/frontend. The gcloud run deploy command create a cloud build that uses the Dockerfile in the OpenDataQnA folder
     
   ***Deploy endpoints to Cloud Run***
 ```
- cd Talk2Data
+ cd applied-ai-engineering-samples
+ git checkout opendataqna 
 
  gcloud auth login
+ 
+ export PROJECT_ID=<PROJECT_ID>
 
- gcloud config set project <PROJECT_ID>
+ gcloud config set project $PROJECT_ID
 
- gcloud run deploy <CLOUD_RUN_INSTANCE_NAME> --region <REGION> --source . --allow-unauthenticated #if you are deploying cloud run application for the first time in the project you will be prompted for a couple of settings. Go ahead and type Yes.
+ gcloud run deploy <<NAME OF THE INSTANCE>> --region <<REGION>> --source . --service-account=opendataqna@$PROJECT_ID.iam.gserviceaccount.com --min-instances=1   #if you are deploying cloud run application for the first time in the project you will be prompted for a couple of settings. Go ahead and type Yes.
+
 
 ```
 
-Once the deployment is done successfully you should be able to see the Service URL (endpoint point) link as shown below. Please keep this handy to add this in the frontend or you can get this uri from the cloud run page in the GCP Console. e.g. *https://Talk2Data-aeiouAEI-uc.a.run.app*
+   Once the deployment is done successfully you should be able to see the Service URL (endpoint point) link as shown below. Please keep this handy to add this in the frontend or you can get this uri from the cloud run page in the GCP Console. e.g. *https://OpenDataQnA-aeiouAEI-uc.a.run.app*
 
-Test if the endpoints are working with below command. This should return the dataset your created in the source env setup notebook.
+   Test if the endpoints are working with below command. This should return the dataset your created in the source env setup notebook.
 ```
  curl <URI of the end point>/available_databases
 
@@ -198,6 +206,14 @@ Test if the endpoints are working with below command. This should return the dat
 </p>
 
 
+  Delete the Org Policy on the Project that's created above. Do not run this if you haven’t created the org policy above
+
+```
+gcloud resource-manager org-policies delete iam.allowedPolicyMemberDomains --project=$PROJECT_ID
+```
+
+
+
 **API Details**
 
    All the payloads are in JSON format
@@ -205,7 +221,7 @@ Test if the endpoints are working with below command. This should return the dat
 1. List Databases : Get the available databases in the vector store that solution can run against
 
     URI: {Service URL}/available_databases 
-    Complete URL Sample : https://Talk2Data-aeiouAEI-uc.a.run.app/available_databases
+    Complete URL Sample : https://OpenDataQnA-aeiouAEI-uc.a.run.app/available_databases
 
     Method: GET
 
@@ -223,7 +239,7 @@ Test if the endpoints are working with below command. This should return the dat
 2. Known SQL : Get suggestive questions (previously asked/examples added) for selected database
 
     URI: /get_known_sql
-    Complete URL Sample : https://Talk2Data-aeiouAEI-uc.a.run.app/get_known_sql   
+    Complete URL Sample : https://OpenDataQnA-aeiouAEI-uc.a.run.app/get_known_sql   
 
     Method: POST
 
@@ -253,7 +269,7 @@ Test if the endpoints are working with below command. This should return the dat
 
     Method: POST
 
-    Complete URL Sample : https://Talk2Data-aeiouAEI-uc.a.run.app/get_known_sql
+    Complete URL Sample : https://OpenDataQnA-aeiouAEI-uc.a.run.app/get_known_sql
 
 
     Request payload:
@@ -279,7 +295,7 @@ Test if the endpoints are working with below command. This should return the dat
 4. Execute SQL : Run the SQL statement against provided database source
 
     URI:/run_query
-    Complete URL Sample : https://Talk2Data-aeiouAEI-uc.a.run.app/run_query
+    Complete URL Sample : https://OpenDataQnA-aeiouAEI-uc.a.run.app/run_query
 
     Method: POST
 
@@ -301,7 +317,7 @@ Test if the endpoints are working with below command. This should return the dat
 5. Embedd SQL : To embed known good SQLs to your example embeddings
 
     URI:/embed_sql
-    Complete URL Sample : https://Talk2Data-aeiouAEI-uc.a.run.app/embed_sql
+    Complete URL Sample : https://OpenDataQnA-aeiouAEI-uc.a.run.app/embed_sql
 
     METHOD: POST
 
@@ -331,7 +347,7 @@ Test if the endpoints are working with below command. This should return the dat
     If you are only looking to setup enpoint you can stop here. In case you require the demo app (frontend UI) built in the solution, proceed to the next step.
 
     URI:/generate_viz
-    Complete URL Sample : https://Talk2Data-aeiouAEI-uc.a.run.app/generate_viz
+    Complete URL Sample : https://OpenDataQnA-aeiouAEI-uc.a.run.app/generate_viz
     
     METHOD: POST
 
@@ -388,10 +404,11 @@ Test if the endpoints are working with below command. This should return the dat
 * **Framework:** Angular
 * **Hosting Platform:** Firebase
 
+**Note** : This UI demo doesn't configure any domain restrictions. If you choose to build one refer to this link https://firebase.google.com/docs/functions/auth-blocking-events?gen=2nd#only_allowing_registration_from_a_specific_domain
 
 1. Install the firebase tools to run CLI commands
     ```
-    cd Talk2Data
+    cd applied-ai-engineering-samples
 
     npm install -g firebase-tools
 
@@ -405,41 +422,50 @@ Test if the endpoints are working with below command. This should return the dat
 
     **Note**:*Please complete the steps carely and use the same project which you are going to host the app*
 
-    Follow detailed instructions in the below guide
-
-    https://cloud.google.com/build/docs/deploying-builds/deploy-firebase#using_the_firebase_community_builder
-
-
-
-3. Initialize Firebase
+    Follow detailed instructions:
+    
+    1. Navigate to your project root directory.
+    2. Clone the cloud-builders-community repository:
 
     ```
-    cd Talk2Data/frontend
+    git clone https://github.com/GoogleCloudPlatform/cloud-builders-community.git
+    ```
+    3. Navigate to the firebase builder image:
 
-    firebase login --no-localhost #authenticate yourself
+    ```
+    cd cloud-builders-community/firebase 
+    ```
+    4. Submit the builder to your project, where REGION is one of the supported build regions: 
 
-    firebase init hosting 
+    ```
+    gcloud builds submit --region=REGION .
+    ```
 
-    ## Use the down arrow to select the option Add firebase to an existing GCP Project and enter the hosting Project ID
-
-    ## For the public directory prompt provide >> /dist/frontend/browser
+    5. Navigate back to your project root directory:
     
-    ## Rewrite all URLs to index prompt enter >> Yes (Enter No for any other options)
-
-    ## You should now see firebase.json created in the folder 
-
+    ```
+    cd ../..
+    ```
+ 
+    6. Remove the repository from your root directory:
+    ```
+    rm -rf cloud-builders-community/
     ```
 
 
 4. Configure Firebase
 
-    Once you added the project to firebase navigate the https://console.firebase.google.com/ and select your project
+    Login into firebase console (https://console.firebase.google.com/) and create project “Add existing GCP project” select your GCP project that you are using for the deployment of firebase. 
+
+    Choose pay as you go plan and turn off Google Analytics and create.
+
+    Once you added the project to firebase navigate and select your project
 
    * Navigate to Project Settings > General
 
    * Add App and select Web
 
-   * Fill the details e.g. Nickname : Talk2Data and just register the app
+   * Fill the details e.g. Nickname : opendataqna and just register the app
 
    * Once done continue back the general page and you should see the app
 
@@ -450,7 +476,7 @@ Test if the endpoints are working with below command. This should return the dat
 
     <p align="center">
         <a href="utilities/imgs/Firebase Config .png">
-            <img src="utilities/imgs/Firebase Config .png" alt="aaie image">
+            <img src="utilities/imgs/Firebase Config.png" alt="aaie image">
         </a>
     </p>
 
@@ -460,10 +486,34 @@ Test if the endpoints are working with below command. This should return the dat
     * Under Sign-in Method add provider as Google
 
 
+4. Initialize Firebase
+
+    ```
+    cd applied-ai-engineering-samples
+
+    cd frontend
+
+    firebase login --no-localhost
+
+    firebase init hosting 
+
+    ```
+
+    * firebase login --reauth --no-localhost # this command can be used re authenticate in case of authentication errors
+
+    * Use the down arrow to select the option Use an existing project
+
+    * For the public directory prompt provide >> /dist/frontend/browser
+    
+    * Rewrite all URLs to index prompt enter >> Yes (Enter No for any other options)
+
+    * You should now see firebase.json created in the folder 
+
+
 
 5. Update the Config Object and Endpoint URLs for the frontend
 
-    In the file [`/frontend/src/assets/constants.ts`](/frontend/src/assets/constants.ts) replace the config object with the one you copied in the above step and replace the ENDPOINT_TALK2DATA with the Service URL from the Endpoint Deployment section above.
+    In the file [`/frontend/src/assets/constants.ts`](/frontend/src/assets/constants.ts) replace the config object with the one you copied in the above step and replace the ENDPOINT_OPENDATAQNA with the Service URL from the Endpoint Deployment section above.
 
     ***Note that these variables need to be exported using "export" keyword. So make sure export is mentioned for both the variables***
 
@@ -493,7 +543,9 @@ Test if the endpoints are working with below command. This should return the dat
     ```
     gcloud services enable firebase.googleapis.com # Enable firebase management API
 
-    cd Talk2Data/frontend
+    cd applied-ai-engineering-samples
+    git checkout opendataqna
+    cd frontend
 
     gcloud builds submit . --config frontend.yaml --substitutions _FIREBASE_PROJECT_ID=<PROJECT_ID>
 
@@ -503,7 +555,7 @@ Test if the endpoints are working with below command. This should return the dat
 
     You can see the app URL at the end of successful deployment
 
-    Once deployed login if your Google Account > Select Business User > Select a database in the dropdown (top right) > Type in the Query > Hit Query
+    > Once deployed login if your Google Account > Select Business User > Select a database in the dropdown (top right) > Type in the Query > Hit Query
 
     A successful SQL generated will be show as below
 

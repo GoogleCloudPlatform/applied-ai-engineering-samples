@@ -1,0 +1,9 @@
+TableName,ColumnName,TableDescription,ColumnDescription
+Table_1,Col11,Table_1_DESC,Col11_DESC
+Table_1,Col12,,Col12_DESC
+Table_1,Col13,,Col13_DESC
+Table_1,Col14,,Col14_DESC
+,,,
+Table_2,Col21,Table_2_DESC,Col21_DESC
+Table_2,Col22,,Col22_DESC
+Table_2,Col23,,Col31_DESC

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpHeaders, HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, throwError, BehaviorSubject } from 'rxjs';
 import { Observable } from 'rxjs';
-import { ENDPOINT_TALK2DATA } from '../../../assets/constants'
+import { ENDPOINT_OPENDATAQNA } from '../../../assets/constants'
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +16,7 @@ export class HomeService {
   public selectedDBType: any;
   DBType: any;
   config: any;
+  selectedDbName: any;
 
   constructor(public http: HttpClient) { }
 
@@ -28,7 +29,7 @@ export class HomeService {
       headers: new HttpHeaders(header),
     };
 
-    return this.http.get(ENDPOINT_TALK2DATA + '/available_databases', requestOptions).pipe(catchError(this.handleError))
+    return this.http.get(ENDPOINT_OPENDATAQNA + '/available_databases', requestOptions).pipe(catchError(this.handleError))
   }
   sqlSuggestionList(databasetype: any, dbtype: any) {
 
@@ -45,12 +46,12 @@ export class HomeService {
     }
     this.selectedDBType = dbtype;
 
-    return this.http.post(ENDPOINT_TALK2DATA + '/get_known_sql', body, requestOptions)
+    return this.http.post(ENDPOINT_OPENDATAQNA + '/get_known_sql', body, requestOptions)
       .pipe(catchError(this.handleError));
 
   }
   returnEndpointURL() {
-    return ENDPOINT_TALK2DATA;
+    return ENDPOINT_OPENDATAQNA;
   }
   generateSql(userQuestion: any, databasetype: any) {
 
@@ -65,7 +66,7 @@ export class HomeService {
       "user_question": userQuestion,
       "user_database": databasetype
     }
-    let endpoint = ENDPOINT_TALK2DATA;
+    let endpoint = ENDPOINT_OPENDATAQNA;
 
     return this.http.post(endpoint + "/generate_sql", body, requestOptions)
       .pipe(catchError(this.handleError));
@@ -92,6 +93,12 @@ export class HomeService {
     return this.selectedDb;
   }
 
+  setselectedDbName(databaseList: any) {
+    this.selectedDbName = databaseList;
+  }
+  getselectedDbName(): string {
+    return this.selectedDbName;
+  }
   generateResultforSql(query: any, databasetype: any) {
     const header = {
       'Content-Type': 'application/json',
@@ -104,7 +111,7 @@ export class HomeService {
       "generated_sql": query,
       "user_database": databasetype
     }
-    let endpoint = ENDPOINT_TALK2DATA;
+    let endpoint = ENDPOINT_OPENDATAQNA;
 
     return this.http.post(endpoint + "/run_query", body, requestOptions)
       .pipe(catchError(this.handleError));
@@ -123,7 +130,7 @@ export class HomeService {
       generated_sql: sql.example_generated_sql,
       user_question: sql.example_user_question
     }
-    let endpoint = ENDPOINT_TALK2DATA;
+    let endpoint = ENDPOINT_OPENDATAQNA;
     return this.http.post(endpoint + "/embed_sql", body, requestOptions)
       .pipe(catchError(this.handleError));
   }
@@ -141,7 +148,7 @@ export class HomeService {
       "sql_generated": query,
       "sql_results": result
     }
-    return this.http.post(ENDPOINT_TALK2DATA + "/generate_viz", body, requestOptions)
+    return this.http.post(ENDPOINT_OPENDATAQNA + "/generate_viz", body, requestOptions)
       .pipe(catchError(this.handleError));
   }
 }

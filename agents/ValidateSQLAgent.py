@@ -13,7 +13,7 @@ class ValidateSQLAgent(Agent, ABC):
 
 
     # TODO: Make the LLM Validator optional
-    def check(self, user_question, tables_schema, tables_detailed_schema, generated_sql):
+    def check(self, user_question, tables_schema, columns_schema, generated_sql):
 
         context_prompt = f"""
 
@@ -36,10 +36,10 @@ class ValidateSQLAgent(Agent, ABC):
         Parameters:
         - SQL query: {generated_sql}
         - table schema: {tables_schema}
-        - column description: {tables_detailed_schema}
+        - column description: {columns_schema}
 
         Respond using a valid JSON format with two elements valid and errors. Remove ```json and ``` from the output:
-
+        {{ "valid": true or false, "errors":errors }}
 
         Initial user question:
         {user_question}
@@ -48,7 +48,7 @@ class ValidateSQLAgent(Agent, ABC):
         """
 
         
-        if self.model_id =='gemini-pro':
+        if self.model_id =='gemini-1.0-pro':
             context_query = self.model.generate_content(context_prompt, stream=False)
             generated_sql = str(context_query.candidates[0].text)
 
@@ -59,7 +59,7 @@ class ValidateSQLAgent(Agent, ABC):
 
         json_syntax_result = json.loads(str(generated_sql).replace("```json","").replace("```",""))
 
-        print('\n SQL Syntax Validity:' + str(json_syntax_result['valid']))
-        print('\n SQL Syntax Error Description:' +str(json_syntax_result['errors']) + '\n')
+        # print('\n SQL Syntax Validity:' + str(json_syntax_result['valid']))
+        # print('\n SQL Syntax Error Description:' +str(json_syntax_result['errors']) + '\n')
         
         return json_syntax_result

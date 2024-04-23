@@ -101,7 +101,7 @@ class BuildSQLAgent(Agent, ABC):
             """
             # print(context_prompt)
 
-        if self.model_id =='gemini-pro':
+        if self.model_id =='gemini-1.0-pro':
             context_query = self.model.generate_content(context_prompt, stream=False)
             generated_sql = str(context_query.candidates[0].text)
 

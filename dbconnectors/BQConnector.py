@@ -10,10 +10,13 @@ import google.auth
 import pandas as pd
 from google.cloud.exceptions import NotFound
 
-def get_auth_user():  
+def get_auth_user():
     credentials, project_id = google.auth.default()
-    return credentials.service_account_email
 
+    if hasattr(credentials, 'service_account_email'):
+        return credentials.service_account_email
+    else:
+        return "Not Determined"
 
 def bq_specific_data_types(): 
     return '''
@@ -54,13 +57,13 @@ class BQConnector(DBConnector, ABC):
                  project_id:str,
                  region:str,
                  dataset_name:str,
-                 talk2data_dataset:str,
+                 opendataqna_dataset:str,
                  audit_log_table_name:str):
 
         self.project_id = project_id
         self.region = region
         self.dataset_name = dataset_name
-        self.talk2data_dataset = talk2data_dataset
+        self.opendataqna_dataset = opendataqna_dataset
         self.audit_log_table_name = audit_log_table_name
         self.client=self.getconn()
 
@@ -77,7 +80,7 @@ class BQConnector(DBConnector, ABC):
 
         PROJECT_ID = self.project_id
         # print('\nInside the Append to BQ block\n')
-        table_id= PROJECT_ID+ '.' + self.talk2data_dataset + '.' + self.audit_log_table_name
+        table_id= PROJECT_ID+ '.' + self.opendataqna_dataset + '.' + self.audit_log_table_name
         now = datetime.now()
 
         table_exists=False
@@ -172,7 +175,7 @@ class BQConnector(DBConnector, ABC):
     
     def create_embedding_model(self,connection_id: str, embedding_model: str):
         client = self.getconn()
-        client.query_and_wait(f'''CREATE OR REPLACE MODEL `{self.project_id}.{self.talk2data_dataset}.EMBEDDING_MODEL`
+        client.query_and_wait(f'''CREATE OR REPLACE MODEL `{self.project_id}.{self.opendataqna_dataset}.EMBEDDING_MODEL`
                                             REMOTE WITH CONNECTION `{self.project_id}.{self.region}.{connection_id}`
                                             OPTIONS (ENDPOINT = '{embedding_model}');''')
    
@@ -185,11 +188,11 @@ class BQConnector(DBConnector, ABC):
         matches = []
 
         if mode == 'table':
-            sql = '''select base.content as schema_dt from vector_search(TABLE `{}.table_details_embeddings`, "embedding", 
+            sql = '''select base.content as tables_content from vector_search(TABLE `{}.table_details_embeddings`, "embedding", 
             (SELECT {} as qe), top_k=> {},distance_type=>"COSINE") where distance > {} '''
         
         elif mode == 'column':
-            sql='''select base.content as table_schema_det from vector_search(TABLE `{}.tablecolumn_details_embeddings`, "embedding",
+            sql='''select base.content as columns_content from vector_search(TABLE `{}.tablecolumn_details_embeddings`, "embedding",
             (SELECT {} as qe), top_k=> {}, distance_type=>"COSINE") where distance > {} '''
 
         elif mode == 'example': 
@@ -200,20 +203,20 @@ class BQConnector(DBConnector, ABC):
             ValueError("No valid mode. Must be either table, column, or example")
             name_txt = ''
 
-        results=self.client.query_and_wait(sql.format('{}.{}'.format(self.project_id,self.talk2data_dataset),qe,limit,similarity_threshold)).to_dataframe()
+        results=self.client.query_and_wait(sql.format('{}.{}'.format(self.project_id,self.opendataqna_dataset),qe,limit,similarity_threshold)).to_dataframe()
         # CHECK RESULTS 
         if len(results) == 0:
             print("Did not find any results. Adjust the query parameters.")
 
         if mode == 'table': 
-            name_txt = 'Schema(values):'
+            name_txt = ''
             for _ , r in results.iterrows():
-                name_txt=name_txt+r["schema_dt"]+"\n"
+                name_txt=name_txt+r["tables_content"]+"\n"
 
         elif mode == 'column': 
-            name_txt = 'Column name(type):' 
+            name_txt = '' 
             for _ ,r in results.iterrows():
-                name_txt=name_txt+r["table_schema_det"]+"\n"
+                name_txt=name_txt+r["columns_content"]+"\n"
 
         elif mode == 'example': 
             name_txt = ''
@@ -253,7 +256,7 @@ class BQConnector(DBConnector, ABC):
 
     def getExactMatches(self, query):
         """Checks if the exact question is already present in the example SQL set"""
-        check_history_sql=f"""SELECT example_user_question,example_generated_sql FROM {self.project_id}.{self.talk2data_dataset}.example_prompt_sql_embeddings
+        check_history_sql=f"""SELECT example_user_question,example_generated_sql FROM {self.project_id}.{self.opendataqna_dataset}.example_prompt_sql_embeddings
                           WHERE lower(example_user_question) = lower('{query}') LIMIT 1; """
 
         exact_sql_history = self.client.query_and_wait(check_history_sql).to_dataframe()
@@ -294,12 +297,12 @@ class BQConnector(DBConnector, ABC):
     def return_table_schema_sql(self, dataset): 
         """
         Returns the SQL query to be run on 'Source DB' to get the Table Schema
-        The SQL query below returns a df containing the cols table_schema, table_name, table_description, table_column (with cols in the table)
+        The SQL query below returns a df containing the cols table_schema, table_name, table_description, table_columns (with cols in the table)
         for the schema specified above, e.g. 'retail'
         - table_schema: e.g. retail 
         - table_name: name of the table inside the schema, e.g. products 
         - table_description: text descriptor, can be empty 
-        - table_column: aggregate of the col names inside the table 
+        - table_columns: aggregate of the col names inside the table 
         """
 
         user_dataset = self.project_id + '.' + dataset
@@ -307,7 +310,7 @@ class BQConnector(DBConnector, ABC):
         table_schema_sql = f'''
         (SELECT
           TABLE_CATALOG as project_id, TABLE_SCHEMA as table_schema , TABLE_NAME as table_name,  OPTION_VALUE as table_description,
-          (SELECT STRING_AGG(column_name, ', ') from `{user_dataset}.INFORMATION_SCHEMA.COLUMNS` where TABLE_NAME= t.TABLE_NAME and TABLE_SCHEMA=t.TABLE_SCHEMA) as table_column
+          (SELECT STRING_AGG(column_name, ', ') from `{user_dataset}.INFORMATION_SCHEMA.COLUMNS` where TABLE_NAME= t.TABLE_NAME and TABLE_SCHEMA=t.TABLE_SCHEMA) as table_columns
         FROM
             `{user_dataset}.INFORMATION_SCHEMA.TABLE_OPTIONS` as t
         WHERE
@@ -319,7 +322,7 @@ class BQConnector(DBConnector, ABC):
 
                 (SELECT
           TABLE_CATALOG as project_id, TABLE_SCHEMA as table_schema , TABLE_NAME as table_name,  "NA" as table_description,
-          (SELECT STRING_AGG(column_name, ', ') from `{user_dataset}.INFORMATION_SCHEMA.COLUMNS` where TABLE_NAME= t.TABLE_NAME and TABLE_SCHEMA=t.TABLE_SCHEMA) as table_column
+          (SELECT STRING_AGG(column_name, ', ') from `{user_dataset}.INFORMATION_SCHEMA.COLUMNS` where TABLE_NAME= t.TABLE_NAME and TABLE_SCHEMA=t.TABLE_SCHEMA) as table_columns
         FROM
             `{user_dataset}.INFORMATION_SCHEMA.TABLES` as t WHERE NOT EXISTS (SELECT 1   FROM
             `{user_dataset}.INFORMATION_SCHEMA.TABLE_OPTIONS`  

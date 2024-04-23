@@ -1,6 +1,7 @@
 import json 
 from abc import ABC
 from .core import Agent 
+from vertexai.generative_models import HarmCategory, HarmBlockThreshold
 
 class ResponseAgent(Agent, ABC): 
     """ 
@@ -19,12 +20,12 @@ class ResponseAgent(Agent, ABC):
 
             The system has returned the following result after running the SQL query: "{str(sql_result)}".
 
-            Provide a natural sounding response to the user to answer the question with the SQL result provided to you. 
+            Provide a natural sounding response to the user to answer the question with the SQL result provided to you.
         """
 
-        
-        if self.model_id =='gemini-pro':
-            context_query = self.model.generate_content(context_prompt, stream=False)
+
+        if self.model_id =='gemini-1.0-pro':
+            context_query = self.model.generate_content(context_prompt,safety_settings=self.safety_settings, stream=False)
             generated_sql = str(context_query.candidates[0].text)
 
         else:
@@ -46,6 +47,7 @@ class ResponseAgent(Agent, ABC):
                         - column metadata: {column_name_df.query(q).to_markdown(index = False)}
                         - table metadata: {table_desc_df.query(q).to_markdown(index = False)}
                         
+                        DO NOT generate description more than two lines
                     """
                 else:
                      context_prompt = f"""
@@ -54,7 +56,8 @@ class ResponseAgent(Agent, ABC):
                         Parameters:
                         - column metadata: {column_name_df.query(q).to_markdown(index = False)}
                         - table metadata: {table_desc_df.query(q).to_markdown(index = False)}
-                        
+
+                        DO NOT generate description more than two lines
                     """
 
                 table_desc_df.at[index,'table_description']=self.generate_llm_response(context_prompt)
@@ -79,6 +82,8 @@ class ResponseAgent(Agent, ABC):
                     Details of the table of this column are below:
                     {table_desc_df.query(q).to_markdown(index=False)}
                     Column Contrainst of this column are : {row['column_constraints']}
+
+                    DO NOT generate description more than two lines
                 """
                 else:
                     context_prompt = f"""
@@ -93,6 +98,8 @@ class ResponseAgent(Agent, ABC):
                     Details of the table of this column are below:
                     {table_desc_df.query(q).to_markdown(index=False)}
                     Column Contrainst of this column are : {row['column_constraints']}
+
+                    DO NOT generate description more than two lines
                 """
 
                 column_name_df.at[index,'column_description']=self.generate_llm_response(prompt=context_prompt)

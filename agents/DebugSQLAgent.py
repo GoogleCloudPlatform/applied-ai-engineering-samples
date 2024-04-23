@@ -1,8 +1,9 @@
-
 from abc import ABC
-from vertexai.preview.language_models import CodeChatModel
-from .core import Agent 
-from agents import ValidateSQLAgent 
+
+from vertexai.language_models import CodeChatModel
+from vertexai.generative_models import GenerativeModel
+
+from .core import Agent
 import pandas as pd
 import json  
 from dbconnectors import pgconnector, bqconnector
@@ -16,10 +17,9 @@ class DebugSQLAgent(Agent, ABC):
 
     agentType: str = "DebugSQLAgent"
 
-    # TODO: can we support other models for chat?? 
-    def __init__(self): 
-        self.model_id = 'codechat-bison-32k'
-        self.model = CodeChatModel.from_pretrained("codechat-bison-32k")
+    def __init__(self, chat_model_id = 'gemini-1.0-pro'): 
+        self.chat_model_id = chat_model_id
+        # self.model = CodeChatModel.from_pretrained("codechat-bison-32k")
 
 
     def init_chat(self,source_type, tables_schema,tables_detailed_schema,sql_example="-No examples provided..-"):
@@ -86,7 +86,20 @@ class DebugSQLAgent(Agent, ABC):
 
         """
         
-        chat_session = self.model.start_chat(context=context_prompt)
+        if self.chat_model_id == 'codechat-bison-32k':
+            chat_model = CodeChatModel.from_pretrained("codechat-bison-32k")
+            chat_session = chat_model.start_chat(context=context_prompt)
+        elif self.chat_model_id == 'gemini-1.0-pro':
+            chat_model = GenerativeModel("gemini-1.0-pro-001")
+            chat_session = chat_model.start_chat(response_validation=False)
+            chat_session.send_message(context_prompt)
+        elif self.chat_model_id == 'gemini-ultra':
+            chat_model = GenerativeModel("gemini-1.0-ultra-001")
+            chat_session = chat_model.start_chat(response_validation=False)
+            chat_session.send_message(context_prompt)
+        else:
+            raise ValueError('Invalid chat_model_id')
+        
         return chat_session
 
 
@@ -107,9 +120,19 @@ class DebugSQLAgent(Agent, ABC):
 
             """
 
-        response = chat_session.send_message(context_prompt).candidates[0]
+        if self.chat_model_id =='codechat-bison-32k':
+            response = chat_session.send_message(context_prompt)
+            resp_return = (str(response.candidates[0])).replace("```sql", "").replace("```", "")
+        elif self.chat_model_id =='gemini-1.0-pro':
+            response = chat_session.send_message(context_prompt, stream=False)
+            resp_return = (str(response.text)).replace("```sql", "").replace("```", "")
+        elif self.chat_model_id == 'gemini-ultra':
+            response = chat_session.send_message(context_prompt, stream=False)
+            resp_return = (str(response.text)).replace("```sql", "").replace("```", "")
+        else:
+            raise ValueError('Invalid chat_model_id')
 
-        return response
+        return resp_return
 
 
     def start_debugger  (self,
@@ -128,7 +151,7 @@ class DebugSQLAgent(Agent, ABC):
         chat_session = self.init_chat(source_type,tables_schema,tables_detailed_schema,similar_sql)
         sql = query.replace("```sql","").replace("```","").replace("EXPLAIN ANALYZE ","")
 
-        AUDIT_TEXT=AUDIT_TEXT+"Entering the debugging steps!"
+        AUDIT_TEXT=AUDIT_TEXT+"\n\nEntering the debugging steps!"
         while (not STOP):
             # sql = query.replace("```sql","").replace("```","").replace("EXPLAIN ANALYZE ","")
             json_syntax_result = SQLChecker.check(user_question,tables_schema,tables_detailed_schema, sql) 
@@ -137,7 +160,7 @@ class DebugSQLAgent(Agent, ABC):
 
             if json_syntax_result['valid'] is True:
                 # Testing SQL Execution
-                AUDIT_TEXT=AUDIT_TEXT+"Generated SQL is syntactically"
+                AUDIT_TEXT=AUDIT_TEXT+"\nGenerated SQL is syntactically correct as per LLM Validation!"
                 # print(AUDIT_TEXT)
                 if source_type=='bigquery':
                     connector=bqconnector
@@ -147,18 +170,17 @@ class DebugSQLAgent(Agent, ABC):
                 correct_sql, exec_result_df = connector.test_sql_plan_execution(sql)
                 print("exec_result_df:" + exec_result_df)
                 if not correct_sql:
-                        AUDIT_TEXT=AUDIT_TEXT+"Generated SQL is not able to generate the query-plan!"
+                        AUDIT_TEXT=AUDIT_TEXT+"\nGenerated SQL failed on execution! Here is the feedback from bigquery dryrun/ explain plan:  \n" + str(exec_result_df)
                         rewrite_result = self.rewrite_sql_chat(chat_session, sql, exec_result_df)
                         print('\n Rewritten and Cleaned SQL: ' + str(rewrite_result))
-                        AUDIT_TEXT=AUDIT_TEXT+"\n Rewritten and Cleaned SQL: ' + str({rewrite_result})"
+                        AUDIT_TEXT=AUDIT_TEXT+"\nRewritten and Cleaned SQL: \n' + str({rewrite_result})"
                         sql = str(rewrite_result).replace("```sql","").replace("```","").replace("EXPLAIN ANALYZE ","")
 
                 else: STOP = True
             else:
-                print('\n Will try to rewrite the query due to syntax error ...')
-                AUDIT_TEXT=AUDIT_TEXT+'\n Will try to rewrite the query due to syntax error ...'
-                print('\n Error Message: ' + str(json_syntax_result))
-                AUDIT_TEXT=AUDIT_TEXT+'\n Error Message: ' + str(json_syntax_result)
+                print(f'\nGenerated qeury failed on syntax check as per LLM Validation!\nError Message from LLM:  {json_syntax_result} \nRewriting the query...')
+                AUDIT_TEXT=AUDIT_TEXT+'\nGenerated qeury failed on syntax check as per LLM Validation! \nError Message from LLM:  '+ str(json_syntax_result) + '\nRewriting the query...'
+                
                 syntax_err_df = pd.read_json(json.dumps(json_syntax_result))
                 rewrite_result=self.rewrite_sql_chat(chat_session, sql, syntax_err_df)
                 print(rewrite_result)

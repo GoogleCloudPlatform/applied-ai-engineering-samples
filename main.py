@@ -38,29 +38,53 @@ import configparser
 config = configparser.ConfigParser()
 config.read('config.ini')
 
-PROJECT_ID = config['GCP']['PROJECT_ID'] 
+PROJECT_ID = config['GCP']['PROJECT_ID']
+VECTOR_STORE = config['CONFIG']['VECTOR_STORE']
 PG_SCHEMA = config['PGCLOUDSQL']['PG_SCHEMA']
 PG_DATABASE = config['PGCLOUDSQL']['PG_DATABASE']
 PG_USER = config['PGCLOUDSQL']['PG_USER']
 PG_REGION = config['PGCLOUDSQL']['PG_REGION'] 
 PG_INSTANCE = config['PGCLOUDSQL']['PG_INSTANCE'] 
-PG_PASSWORD = config['PGCLOUDSQL']['PG_PASSWORD'] 
+PG_PASSWORD = config['PGCLOUDSQL']['PG_PASSWORD']
+BQ_OPENDATAQNA_DATASET_NAME = config['BIGQUERY']['BQ_OPENDATAQNA_DATASET_NAME']
+BQ_LOG_TABLE_NAME = config['BIGQUERY']['BQ_LOG_TABLE_NAME'] 
 BQ_DATASET_REGION = config['BIGQUERY']['BQ_DATASET_REGION']
 BQ_DATASET_NAME = config['BIGQUERY']['BQ_DATASET_NAME']
-BQ_TALK2DATA_DATASET_NAME = config['BIGQUERY']['BQ_TALK2DATA_DATASET_NAME']
-BQ_LOG_TABLE_NAME = config['BIGQUERY']['BQ_LOG_TABLE_NAME']
 BQ_TABLE_LIST = config['BIGQUERY']['BQ_TABLE_LIST']
+
 
 embedder = EmbedderAgent('vertex') 
 
-SQLBuilder = BuildSQLAgent('gemini-pro')
-SQLChecker = ValidateSQLAgent('gemini-pro')
-SQLDebugger = DebugSQLAgent()
-Responder = ResponseAgent('gemini-pro')
+SQLBuilder = BuildSQLAgent('gemini-1.0-pro')
+SQLChecker = ValidateSQLAgent('gemini-1.0-pro')
+SQLDebugger = DebugSQLAgent('gemini-1.0-pro')
+Responder = ResponseAgent('gemini-1.0-pro')
 Visualize = VisualizeAgent ()
 
-num_similar_matches = 10 
-similarity_score_matches = 0.3
+num_table_matches = 5
+num_column_matches = 10
+similarity_threshold = 0.3
+num_sql_matches=3
+
+
+# Set the vector store paramaters
+if VECTOR_STORE=='bigquery-vector':
+    instance_name=None
+    database_name=BQ_OPENDATAQNA_DATASET_NAME
+    database_user=None
+    database_password=None
+    region=BQ_DATASET_REGION
+    vector_connector = bqconnector
+    call_await = False
+
+else:
+    instance_name=PG_INSTANCE
+    database_name=PG_DATABASE
+    database_user=PG_USER
+    database_password=PG_PASSWORD
+    region=PG_REGION
+    vector_connector = pgconnector
+    call_await=True
 
 RUN_DEBUGGER = True 
 EXECUTE_FINAL_SQL = True 
@@ -143,16 +167,15 @@ async def embedSql():
 @app.route("/run_query", methods=["POST"])
 def getSQLResult():
     try:
-        print("Extracting the knwon SQLs from the example embeddings.")
         envelope = str(request.data.decode('utf-8'))
         envelope=json.loads(envelope)
         print("request payload: "+ str(envelope))
         user_database = envelope.get('user_database')
         final_sql = envelope.get('generated_sql')
 
-        source_type = get_source_type(user_database)
+        DATA_SOURCE = get_source_type(user_database)
 
-        if source_type=='bigquery':
+        if DATA_SOURCE=='bigquery':
             result = bqconnector.retrieve_df(final_sql)
         else:
             result = pgconnector.retrieve_df(final_sql)
@@ -242,88 +265,93 @@ async def generateSQL():
    user_question = envelope.get('user_question')
    user_database = envelope.get('user_database')
    corrected_sql = ''
-   source_type = get_source_type(user_database)
-#    print(source_type)
-   AUDIT_TEXT = AUDIT_TEXT + "User Question : " + str(user_question) + "\nUser Database : " + str(user_database) + "\nSource : " + source_type
+   DATA_SOURCE = get_source_type(user_database)
+#    print(DATA_SOURCE)
    
    try:
+        # Fetch the embedding of the user's input question 
     embedded_question = embedder.create(user_question)
-    process_step = "Get Exact Match"
-    exact_sql_history = pgconnector.getExactMatches(user_question)
-        
+
+    # Reset AUDIT_TEXT
+    AUDIT_TEXT = ''
+
+    AUDIT_TEXT = AUDIT_TEXT + "\nUser Question : " + str(user_question) + "\nUser Database : " + str(USER_DATABASE)
+    process_step = "\n\nGet Exact Match: "
+    # Look for exact matches in known questions 
+    exact_sql_history = vector_connector.getExactMatches(user_question) 
+
     if exact_sql_history is not None:
-        found_in_vector = 'Y'
+        found_in_vector = 'Y' 
         final_sql = exact_sql_history
         invalid_response = False
-        AUDIT_TEXT = AUDIT_TEXT + "\nExact match has been found"
+        AUDIT_TEXT = AUDIT_TEXT + "\nExact match has been found! Going to retreive the SQL query from cache and serve!" 
+
 
     else:
-        AUDIT_TEXT = AUDIT_TEXT + "\nNo exact match found looking for similar entries and schema"
         # No exact match found. Proceed looking for similar entries in db 
-        process_step = "Get Similar Match"
-        similar_sql = await pgconnector.getSimilarMatches('example',user_database, embedded_question, num_similar_matches, similarity_score_matches)
+        AUDIT_TEXT = AUDIT_TEXT +  process_step + "\nNo exact match found in query cache, retreiving revelant schema and known good queries for few shot examples using similarity search...."
+        process_step = "\n\nGet Similar Match: "
+        if call_await:
+            similar_sql = await vector_connector.getSimilarMatches('example', USER_DATABASE, embedded_question, num_sql_matches, similarity_threshold)
+        else:
+            similar_sql = vector_connector.getSimilarMatches('example', USER_DATABASE, embedded_question, num_sql_matches, similarity_threshold)
 
-        process_step = "Get Table and Column Schema"
-        # Retrieve matching tables and columns 
-        tables_schema = await pgconnector.getSimilarMatches('table',user_database, embedded_question, num_similar_matches, similarity_score_matches)
-        tables_detailed_schema = await pgconnector.getSimilarMatches('column',user_database, embedded_question, num_similar_matches, similarity_score_matches)
+        process_step = "\n\nGet Table and Column Schema: "
+        # Retrieve matching tables and columns
+        if call_await: 
+            table_matches =  await vector_connector.getSimilarMatches('table', USER_DATABASE, embedded_question, num_table_matches, similarity_threshold)
+            column_matches =  await vector_connector.getSimilarMatches('column', USER_DATABASE, embedded_question, num_column_matches, similarity_threshold)
+        else:
+            table_matches =  vector_connector.getSimilarMatches('table', USER_DATABASE, embedded_question, num_table_matches, similarity_threshold)
+            column_matches =  vector_connector.getSimilarMatches('column', USER_DATABASE, embedded_question, num_column_matches, similarity_threshold)
 
-        AUDIT_TEXT = AUDIT_TEXT + "\n Retrived Similar Entries, Table Schema and Column Schema"
+        AUDIT_TEXT = AUDIT_TEXT +  process_step + "\nRetrieved Similar Known Good Queries, Table Schema and Column Schema: \n" + '\nRetrieved Tables: \n' + str(table_matches) + '\n\nRetrieved Columns: \n' + str(column_matches) + '\n\nRetrieved Known Good Queries: \n' + str(similar_sql)
         # If similar table and column schemas found: 
-        if len(tables_schema.replace('Schema(values):','').replace(' ','')) > 0 or len(tables_detailed_schema.replace('Column name(type):','').replace(' ','')) > 0 :
+        if len(table_matches.replace('Schema(values):','').replace(' ','')) > 0 or len(column_matches.replace('Column name(type):','').replace(' ','')) > 0 :
 
             # GENERATE SQL
-            process_step = "Build SQL"
-            generated_sql = SQLBuilder.build_sql(source_type,user_question,tables_schema,tables_detailed_schema,similar_sql)
-            # print(generated_sql)
+            process_step = "\n\nBuild SQL: "
+            generated_sql = SQLBuilder.build_sql(DATA_SOURCE,user_question,table_matches,column_matches,similar_sql)
             final_sql=generated_sql
-            AUDIT_TEXT = AUDIT_TEXT + "\n Generated SQL : " + str(generated_sql)
-
+            AUDIT_TEXT = AUDIT_TEXT + process_step +  "\nGenerated SQL: " + str(generated_sql)
+            
             if 'unrelated_answer' in generated_sql :
                 invalid_response=True
-                AUDIT_TEXT = AUDIT_TEXT + "\n Unrelated Question Asked"
 
             # If agent assessment is valid, proceed with checks  
             else:
                 invalid_response=False
 
-                AUDIT_TEXT = AUDIT_TEXT + "\nRunning Debugger \n"
-                process_step = "Run Debugger"
-                if RUN_DEBUGGER:
-                    generated_sql, invalid_response, AUDIT_TEXT = SQLDebugger.start_debugger(source_type,generated_sql, user_question, SQLChecker, tables_schema, tables_detailed_schema,AUDIT_TEXT, similar_sql) 
-
-
-                    # generated_sql, invalid_response, AUDIT_TEXT = SQLDebugger.start_debugger(source_type,user_database,generated_sql, user_question, SQLChecker, pgconnector, tables_schema, tables_detailed_schema,AUDIT_TEXT, similar_sql) 
+                if RUN_DEBUGGER: 
+                    generated_sql, invalid_response, AUDIT_TEXT = SQLDebugger.start_debugger(DATA_SOURCE, generated_sql, user_question, SQLChecker, table_matches, column_matches, AUDIT_TEXT, similar_sql) 
+                    # AUDIT_TEXT = AUDIT_TEXT + '\n Feedback from Debugger: \n' + feedback_text
 
                 final_sql=generated_sql
-                # print(AUDIT_TEXT)
-                # print(generated_sql)
-
-                AUDIT_TEXT = AUDIT_TEXT + "\nFinal SQL after Debugger : " +str(final_sql)
+                AUDIT_TEXT = AUDIT_TEXT + "\nFinal SQL after Debugger: \n" +str(final_sql)
 
 
         # No matching table found 
         else:
             invalid_response=True
             print('No tables found in Vector ...')
-            AUDIT_TEXT = AUDIT_TEXT + "\n No tables have been found in the Vector DB..."
+            AUDIT_TEXT = AUDIT_TEXT + "\nNo tables have been found in the Vector DB. The question cannot be answered with the provide data source!"
 
-    if not invalid_response:
-        responseDict = { 
-                   "ResponseCode" : 200, 
-                   "GeneratedSQL" : final_sql,
-                   "Error":""
-                   }          
-        
-        # return jsonify(responseDict)
+        if not invalid_response:
+            responseDict = { 
+                    "ResponseCode" : 200, 
+                    "GeneratedSQL" : final_sql,
+                    "Error":""
+                    }          
+            
+            # return jsonify(responseDict)
 
-    else:  # Do not execute final SQL
+        else:  # Do not execute final SQL
 
-        print("Not executing final SQL as it is invalid, please debug!")
-        response = "I am sorry, I could not come up with a valid SQL."
-        _resp = Responder.run(user_question, response)
-        # print(_resp)
-        AUDIT_TEXT = AUDIT_TEXT + "\n Model says " + str(_resp) 
+            print("Not executing final SQL as it is invalid, please debug!")
+            response = "I am sorry, I could not come up with a valid SQL."
+            _resp = Responder.run(user_question, response)
+            # print(_resp)
+            AUDIT_TEXT = AUDIT_TEXT + "\nModel says " + str(_resp) 
 
     
         responseDict = { 
@@ -331,7 +359,7 @@ async def generateSQL():
                    "GeneratedSQL" : _resp,
                    "Error":""
                    }
-    bqconnector.make_audit_entry(source_type, user_database, "gemini-pro", user_question, final_sql, found_in_vector, "", process_step, "", AUDIT_TEXT)
+    bqconnector.make_audit_entry(DATA_SOURCE, user_database, "gemini-1.0-pro", user_question, final_sql, found_in_vector, "", process_step, "", AUDIT_TEXT)
     return jsonify(responseDict)
 
    except Exception as e:
@@ -341,7 +369,7 @@ async def generateSQL():
                    "GeneratedHQL" : "",
                    "Error":"Issue was encountered while generating the SQL, please check the logs!"  + str(e)
                    } 
-    bqconnector.make_audit_entry(source_type, user_database, "gemini-pro", user_question, final_sql, found_in_vector, "", process_step, str(e), AUDIT_TEXT)
+    bqconnector.make_audit_entry(DATA_SOURCE, user_database, "gemini-1.0-pro", user_question, final_sql, found_in_vector, "", process_step, str(e), AUDIT_TEXT)
     return jsonify(responseDict)
 
 @app.route("/generate_viz", methods=["POST"])
@@ -374,7 +402,207 @@ async def generateViz():
                 } 
         return jsonify(responseDict)
 
-     
+@app.route("/summarize_results", methods=["POST"])
+async def getSummary():
+    AUDIT_TEXT='Creating Summary '
+    envelope = str(request.data.decode('utf-8'))
+    envelope=json.loads(envelope)
+   
+    user_question = envelope.get('user_question')
+    sql_results = envelope.get('sql_results')
+    
+    try:
+        summary_response = Responder.run(user_question,sql_results)
+        if summary_response:
+            responseDict = { 
+                    "ResponseCode" : 200, 
+                    "summary_response" : summary_response,
+                    "Error":""
+                    } 
+        else:
+              
+                AUDIT_TEXT= AUDIT_TEXT + '\n Cannot generate the Summarization! \n'
+                responseDict = { 
+                    "ResponseCode" : 500, 
+                    "summary_response" : summary_response,
+                    "Error":"Oopss!!! Cannot generate the summary! !!!!!"
+                    }            
+        print(AUDIT_TEXT)
+        return jsonify(responseDict)
+    except Exception as e:
+        AUDIT_TEXT=AUDIT_TEXT+ "Cannot generate the Summarization!!!, please check the logs!" + str(e)
+        responseDict = { 
+                    "ResponseCode" : 500, 
+                    "summary_response" : "",
+                    "Error":"Issue was encountered while summarizing the results, please check the logs!"  + str(e)
+                    }
+        print(AUDIT_TEXT)
+        return jsonify(responseDict)
+
+
+
+
+@app.route("/natural_response", methods=["POST"])
+async def getNaturalResponse():
+   AUDIT_TEXT=''
+   found_in_vector = 'N'
+   process_step=''
+   final_sql='Not Generated Yet'
+   envelope = str(request.data.decode('utf-8'))
+   #print("Here is the request payload " + envelope)
+   envelope=json.loads(envelope)
+   
+   user_question = envelope.get('user_question')
+   user_database = envelope.get('user_database')
+   corrected_sql = ''
+   DATA_SOURCE = get_source_type(user_database)
+   AUDIT_TEXT = AUDIT_TEXT + "User Question : " + str(user_question) + "\nUser Database : " + str(user_database) + "\nSource : " + DATA_SOURCE
+   try: 
+        # Fetch the embedding of the user's input question 
+    embedded_question = embedder.create(user_question)
+
+    # Reset AUDIT_TEXT
+    AUDIT_TEXT = ''
+
+    AUDIT_TEXT = AUDIT_TEXT + "\nUser Question : " + str(user_question) + "\nUser Database : " + str(USER_DATABASE)
+    process_step = "\n\nGet Exact Match: "
+    # Look for exact matches in known questions 
+    exact_sql_history = vector_connector.getExactMatches(user_question) 
+
+    if exact_sql_history is not None:
+        found_in_vector = 'Y' 
+        final_sql = exact_sql_history
+        invalid_response = False
+        AUDIT_TEXT = AUDIT_TEXT + "\nExact match has been found" 
+
+
+    else:
+        # No exact match found. Proceed looking for similar entries in db 
+        AUDIT_TEXT = AUDIT_TEXT +  process_step + "\nNo exact match found looking for similar entries and schema"
+        process_step = "\n\nGet Similar Match: "
+        if call_await:
+            similar_sql = await vector_connector.getSimilarMatches('example', USER_DATABASE, embedded_question, num_sql_matches, similarity_threshold)
+        else:
+            similar_sql = vector_connector.getSimilarMatches('example', USER_DATABASE, embedded_question, num_sql_matches, similarity_threshold)
+
+        process_step = "\n\nGet Table and Column Schema: "
+        # Retrieve matching tables and columns
+        if call_await: 
+            table_matches =  await vector_connector.getSimilarMatches('table', USER_DATABASE, embedded_question, num_table_matches, similarity_threshold)
+            column_matches =  await vector_connector.getSimilarMatches('column', USER_DATABASE, embedded_question, num_column_matches, similarity_threshold)
+        else:
+            table_matches =  vector_connector.getSimilarMatches('table', USER_DATABASE, embedded_question, num_table_matches, similarity_threshold)
+            column_matches =  vector_connector.getSimilarMatches('column', USER_DATABASE, embedded_question, num_column_matches, similarity_threshold)
+
+        AUDIT_TEXT = AUDIT_TEXT +  process_step + "\nRetrieved Similar Entries, Table Schema and Column Schema: \n" + '\nRetrieved Tables: \n' + str(table_matches) + '\n\nRetrieved Columns: \n' + str(column_matches) + '\n\nRetrieved Known Good Queries: \n' + str(similar_sql)
+        # If similar table and column schemas found: 
+        if len(table_matches.replace('Schema(values):','').replace(' ','')) > 0 or len(column_matches.replace('Column name(type):','').replace(' ','')) > 0 :
+
+            # GENERATE SQL
+            process_step = "\n\nBuild SQL: "
+            generated_sql = SQLBuilder.build_sql(DATA_SOURCE,user_question,table_matches,column_matches,similar_sql)
+            final_sql=generated_sql
+            AUDIT_TEXT = AUDIT_TEXT + process_step +  "\nGenerated SQL: " + str(generated_sql)
+            
+            if 'unrelated_answer' in generated_sql :
+                invalid_response=True
+
+            # If agent assessment is valid, proceed with checks  
+            else:
+                invalid_response=False
+
+                if RUN_DEBUGGER: 
+                    generated_sql, invalid_response, AUDIT_TEXT = SQLDebugger.start_debugger(DATA_SOURCE, generated_sql, user_question, SQLChecker, table_matches, column_matches, AUDIT_TEXT, similar_sql) 
+                    # AUDIT_TEXT = AUDIT_TEXT + '\n Feedback from Debugger: \n' + feedback_text
+
+                final_sql=generated_sql
+                AUDIT_TEXT = AUDIT_TEXT + "\nFinal SQL after Debugger \n: " +str(final_sql)
+
+
+        # No matching table found 
+        else:
+            invalid_response=True
+            print('No tables found in Vector ...')
+            AUDIT_TEXT = AUDIT_TEXT + "\n No tables have been found in the Vector DB..."
+
+
+    if not invalid_response:
+        try:
+            process_step="Execute the SQL"
+            if EXECUTE_FINAL_SQL is True:
+
+                if DATA_SOURCE=='bigquery':
+                    result = bqconnector.retrieve_df(final_sql)
+                else:
+                    result = pgconnector.retrieve_df(final_sql)
+                # df_len = result[result.columns[0]].count()
+                # if df_len > 10:
+                #     result = result.head(10)
+                # print(result.to_json(orient='records'))
+
+                try:
+                    process_step="Generate Summary"
+                    summary_response = Responder.run(user_question,result)
+                    AUDIT_TEXT = AUDIT_TEXT + "\n Model says " + str(summary_response) 
+                    if summary_response:
+                        responseDict = { 
+                                "ResponseCode" : 200, 
+                                "summary_response" : summary_response,
+                                "Error":""
+                                }
+                except Exception as e:
+                    AUDIT_TEXT = AUDIT_TEXT + "\n Model couldn't provided natural response. Error:  " +  str(e) 
+                    responseDict = { 
+                                "ResponseCode" : 500, 
+                                "summary_response" : "",
+                                "Error":"Issue was encountered while summarizing the results, please check the logs!"  + str(e)
+                                } 
+                return jsonify(responseDict) 
+            else:
+                print("Not executing final SQL since EXECUTE_FINAL_SQL variable is False\n ")
+                response = "Please enable the Execution of the final SQL so I can provide an answer"
+                summary_response=Responder.run(user_question, response)
+                AUDIT_TEXT = AUDIT_TEXT + "\n Model says " + str(summary_response) 
+                responseDict = { 
+                        "ResponseCode" : 500, 
+                        "summary_response" : summary_response,
+                        "Error":"Oopss!!! Cannot generate the summary! !!!!!"
+                        }            
+
+            return jsonify(responseDict)
+            
+
+        except Exception as e:
+            AUDIT_TEXT = AUDIT_TEXT + "Error while generating SQL " + str(e) 
+            responseDict = { 
+                    "ResponseCode" : 500, 
+                    "KnownDB" : "",
+                    "Error":"Issue was encountered while running the generated SQL, please check the logs!" + str(e)
+                    } 
+            return jsonify(responseDict)
+
+    else:  # Do not execute final SQL
+        print("Not executing final SQL as it is invalid, please debug!")
+        response = "I am sorry, I could not come up with a valid SQL."
+        _resp = Responder.run(user_question, response)
+        # print(_resp)
+        AUDIT_TEXT = AUDIT_TEXT + "\n Model says " + str(_resp) 
+        responseDict = { 
+                "ResponseCode" : 200, 
+                "GeneratedSQL" : _resp,
+                "Error":""
+                }
+    bqconnector.make_audit_entry(DATA_SOURCE, user_database, "gemini-1.0-pro", user_question, final_sql, found_in_vector, "", process_step, "", AUDIT_TEXT)
+    return jsonify(responseDict)
+
+   except Exception as e:
+        util.write_log_entry("Issue was encountered while generating the SQL, please check the logs!" + str(e))
+        responseDict = { 
+                    "ResponseCode" : 500, 
+                    "summary_response" : "",
+                    "Error":"Issue was encountered while generating the SQL, please check the logs!"  + str(e)
+                    } 
+        return jsonify(responseDict)
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))

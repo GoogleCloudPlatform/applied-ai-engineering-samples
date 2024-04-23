@@ -1,31 +1,42 @@
 import configparser
 import os
 import sys
-module_path = os.path.abspath(os.path.join('..'))
 
+module_path = os.path.abspath(os.path.join('..'))
 config = configparser.ConfigParser()
 
-# Provide the file location depending on the starting point of the script
-print("module path: ", module_path)
-if 'talktodata' in module_path: 
-    config.read(module_path+'/config.ini')
-    root_dir = module_path
+current_dir = os.getcwd()
 
-elif 'Talk2Data' in module_path: 
-    config.read(module_path+'/config.ini')
-    root_dir = module_path
+# while current_dir != os.path.dirname(current_dir):  # Loop until root dir
+#     if any(prefix in current_dir for prefix in module_prefixes):
+#         config_path = os.path.join(current_dir, 'config.ini')
+#         print(config_path)
+#         if os.path.exists(config_path):
+#             config.read(config_path)
+#             root_dir = current_dir
+#             break  # Stop searching once found
+#     current_dir = os.path.dirname(current_dir)  # Move to parent dir
 
+# print("module path: ", module_path)
+
+module_prefixes = ["Talk2Data", "open-data-qna", "applied-ai-engineering-samples"]
+if any(prefix in module_path for prefix in module_prefixes):
+    config.read(module_path + '/config.ini')
+    root_dir = module_path
 else: 
     config.read('config.ini')
     root_dir = os.path.abspath(os.path.join(''))
 
+if not 'root_dir' in locals():  # If not found in any parent dir
+    raise FileNotFoundError("config.ini not found in current or parent directories.")
 
-#[CONFIG]
+print(f'root_dir set to: {root_dir}')
+
+# [CONFIG]
 EMBEDDING_MODEL = config['CONFIG']['EMBEDDING_MODEL']
 DATA_SOURCE = config['CONFIG']['DATA_SOURCE'] 
 VECTOR_STORE = config['CONFIG']['VECTOR_STORE']
 
-EXAMPLES = config.getboolean('CONFIG','EXAMPLES')
 CACHING = config.getboolean('CONFIG','CACHING')
 DEBUGGING = config.getboolean('CONFIG','DEBUGGING')
 LOGGING = config.getboolean('CONFIG','LOGGING')
@@ -44,7 +55,7 @@ PG_PASSWORD = config['PGCLOUDSQL']['PG_PASSWORD']
 #[BIGQUERY]
 BQ_REGION = config['BIGQUERY']['BQ_DATASET_REGION']
 BQ_DATASET_NAME = config['BIGQUERY']['BQ_DATASET_NAME']
-BQ_TALK2DATA_DATASET_NAME = config['BIGQUERY']['BQ_TALK2DATA_DATASET_NAME']
+BQ_OPENDATAQNA_DATASET_NAME = config['BIGQUERY']['BQ_OPENDATAQNA_DATASET_NAME']
 BQ_LOG_TABLE_NAME = config['BIGQUERY']['BQ_LOG_TABLE_NAME']
 BQ_TABLE_LIST = config['BIGQUERY']['BQ_TABLE_LIST']
 
@@ -54,7 +65,6 @@ __all__ = ["EMBEDDING_MODEL",
            "DATA_SOURCE",
            "VECTOR_STORE",
            "CACHING",
-           "EXAMPLES",
            "DEBUGGING",
            "LOGGING",
            "PROJECT_ID",
@@ -66,7 +76,7 @@ __all__ = ["EMBEDDING_MODEL",
            "PG_PASSWORD", 
            "BQ_REGION",
            "BQ_DATASET_NAME",
-           "BQ_TALK2DATA_DATASET_NAME",
+           "BQ_OPENDATAQNA_DATASET_NAME",
            "BQ_LOG_TABLE_NAME",
            "BQ_TABLE_LIST",
            "root_dir"]

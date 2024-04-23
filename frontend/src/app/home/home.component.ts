@@ -4,6 +4,8 @@ import { HomeService } from '../shared/services/home.service';
 import { ThemePalette } from '@angular/material/core';
 import { MatSidenav } from '@angular/material/sidenav';
 import { BreakpointObserver } from '@angular/cdk/layout';
+import { LoginService } from '../shared/services/login.service';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -26,9 +28,17 @@ export class HomeComponent {
   sidenav!: MatSidenav;
   isMobile = true;
   selectedDb: any;
+  photoURL: any;
 
-  constructor(private homeService: HomeService, private observer: BreakpointObserver) { }
+  constructor(private homeService: HomeService, private observer: BreakpointObserver , private _router : Router, private loginService : LoginService) { 
+    this.loginService.getUserDetails().subscribe(message => {
+      this.photoURL = message?.photoURL
+    });
+  }
   async ngOnInit() {
+    if(!this.photoURL){
+      this._router.navigate(['']);
+    }
     this.observer.observe(['(max-width: 800px)']).subscribe((screenSize) => {
       if (screenSize.matches) {
         this.isMobile = true;
@@ -49,9 +59,12 @@ export class HomeComponent {
     if (this.organizationString !== null && this.organizationString !== undefined) {
       this.organisation = JSON.parse(this.organizationString);
       this.selectedDb = this.organisation[0].table_schema.split("-")
-
+      if (this.selectedDb.length === 2) {
+        this.selectedDb[1] = this.selectedDb.slice(1).join("-"); // Merge elements from index 1 onwards
+      }
       this.organizationCtrl.setValue(this.organisation[0].table_schema);
       this.homeService.setselectedDb(this.selectedDb[0]);
+      this.homeService.setselectedDbName(this.selectedDb[1])
       this.homeService.sqlSuggestionList(this.selectedDb[0], this.selectedDb[1]).subscribe((data: any) => {
         if (data && data.ResponseCode === 200) {
           this.homeService.databaseSubject.next(data.KnownSQL);
@@ -65,6 +78,7 @@ export class HomeComponent {
           this.selectedDb = this.organisation[0].table_schema.split("-")
           this.organizationCtrl.setValue(this.organisation[0].table_schema);
           this.homeService.setselectedDb(this.selectedDb[0]);
+          this.homeService.setselectedDbName(this.selectedDb[1])
           this.homeService.sqlSuggestionList(this.selectedDb[0], this.selectedDb[1]).subscribe((data: any) => {
             if (data && data.ResponseCode === 200) {
               this.homeService.databaseSubject.next(data.KnownSQL);
@@ -78,7 +92,7 @@ export class HomeComponent {
   changeDb(dbtype: any) {
     let selectedDbtype = dbtype.target.value.split("-");
     this.homeService.setselectedDb(selectedDbtype[0]);
-
+    this.homeService.setselectedDbName(selectedDbtype[1])
     this.homeService.sqlSuggestionList(selectedDbtype[0], selectedDbtype[1]).subscribe((data: any) => {
       if (data && data.ResponseCode === 200) {
         this.homeService.databaseSubject.next(data.KnownSQL);

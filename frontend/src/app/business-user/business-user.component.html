@@ -1,5 +1,5 @@
 <div class="container col-12" style="padding: 25px;">
-  <h1 class="h1-ref" *ngIf="!showResult"> Welcome to NL2SQL</h1>
+  <h1 class="h1-ref" *ngIf="!showResult"> Welcome to Open Data QnA</h1>
   <div class="container-fluid">
 
     <form [formGroup]="sqlSearchForm" (ngSubmit)="onSubmit()">
@@ -98,16 +98,16 @@
 
                 <div class="d-flex gap-2 w-100 ">
                   <p class="left-text"> Source </p>
-                  <span class="right-text"> Postgres (CloudSQL)</span>
+                  <span class="right-text"> {{dataSetName}}</span>
                 </div>
 
                 <div class="d-flex  w-100 ">
                   <p class="left-text"> Owner </p>
-                  <span class="right-text"> nl2sql_test</span>
+                  <span class="right-text"> OpenData QnA</span>
                 </div>
                 <div class="d-flex gap-2 w-100 ">
                   <p class="left-text"> Project ID </p>
-                  <span class="right-text"> steveswalker-sandbox</span>
+                  <span class="right-text"> Demo Project</span>
                 </div>
                 <div class="d-flex gap-2 w-100 ">
                   <p class="left-text"> Dataset ID </p>

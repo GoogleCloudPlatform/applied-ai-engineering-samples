@@ -93,6 +93,7 @@ export class BusinessUserComponent {
   res_data: any;
   showLoader: boolean = false;
   selectedFeedbackOption: any;
+  dataSetName!: string;
 
 
   constructor(public loginService: LoginService, public homeService: HomeService,
@@ -118,6 +119,7 @@ export class BusinessUserComponent {
         this.suggestionList = JSON.parse(response);
       }
       this.dataSet = this.homeService.getselectedDb();
+      this.dataSetName = this.homeService.getselectedDbName()
     });
   }
 

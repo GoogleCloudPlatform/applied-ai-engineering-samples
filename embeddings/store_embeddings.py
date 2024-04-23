@@ -9,8 +9,9 @@ from google.cloud import bigquery
 from dbconnectors import pgconnector
 from agents import EmbedderAgent
 from sqlalchemy.sql import text
-from utilities import PG_SCHEMA, PROJECT_ID, PG_INSTANCE, PG_DATABASE, PG_USER, PG_PASSWORD, PG_REGION, BQ_TALK2DATA_DATASET_NAME, DATA_SOURCE
+from utilities import PG_SCHEMA, PROJECT_ID, PG_INSTANCE, PG_DATABASE, PG_USER, PG_PASSWORD, PG_REGION, BQ_OPENDATAQNA_DATASET_NAME, DATA_SOURCE, BQ_REGION
 
+print("Source Selected is "+ DATA_SOURCE)
 
 embedder = EmbedderAgent('vertex')
 
@@ -23,10 +24,7 @@ async def store_schema_embeddings(table_details_embeddings,
                             database_user,
                             database_password,
                             region,
-                            EXAMPLES = True, 
-                            VECTOR_STORE = "cloudsql-pgvector",
-                            example_prompt_sql_embeddings = None
-                            ):
+                            VECTOR_STORE = "cloudsql-pgvector"):
     """ 
     Store the vectorised table and column details in the DB table.
     This code may run for a few minutes.  
@@ -52,7 +50,7 @@ async def store_schema_embeddings(table_details_embeddings,
 
             # await conn.execute(f"CREATE SCHEMA {pg_schema}")        
 
-            await conn.execute("DROP TABLE IF EXISTS table_details_embeddings")
+            # await conn.execute("DROP TABLE IF EXISTS table_details_embeddings")
             # Create the `table_details_embeddings` table to store vector embeddings.
             await conn.execute(
                 """CREATE TABLE IF NOT EXISTS table_details_embeddings(
@@ -66,7 +64,7 @@ async def store_schema_embeddings(table_details_embeddings,
             # Store all the generated embeddings back into the database.
             for index, row in table_details_embeddings.iterrows():
                 await conn.execute(
-                    """
+                    f"""
                     DELETE FROM table_details_embeddings
                     WHERE
                     table_schema = '{row["table_schema"]}'
@@ -83,7 +81,7 @@ async def store_schema_embeddings(table_details_embeddings,
                     np.array(row["embedding"]),
                 )
 
-            await conn.execute("DROP TABLE IF EXISTS tablecolumn_details_embeddings")
+            # await conn.execute("DROP TABLE IF EXISTS tablecolumn_details_embeddings")
             # Create the `table_details_embeddings` table to store vector embeddings.
             await conn.execute(
                 """CREATE TABLE IF NOT EXISTS tablecolumn_details_embeddings(
@@ -98,11 +96,13 @@ async def store_schema_embeddings(table_details_embeddings,
             # Store all the generated embeddings back into the database.
             for index, row in tablecolumn_details_embeddings.iterrows():
                 await conn.execute(
-                    """
+                    f"""
                     DELETE FROM tablecolumn_details_embeddings
                     WHERE table_schema = '{row["table_schema"]}'
                     and
-                    table_name = '{row["table_name"]}';
+                    table_name = '{row["table_name"]}'
+                    and 
+                    column_name = '{row["column_name"]}';
                     """
                 )
                 await conn.execute(
@@ -117,7 +117,7 @@ async def store_schema_embeddings(table_details_embeddings,
             await conn.execute("CREATE EXTENSION IF NOT EXISTS vector")
             await register_vector(conn)
 
-            await conn.execute("DROP TABLE IF EXISTS example_prompt_sql_embeddings")
+            # await conn.execute("DROP TABLE IF EXISTS example_prompt_sql_embeddings")
             await conn.execute(
                         """CREATE TABLE IF NOT EXISTS example_prompt_sql_embeddings(
                                             table_schema VARCHAR(1024) NOT NULL,
@@ -126,29 +126,6 @@ async def store_schema_embeddings(table_details_embeddings,
                                             embedding vector(768))"""
                         )
 
-
-            if EXAMPLES: 
-                if example_prompt_sql_embeddings is not None:
-
-                    await conn.execute(
-                                f"""delete from example_prompt_sql_embeddings where table_schema = '{schema}'""")
-
-                    # Store all the generated embeddings back into the database.
-                    for _, row in example_prompt_sql_embeddings.iterrows():
-                        await conn.execute(
-                                "DELETE FROM example_prompt_sql_embeddings WHERE table_schema= $1 and example_user_question=$2",
-                                schema,
-                                row["example_user_question"])
-                        await conn.execute(
-                            "INSERT INTO example_prompt_sql_embeddings (table_schema, example_user_question, example_generated_sql, embedding) VALUES ($1, $2, $3, $4)",
-                            schema,
-                            row["example_user_question"],
-                            row["example_generated_sql"],
-                            np.array(row["embedding"]),
-                        )
-
-
-                else: print("Caching is active but no embeddings were provided. Skipping.")
             await conn.close()
 
 
@@ -157,43 +134,38 @@ async def store_schema_embeddings(table_details_embeddings,
         client=bigquery.Client(project=project_id)
 
         #Store table embeddings
-        client.query_and_wait(f'''CREATE OR REPLACE TABLE `{project_id}.{database_name}.table_details_embeddings` (
+        client.query_and_wait(f'''CREATE TABLE IF NOT EXISTS `{project_id}.{schema}.table_details_embeddings` (
             source_type string NOT NULL, table_schema string NOT NULL, table_name string NOT NULL, content string, embedding ARRAY<FLOAT64>)''')
         #job_config = bigquery.LoadJobConfig(write_disposition="WRITE_TRUNCATE")
         table_details_embeddings['source_type']=DATA_SOURCE
-        client.load_table_from_dataframe(table_details_embeddings,f'{project_id}.{database_name}.table_details_embeddings')
+        for _, row in table_details_embeddings.iterrows():
+            client.query_and_wait(f'''DELETE FROM `{project_id}.{schema}.table_details_embeddings`
+                    WHERE table_schema= '{row["table_schema"]}' and table_name= '{row["table_name"]}' '''
+                        )
+        client.load_table_from_dataframe(table_details_embeddings,f'{project_id}.{schema}.table_details_embeddings')
 
 
         #Store column embeddings
-        client.query_and_wait(f'''CREATE OR REPLACE TABLE `{project_id}.{database_name}.tablecolumn_details_embeddings` (
+        client.query_and_wait(f'''CREATE TABLE IF NOT EXISTS `{project_id}.{schema}.tablecolumn_details_embeddings` (
             source_type string NOT NULL, table_schema string NOT NULL, table_name string NOT NULL, column_name string NOT NULL,
             content string, embedding ARRAY<FLOAT64>)''')
         #job_config = bigquery.LoadJobConfig(write_disposition="WRITE_TRUNCATE")
         tablecolumn_details_embeddings['source_type']=DATA_SOURCE
-        client.load_table_from_dataframe(tablecolumn_details_embeddings,f'{project_id}.{database_name}.tablecolumn_details_embeddings')
+        for _, row in tablecolumn_details_embeddings.iterrows():
+            client.query_and_wait(f'''DELETE FROM `{project_id}.{schema}.tablecolumn_details_embeddings`
+                    WHERE table_schema= '{row["table_schema"]}' and table_name= '{row["table_name"]}' and column_name= '{row["column_name"]}' '''
+                        )
+        client.load_table_from_dataframe(tablecolumn_details_embeddings,f'{project_id}.{schema}.tablecolumn_details_embeddings')
 
-        if EXAMPLES:
-            if example_prompt_sql_embeddings is not None:
-                 client.query_and_wait(f'''CREATE TABLE IF NOT EXISTS `{project_id}.{database_name}.example_prompt_sql_embeddings` (
-            table_schema string NOT NULL, example_user_question string NOT NULL, example_generated_sql string NOT NULL,
-            embedding ARRAY<FLOAT64>)''')
-                 for _, row in example_prompt_sql_embeddings.iterrows():
-                    client.query_and_wait(f'''DELETE FROM `{project_id}.{database_name}.example_prompt_sql_embeddings`
-                         WHERE table_schema= '{schema}' and example_user_question= '{row["example_user_question"]}' '''
-                                )
-                    # embedding=np.array(row["embedding"])
-                    client.query_and_wait(f'''INSERT INTO `{project_id}.{database_name}.example_prompt_sql_embeddings` 
-                    VALUES ('{schema}','{row["example_user_question"]}' , 
-                    '{row["example_generated_sql"]}',{row["embedding"]} )''')
-                 
-        
-        else: print("Caching is active but no embeddings were provided. Skipping.")
+        client.load_table_from_dataframe(tablecolumn_details_embeddings,f'{project_id}.{database_name}.tablecolumn_details_embeddings')
 
     else: raise ValueError("Please provide a valid Vector Store.")
     return "Embeddings are stored successfully"
 
-async def add_sql_embedding(user_question, generated_sql, database,EXAMPLES = True,VECTOR_STORE = "cloudsql-pgvector"):
+async def add_sql_embedding(user_question, generated_sql, database,VECTOR_STORE = "cloudsql-pgvector"):
+        
         emb=embedder.create(user_question)
+
         if VECTOR_STORE == "cloudsql-pgvector":
         #    sql=  f'''MERGE INTO example_prompt_sql_embeddings as tgt
         #    using (SELECT '{user_question}' as example_user_question) as src 
@@ -235,8 +207,20 @@ async def add_sql_embedding(user_question, generated_sql, database,EXAMPLES = Tr
                                 np.array(emb),
                             )
 
+        elif VECTOR_STORE == "bigquery-vector":
 
-
+            client=bigquery.Client(project=PROJECT_ID)
+        
+            client.query_and_wait(f'''CREATE TABLE IF NOT EXISTS `{project_id}.{schema}.example_prompt_sql_embeddings` (
+                table_schema string NOT NULL, example_user_question string NOT NULL, example_generated_sql string NOT NULL,
+                embedding ARRAY<FLOAT64>)''')
+            client.query_and_wait(f'''DELETE FROM `{project_id}.{schema}.example_prompt_sql_embeddings`
+                                WHERE table_schema= '{database}' and example_user_question= '{user_question}' '''
+                                    )
+                        # embedding=np.array(row["embedding"])
+            client.query_and_wait(f'''INSERT INTO `{project_id}.{schema}.example_prompt_sql_embeddings` 
+                        VALUES ('{database}','{user_question}' , 
+                        '{generated_sql}',{emb})''')
         return 1
 
 
@@ -245,8 +229,7 @@ if __name__ == '__main__':
     from retrieve_embeddings import retrieve_embeddings
     from utilities import PG_SCHEMA, PROJECT_ID, PG_INSTANCE, PG_DATABASE, PG_USER, PG_PASSWORD, PG_REGION
     VECTOR_STORE = "cloudsql-pgvector"
-    EXAMPLES = True
-    t, c, e = retrieve_embeddings(VECTOR_STORE, EXAMPLES, PG_SCHEMA) 
+    t, c = retrieve_embeddings(VECTOR_STORE, PG_SCHEMA) 
     asyncio.run(store_schema_embeddings(t, 
                             c, 
                             PROJECT_ID,
@@ -256,10 +239,7 @@ if __name__ == '__main__':
                             PG_USER,
                             PG_PASSWORD,
                             PG_REGION,
-                            EXAMPLES = True, 
-                            VECTOR_STORE = VECTOR_STORE,
-                            example_prompt_sql_embeddings=e 
-                            ))
+                            VECTOR_STORE = VECTOR_STORE))
 
 
 

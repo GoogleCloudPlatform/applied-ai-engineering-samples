@@ -1,12 +1,12 @@
 export const firebaseConfig = {
-  apiKey: "DUMMYDUMMYDUMMYDUMMYD",
-  authDomain: "talk2data.firebaseapp.com",
-  projectId: "talk2data",
-  storageBucket: "talk2data.appspot.com",
-  messagingSenderId: "000000000",
-  appId: "1:0000000000:web:000000000"
-  
-  };
+  apiKey: "AIzaSyAu6BDMoMW9R5iDt1D1WQ9CoxR8_O10mHY",
+  authDomain: "eight-p-o.firebaseapp.com",
+  projectId: "eight-p-o",
+  storageBucket: "eight-p-o.appspot.com",
+  messagingSenderId: "610304981648",
+  appId: "1:610304981648:web:8650647a9d4574d027b615"
+};
 
-  export const ENDPOINT_TALK2DATA = 'https://talk2data-oqoqoqoq-uc.a.run.app'
+export const ENDPOINT_OPENDATAQNA = 'https://opendataqna-zxthtz2kga-uc.a.run.app'
+
     
