@@ -1,4 +1,4 @@
 prompt,sql,database_name
-What are the top 5 cities with most recalls?,"SELECT   t1.city,   COUNT(t1.recall_number) AS num_recalls FROM   `talk2data-genai-sa.fda_food.food_enforcement` AS t1 GROUP BY   1 ORDER BY   num_recalls DESC LIMIT   5",fda_food
-How are recalls across the months in 2023?  Use full month names,"SELECT   FORMAT_DATE(""%B"",recall_initiation_date) AS month,   COUNT(*) AS num_recalls FROM   `talk2data-genai-sa.fda_food.food_enforcement` WHERE   EXTRACT(YEAR   FROM     recall_initiation_date) = 2023 GROUP BY   1",fda_food
-How is the distribution across the classifications?,"SELECT   food_enforcement.classification,   COUNT(food_enforcement.event_id) AS num_events FROM   `talk2data-genai-sa.fda_food.food_enforcement` AS food_enforcement GROUP BY   1",fda_food
+What are the top 5 cities with most recalls?,"SELECT   t1.city,   COUNT(t1.recall_number) AS num_recalls FROM   `talk2data-genai-sa.fda_food.food_enforcement` AS t1 GROUP BY   1 ORDER BY   num_recalls DESC LIMIT   5",food
+How are recalls across the months in 2023?  Use full month names,"SELECT   FORMAT_DATE(""%B"",recall_initiation_date) AS month,   COUNT(*) AS num_recalls FROM   `talk2data-genai-sa.fda_food.food_enforcement` WHERE   EXTRACT(YEAR   FROM     recall_initiation_date) = 2023 GROUP BY   1",food
+How is the distribution across the classifications?,"SELECT   food_enforcement.classification,   COUNT(food_enforcement.event_id) AS num_events FROM   `talk2data-genai-sa.fda_food.food_enforcement` AS food_enforcement GROUP BY   1",food

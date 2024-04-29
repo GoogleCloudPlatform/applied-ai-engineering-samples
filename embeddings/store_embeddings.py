@@ -157,8 +157,6 @@ async def store_schema_embeddings(table_details_embeddings,
                         )
         client.load_table_from_dataframe(tablecolumn_details_embeddings,f'{project_id}.{schema}.tablecolumn_details_embeddings')
 
-        client.load_table_from_dataframe(tablecolumn_details_embeddings,f'{project_id}.{database_name}.tablecolumn_details_embeddings')
-
     else: raise ValueError("Please provide a valid Vector Store.")
     return "Embeddings are stored successfully"
 

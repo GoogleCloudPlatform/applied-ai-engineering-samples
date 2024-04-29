@@ -62,7 +62,7 @@ def retrieve_embeddings(SOURCE, SCHEMA="public"):
             r = {"table_schema": cur_table_schema,"table_name": cur_table_name,"content": table_detailed_description}
             table_details_chunked.append(r)
 
-        table_details_embeddings = get_embedding_chunked(table_details_chunked, 10000)
+        table_details_embeddings = get_embedding_chunked(table_details_chunked, 10)
 
 
         ### COLUMN EMBEDDING ###
@@ -89,7 +89,7 @@ def retrieve_embeddings(SOURCE, SCHEMA="public"):
             r = {"table_schema": cur_table_owner,"table_name": cur_table_name,"column_name":curr_column_name, "content": column_detailed_description}
             column_details_chunked.append(r)
 
-        column_details_embeddings = get_embedding_chunked(column_details_chunked, 10000)
+        column_details_embeddings = get_embedding_chunked(column_details_chunked, 10)
 
 
     elif SOURCE=='bigquery':
@@ -121,7 +121,7 @@ def retrieve_embeddings(SOURCE, SCHEMA="public"):
             r = {"table_schema": cur_table_schema,"table_name": cur_table_name,"content": table_detailed_description}
             table_details_chunked.append(r)
 
-        table_details_embeddings = get_embedding_chunked(table_details_chunked, 10000)
+        table_details_embeddings = get_embedding_chunked(table_details_chunked, 10)
 
 
         ### COLUMN EMBEDDING ###
@@ -153,7 +153,7 @@ def retrieve_embeddings(SOURCE, SCHEMA="public"):
             r = {"table_schema": cur_table_owner,"table_name": cur_table_name,"column_name":curr_column_name, "content": column_detailed_description}
             column_details_chunked.append(r)
 
-        column_details_embeddings = get_embedding_chunked(column_details_chunked, 10000)
+        column_details_embeddings = get_embedding_chunked(column_details_chunked, 10)
 
 
     return table_details_embeddings, column_details_embeddings

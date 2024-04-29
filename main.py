@@ -33,12 +33,15 @@ from agents import EmbedderAgent, BuildSQLAgent, DebugSQLAgent, ValidateSQLAgent
 import os
 import sys
 module_path = os.path.abspath(os.path.join('..'))
+sys.path.append(module_path)
+
 
 import configparser
 config = configparser.ConfigParser()
 config.read('config.ini')
 
 PROJECT_ID = config['GCP']['PROJECT_ID']
+DATA_SOURCE = config['CONFIG']['DATA_SOURCE']
 VECTOR_STORE = config['CONFIG']['VECTOR_STORE']
 PG_SCHEMA = config['PGCLOUDSQL']['PG_SCHEMA']
 PG_DATABASE = config['PGCLOUDSQL']['PG_DATABASE']
@@ -66,6 +69,12 @@ num_column_matches = 10
 similarity_threshold = 0.3
 num_sql_matches=3
 
+if DATA_SOURCE=='bigquery':
+    USER_DATABASE=BQ_DATASET_NAME 
+    src_connector = bqconnector
+else: 
+    USER_DATABASE=PG_SCHEMA
+    src_connector = pgconnector
 
 # Set the vector store paramaters
 if VECTOR_STORE=='bigquery-vector':
@@ -278,13 +287,14 @@ async def generateSQL():
     AUDIT_TEXT = AUDIT_TEXT + "\nUser Question : " + str(user_question) + "\nUser Database : " + str(USER_DATABASE)
     process_step = "\n\nGet Exact Match: "
     # Look for exact matches in known questions 
-    exact_sql_history = vector_connector.getExactMatches(user_question) 
+    exact_sql_history = vector_connector.getExactMatches(user_question.replace("'","''"))
 
     if exact_sql_history is not None:
         found_in_vector = 'Y' 
         final_sql = exact_sql_history
         invalid_response = False
         AUDIT_TEXT = AUDIT_TEXT + "\nExact match has been found! Going to retreive the SQL query from cache and serve!" 
+
 
 
     else:
@@ -336,40 +346,46 @@ async def generateSQL():
             print('No tables found in Vector ...')
             AUDIT_TEXT = AUDIT_TEXT + "\nNo tables have been found in the Vector DB. The question cannot be answered with the provide data source!"
 
-        if not invalid_response:
-            responseDict = { 
-                    "ResponseCode" : 200, 
-                    "GeneratedSQL" : final_sql,
-                    "Error":""
-                    }          
-            
-            # return jsonify(responseDict)
+    
+    if not invalid_response:
+        responseDict = { 
+                "ResponseCode" : 200, 
+                "GeneratedSQL" : final_sql,
+                "Error":""
+                }          
+        
+        # return jsonify(responseDict)
 
-        else:  # Do not execute final SQL
+    else:  # Do not execute final SQL
 
-            print("Not executing final SQL as it is invalid, please debug!")
-            response = "I am sorry, I could not come up with a valid SQL."
-            _resp = Responder.run(user_question, response)
-            # print(_resp)
-            AUDIT_TEXT = AUDIT_TEXT + "\nModel says " + str(_resp) 
+        print("Not executing final SQL as it is invalid, please debug!")
+        response = "I am sorry, I could not come up with a valid SQL."
+        _resp = Responder.run(user_question, response)
+        # print(_resp)
+        AUDIT_TEXT = AUDIT_TEXT + "\nModel says " + str(_resp) 
 
     
+
         responseDict = { 
                    "ResponseCode" : 200, 
                    "GeneratedSQL" : _resp,
                    "Error":""
                    }
+
     bqconnector.make_audit_entry(DATA_SOURCE, user_database, "gemini-1.0-pro", user_question, final_sql, found_in_vector, "", process_step, "", AUDIT_TEXT)
+    
     return jsonify(responseDict)
 
    except Exception as e:
     # util.write_log_entry("Issue was encountered while generating the SQL, please check the logs!" + str(e))
     responseDict = { 
                    "ResponseCode" : 500, 
-                   "GeneratedHQL" : "",
-                   "Error":"Issue was encountered while generating the SQL, please check the logs!"  + str(e)
+                   "GeneratedSQL" : "",
+                   "Error":"Issue was encountered while generating the SQL, please check the logs! "  + str(e)
                    } 
+    # Make Audit entry into BQ
     bqconnector.make_audit_entry(DATA_SOURCE, user_database, "gemini-1.0-pro", user_question, final_sql, found_in_vector, "", process_step, str(e), AUDIT_TEXT)
+    
     return jsonify(responseDict)
 
 @app.route("/generate_viz", methods=["POST"])
@@ -397,7 +413,7 @@ async def generateViz():
         # util.write_log_entry("Cannot generate the Visualization!!!, please check the logs!" + str(e))
         responseDict = { 
                 "ResponseCode" : 500, 
-                "GeneratedHQL" : "",
+                "GeneratedSQL" : "",
                 "Error":"Issue was encountered while generating the Google Chart, please check the logs!"  + str(e)
                 } 
         return jsonify(responseDict)
@@ -596,7 +612,7 @@ async def getNaturalResponse():
     return jsonify(responseDict)
 
    except Exception as e:
-        util.write_log_entry("Issue was encountered while generating the SQL, please check the logs!" + str(e))
+        # util.write_log_entry("Issue was encountered while generating the SQL, please check the logs!" + str(e))
         responseDict = { 
                     "ResponseCode" : 500, 
                     "summary_response" : "",

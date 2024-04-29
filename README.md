@@ -131,7 +131,7 @@ Repository Structure
 
 ### 4. [Loading Known Good SQL Examples](/notebooks/2_RunOpenDataQnA.ipynb)
    
-   In case you want to seperately load Known Good SQLs please run this notebook once the config variables are setup in config.ini file. This can be run multiple times just to load the known good sql queries and create embeddings for it.
+   In case you want to separately load Known Good SQLs please run this notebook once the config variables are setup in config.ini file. This can be run multiple times just to load the known good sql queries and create embeddings for it.
 
 
 ### 5. Create Endpoints
