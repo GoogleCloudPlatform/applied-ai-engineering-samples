@@ -30,6 +30,7 @@ Flask = { version = "^2.1.0", extras = ["async"]}
 gunicorn = "^20.1.0"
 flask-cors = "^4.0.0"
 Werkzeug = "^2.3.7"
+setuptools = "^69.5.1"
 
 
 [tool.poetry.group.dev.dependencies]
