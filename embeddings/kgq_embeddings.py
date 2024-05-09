@@ -32,7 +32,7 @@ async def setup_kgq_table( project_id,
         client=bigquery.Client(project=project_id)
 
         # Delete an old table
-        client.query_and_wait(f'''DROP TABLE IF EXISTS `{project_id}.{schema}.example_prompt_sql_embeddings''')
+        client.query_and_wait(f'''DROP TABLE IF EXISTS `{project_id}.{schema}.example_prompt_sql_embeddings`''')
         # Create a new emptry table
         client.query_and_wait(f'''CREATE TABLE IF NOT EXISTS `{project_id}.{schema}.example_prompt_sql_embeddings` (
                               table_schema string NOT NULL, example_user_question string NOT NULL, example_generated_sql string NOT NULL,
