@@ -43,11 +43,14 @@ def caption_image(image_bytes: bytes, model_name="imagetext@001") -> list[str]:
 
 
 def generate_image(
-    prompt: str, negative_prompt: str = "", model_name="imagegeneration@002"
+    prompt: str, negative_prompt: str = "", model_name="imagegeneration@006"
 ) -> ImageGenerationResponse:
     model = ImageGenerationModel.from_pretrained(model_name)
     images = model.generate_images(
-        prompt=prompt, number_of_images=1, negative_prompt=negative_prompt
+        prompt=prompt,
+        number_of_images=1,
+        negative_prompt=negative_prompt,
+        add_watermark=True,
     )
     return images
 
