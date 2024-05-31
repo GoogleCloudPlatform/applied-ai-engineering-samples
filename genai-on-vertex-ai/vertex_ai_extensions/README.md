@@ -1,4 +1,4 @@
-# Vertex Extensions Examples and Training
+# Vertex AI Extensions Examples and Training
 
 ![Two diagrams comparing a RAG extension and custom data analysis application extension. Both have with a user who prompts Vertex AI Extensions which returns a response. The RAG extension queries a data source, the data analysis application extension connects to data, which is fed to Code Interpreter.](vai_extensions_readme.png)
 
