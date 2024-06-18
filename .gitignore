@@ -137,3 +137,5 @@ dmypy.json
 
 *.tfstate
 *.tfstate.backup
+
+.DS_Store
