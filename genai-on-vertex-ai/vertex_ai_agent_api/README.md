@@ -7,4 +7,4 @@ This folder contains code examples and notebooks for working with the [Vertex AI
 These notebooks show you how to use and build things with the Vertex AI Agent API.
 
 * [Getting Started with the Vertex AI Agent API](notebooks/getting_started_vertex_agent_api.ipynb) - Basics of using the Vertex AI Agent API. Covers creating an AI agent, connecting tools, interacting with an agent, managing agents, etc.
-* notebook 2
+* [Research Agent with the Vertex AI Agent API](notebooks/real_estate_research_vertexai_agent.ipynb) - Using the Vertex AI Agent API with Vertex AI Search Extension and Webpage Browser Extension tools to complete housing investment opportunities research for business stakeholders.
