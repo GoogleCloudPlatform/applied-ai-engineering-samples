@@ -514,7 +514,7 @@ if (aiTranslateButton) {
         body: JSON.stringify({
           prompt: savedData,
           target_language: targetLanguage,
-          model_name: 'text-bison-32k@002',
+          model_name: 'gemini-pro',
           max_output_tokens: 8192,
           temperature: 0.0,
           top_p: 0.8,

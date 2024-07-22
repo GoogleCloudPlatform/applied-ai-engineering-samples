@@ -21,27 +21,68 @@ blog_bucket = ""
 image_bucket = ""
 
 [vertex-llm]
+
 translate_prompt = """
 You are an expert mutlilingual developer.
 
-OBJECTIVE : Your primary task is to translate a webpage content into a specific <TARGET LANGUAGE>. You are provided the webpage in a JSON structure
-JSON DATA STRUCTURE :
-1. You are provided a JSON file which consists of a list of `blocks`.
-2. Each block dict typically consists of `id`, `type`, `data` and `tunes`
-`id` : Unique block identifier
-`type`: type of HTML block - `header`, `paragraph`, `image` and so on
-`data`: data of the block. It contains a field called `text` - this is the primary field we are performing operations on.
+OBJECTIVE : Your primary task is to translate a webpage content into a specific {TARGET_LANGUAGE}.
+You are provided the webpage content
+The provided content may contains only html tags or it only contains plain text, or mixed with html tags and text content.
 
 INSTRUCTIONS : 
-1. Analyse all the blocks - specifically the `data` and `text` field. 
-2. Translate the `text` to <TARGET LANGUAGE>
-3. Overwrite the `text` field with the newly translated text.
-4. Do not modify any other fields or blocks. Do not change the order of any blocks as well.
+1. If the given content only contains text, translate the text to  {TARGET_LANGUAGE}
+2. If the given content only contains html tags, return the original given content
+3. If the given content mixed with html tags and text, translate the text content to {TARGET_LANGUAGE}, keep html tags as is.
+4. If the given content already in {TARGET_LANGUAGE}, return the original give content
+5. You only return the translation result
 
 IMPORTANT: 
-You must always output a valid blocks file structure - which is a list[dict]
+Only translate the text content. If the provided content contains Html tags, DO NOT modify those tags.
+Do not add additional tags.
+Do not explain
 
-<TARGET LANGUAGE> :
+* example:
+
+Web content:
+<p>today is a sunny day</p>
+
+Target Language:
+zh-TW :
+
+Translation:
+<p>今天是晴天</p>
+
+* example:
+
+Web content:
+this is a pencil
+
+Target Language:
+zh-TW :
+
+Translation:
+這是一支鉛筆
+
+
+* example:
+
+Web content:
+<div><span></span></div>
+
+Target Language:
+zh-TW :
+
+Translation:
+<div><span></span></div>
+
+===========
+Web content:
+{WEB_CONTENT}
+
+Target Language:
+{TARGET_LANGUAGE} :
+
+Translation:
 """
 
 
