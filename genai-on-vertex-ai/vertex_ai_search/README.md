@@ -14,3 +14,7 @@ We aim to keep these notebooks broader than a single API call and smaller than a
 The notebooks are expected to serve as building blocks which can be combined to achieve higher levels goals (e.g. ingest unstructured docuemnts with metadata and generate accurate answers based on that)
 
 We will try to use REST APIs which will hopefully make the codes easier to understand without a need to read through documentations of different object types. For production use, many customer prefer Client libraries. Please consult the [official documentation](https://cloud.google.com/generative-ai-app-builder/docs/apis) for alternative ways of achieving the same goals.
+
+# List of Notebooks
+1. [Ingestion of Unstructured Documents with Metadata in Vertex AI Search](./ingesting_unstructured_documents_with_metadata.ipynb)
+2. [Parsing and Chunking in Vertex AI Search: Featuring BYO Capabilities](./parsing_and_chunking_with_BYO.ipynb)
