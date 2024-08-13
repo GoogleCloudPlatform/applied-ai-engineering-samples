@@ -87,7 +87,7 @@ Run the [2_gemini_evals_playbook_grid_search](notebooks/2_gemini_evals_playbook_
 
 ## 📄 Documentation
 
-* [Evals Playbook usage](/notebooks)
+* [Evals Playbook usage](notebooks)
 * [`Architecture`](#-architecture)
 * [`Data Schema`](docs/data_schema.md)
 
