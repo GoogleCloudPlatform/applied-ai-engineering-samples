@@ -18,3 +18,4 @@ We will try to use REST APIs which will hopefully make the codes easier to under
 # List of Notebooks
 1. [Ingestion of Unstructured Documents with Metadata in Vertex AI Search](./ingesting_unstructured_documents_with_metadata.ipynb)
 2. [Parsing and Chunking in Vertex AI Search: Featuring BYO Capabilities](./parsing_and_chunking_with_BYO.ipynb)
+3. [Defining custom attributes based on URL patterns in Vertex AI Search Website Datastores](./custom_attributes_by_url_pattern.ipynb)
