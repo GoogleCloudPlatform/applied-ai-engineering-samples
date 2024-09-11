@@ -20,3 +20,4 @@ We will try to use REST APIs which will hopefully make the codes easier to under
 2. [Parsing and Chunking in Vertex AI Search: Featuring BYO Capabilities](./parsing_and_chunking_with_BYO.ipynb)
 3. [Defining custom attributes based on URL patterns in Vertex AI Search Website Datastores](./custom_attributes_by_url_pattern.ipynb)
 4. [Query-Level Boosting, Filtering, and Facets for Vertex AI Search Website Datastores](./query_level_boosting_filtering_and_facets.ipynb)
+5. [Inline Ingestion of Documents into Vertex AI Search](./inline_ingestion_of_documents.ipynb)
