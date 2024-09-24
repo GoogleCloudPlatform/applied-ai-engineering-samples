@@ -472,7 +472,7 @@ if (aiReviewButton) {
         method: 'POST',
         body: JSON.stringify({
           webpage_body: savedData,
-          model_name: 'gemini-pro',
+          model_name: 'gemini-1.5-pro-001',
         }),
         headers: {
           'Content-Type': 'application/json',
@@ -514,7 +514,7 @@ if (aiTranslateButton) {
         body: JSON.stringify({
           prompt: savedData,
           target_language: targetLanguage,
-          model_name: 'gemini-pro',
+          model_name: 'gemini-1.5-pro-001',
           max_output_tokens: 8192,
           temperature: 0.0,
           top_p: 0.8,

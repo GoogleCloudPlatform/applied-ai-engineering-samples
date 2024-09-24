@@ -139,7 +139,7 @@ def webpage_ai_review(data: VertexLLMAIReviewRequest) -> VertexLLMAIReviewRespon
             print("code-bison-32k@002")
             response = llm_code_generate(prompt=final_prompt)
 
-        if data.model_name == "gemini-pro":
+        if data.model_name == "gemini-1.5-pro-001":
             print("gemini-1.5-pro-001")
             response = llm_generate_gemini(prompt=final_prompt)
 

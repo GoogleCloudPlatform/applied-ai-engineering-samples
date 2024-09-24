@@ -17,7 +17,7 @@ from pydantic import BaseModel
 
 class VertexLLMRequest(BaseModel):
     prompt: str
-    model_name: str = "gemini-pro"
+    model_name: str = "gemini-1.5-pro-001"
     max_output_tokens: int = 1024
     temperature: float = 0.0
     top_p: float = 0.8
@@ -40,7 +40,7 @@ class VertexLLMInlineTranslateResponse(BaseModel):
 class VertexTranslateRequest(BaseModel):
     prompt: dict
     target_language: str
-    model_name: str = "gemini-pro"
+    model_name: str = "gemini-1.5-pro-001"
     max_output_tokens: int = 2048
     temperature: float = 0.0
     top_p: float = 0.8
@@ -63,7 +63,7 @@ class VertexLLMAIReviewResponse(BaseModel):
 class VertexLLMRefineTextRequest(BaseModel):
     selected_text: str
     instruction: str
-    model_name: str = "gemini-pro"
+    model_name: str = "gemini-1.5-pro-001"
     max_output_tokens: int = 2048
     temperature: float = 0.0
     top_p: float = 0.8

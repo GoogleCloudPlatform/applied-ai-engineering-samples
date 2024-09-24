@@ -76,7 +76,7 @@ class CollaborationComments2 extends Annotation {
           body: JSON.stringify({
             selected_text: title.value,
             instruction: comment.value,
-            model_name: 'gemini-pro',
+            model_name: 'gemini-1.5-pro-001',
             max_output_tokens: 8192,
             temperature: 0,
             top_p: 0.8,

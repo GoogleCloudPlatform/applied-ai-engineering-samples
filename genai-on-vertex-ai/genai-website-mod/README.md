@@ -36,7 +36,7 @@ The website modernization solution unlocks several key benefits:
 
 |    | Feature           | Description                                                                                                       |
 |----|--------------------|--------------------------------------------------------------------------------------------------------------------|
-| ✨ | **AI Powered Content Review and Generation**    | Uses Vertex LLMs like `text-bison-32k` and `gemini-pro` to provide powerful tools for content creators, helping in the creation of more engaging, relevant, and high-quality content.
+| ✨ | **AI Powered Content Review and Generation**    | Uses Vertex LLMs like `text-bison-32k` and `gemini-1.5-pro-001` to provide powerful tools for content creators, helping in the creation of more engaging, relevant, and high-quality content.
 | 🔎 | **Conversational Search and Discoverability Optimization**    | Vertex Search w/ followups offers an interactive, conversational search interface that enhances website navigation and discoverability. This approach makes it easier for users to find and explore various webpages within the website, thereby improving user experience and content accessibility.
 | 😇 | **Personalized Recommendations**    | Integrates Vertex Generic Recommendations that automatically suggests webpages based on individual user preferences and behaviors, aiming to increase user engagement and site stickiness.
 
