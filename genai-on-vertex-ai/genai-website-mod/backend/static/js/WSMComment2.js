@@ -76,8 +76,8 @@ class CollaborationComments2 extends Annotation {
           body: JSON.stringify({
             selected_text: title.value,
             instruction: comment.value,
-            model_name: 'text-bison',
-            max_output_tokens: 2048,
+            model_name: 'gemini-1.5-pro-001',
+            max_output_tokens: 8192,
             temperature: 0,
             top_p: 0.8,
             top_k: 40,
@@ -90,7 +90,8 @@ class CollaborationComments2 extends Annotation {
         const suggestedText = data.response;
         console.log(`===>>>${suggestedText}`);
         console.log(
-            document.querySelector(`.cdx-annotation_popup-footer-for-suggestions`),
+            document.querySelector(
+                `.cdx-annotation_popup-footer-for-suggestions`),
         );
         const existing = document.querySelector(
             '.cdx-annotation_popup-footer-for-suggestions',

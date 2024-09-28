@@ -13,8 +13,8 @@
 # limitations under the License.
 
 from vertexai.language_models import CodeGenerationModel, TextGenerationModel
-from vertexai.preview.generative_models import GenerativeModel
-
+# from vertexai.preview.generative_models import GenerativeModel
+from vertexai.generative_models import GenerativeModel
 
 def llm_generate(
     prompt: str,
@@ -45,8 +45,8 @@ def llm_code_generate(prompt: str, model_name: str = "code-bison-32k@002") -> st
     return response.text
 
 
-def llm_generate_gemini(prompt: str, model_name: str = "gemini-pro") -> str:
-    model = GenerativeModel("gemini-pro")
+def llm_generate_gemini(prompt: str, model_name: str = "gemini-1.5-pro-001") -> str:
+    model = GenerativeModel("gemini-1.5-pro-001")
 
     response = model.generate_content(
         prompt, generation_config={"max_output_tokens": 8192, "temperature": 0.0}

@@ -221,13 +221,12 @@ class CollaborationComments3 extends Annotation {
     const popup = super.getPopup();
     // Update Text
     popup.querySelector('.cdx-annotation_popup-inp-title').placeholder =
-      'Comment Title';
+        'Comment Title';
     popup.querySelector('.cdx-annotation_popup-title').innerText =
-      'Add Comment';
+        'Add Comment';
     popup.querySelector('.cdx-annotation_popup-inp-text').placeholder =
-      'Comment...';
-    popup
-        .querySelector('.cdx-annotation_popup-btn-save')
+        'Comment...';
+    popup.querySelector('.cdx-annotation_popup-btn-save')
         .addEventListener('click', (e) => {
           console.log(`*** Saving Review Comments...`);
           console.log(this._config);
@@ -237,12 +236,13 @@ class CollaborationComments3 extends Annotation {
         });
     if (popup.querySelector('.cdx-annotation_popup-btn-suggestion')) {
       popup.querySelector('.cdx-annotation_popup-history').innerHTML = '';
-      if (
-        popup.querySelector('#cdx-annotation_popup-inp-text-suggestion-area')
-      ) {
-        popup.querySelector(
-            '#cdx-annotation_popup-inp-text-suggestion-area',
-        ).innerHTML = '';
+      if (popup.querySelector(
+              '#cdx-annotation_popup-inp-text-suggestion-area')) {
+        popup
+            .querySelector(
+                '#cdx-annotation_popup-inp-text-suggestion-area',
+                )
+            .innerHTML = '';
       }
       popup.querySelector('.cdx-annotation_popup-inp-text').innreText = '';
       console.log(`===>>>`);
@@ -257,8 +257,7 @@ class CollaborationComments3 extends Annotation {
       );
       historyContainer.appendChild(history);
 
-      document
-          .querySelector('.cdx-annotation_popup-form')
+      document.querySelector('.cdx-annotation_popup-form')
           .appendChild(historyContainer);
       const container = popup.querySelector('.cdx-annotation_popup-footer');
       const suggestion = document.createElement('button');
@@ -269,16 +268,18 @@ class CollaborationComments3 extends Annotation {
       suggestion.addEventListener('click', async (e) => {
         e.preventDefault();
         const title = popup.querySelector('.cdx-annotation_popup-inp-title');
-        const comment = popup.querySelector(
-            '.cdx-annotation_popup-history',
-        ).textContent;
+        const comment = popup
+                            .querySelector(
+                                '.cdx-annotation_popup-history',
+                                )
+                            .textContent;
         const response = await fetch('/vertex-llm/ai_refine_text', {
           method: 'POST',
           body: JSON.stringify({
             selected_text: title.value,
             instruction: comment,
-            model_name: 'text-bison',
-            max_output_tokens: 2048,
+            model_name: 'gemini-1.5-pro-001',
+            max_output_tokens: 8192,
             temperature: 0,
             top_p: 0.8,
             top_k: 40,
@@ -291,7 +292,8 @@ class CollaborationComments3 extends Annotation {
         const suggestedText = data.response;
         console.log(`===>>>${suggestedText}`);
         console.log(
-            document.querySelector('.cdx-annotation_popup-footer-for-suggestions'),
+            document.querySelector(
+                '.cdx-annotation_popup-footer-for-suggestions'),
         );
         const existing = document.querySelector(
             '.cdx-annotation_popup-footer-for-suggestions',
@@ -368,7 +370,7 @@ class CollaborationComments3 extends Annotation {
     );
     let comments = null;
     if (text) {
-      comments = JSON.parse(text); // TODO:
+      comments = JSON.parse(text);  // TODO:
     }
     if (inputTitle) {
       if (title) {
