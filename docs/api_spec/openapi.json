@@ -1,0 +1,613 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "FastAPI",
+        "version": "0.1.0"
+    },
+    "paths": {
+        "/retrieval/index-names": {
+            "get": {
+                "tags": [
+                    "retrieval"
+                ],
+                "summary": "Get Index Names",
+                "description": "Retrieve the names of all indices from Firestore.\n\nReturns:\n    List[str]: A list of index names.",
+                "operationId": "get_index_names_retrieval_index_names_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/retrieval/compare-retrieval-results": {
+            "post": {
+                "tags": [
+                    "retrieval"
+                ],
+                "summary": "Compare Retrieval Results",
+                "description": "Compare retrieval results for different retriever-model pairs.\n\nArgs:\n    data (CompareRetrieverRequest): The request data containing retriever-model pairs and query information.\n\nReturns:\n    CompareRetrieverResponse: The response containing the comparison results.\n\nRaises:\n    HTTPException: If an error occurs during the workflow execution.",
+                "operationId": "compare_retrieval_results_retrieval_compare_retrieval_results_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CompareRetrieverRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CompareRetrieverResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/index/trigger-indexing-job": {
+            "post": {
+                "tags": [
+                    "index"
+                ],
+                "summary": "Create Indexing Job",
+                "description": "Trigger an indexing job by publishing a message to Pub/Sub.\n\nArgs:\n    data (PubSubMessage): The message to be published.\n\nReturns:\n    dict: A dictionary containing the status and result message.\n\nRaises:\n    HTTPException: If an error occurs while publishing the message.",
+                "operationId": "create_indexing_job_index_trigger_indexing_job_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PubSubMessage"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/index/get-index-request": {
+            "post": {
+                "tags": [
+                    "index"
+                ],
+                "summary": "Print Request",
+                "description": "Print the index request data.\n\nArgs:\n    data (PubSubMessage): The index request data.\n\nReturns:\n    dict: The index request data as a dictionary.",
+                "operationId": "print_request_index_get_index_request_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PubSubMessage"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "CharacterTextSplitterConfig": {
+                "properties": {
+                    "chunk_size": {
+                        "type": "integer",
+                        "title": "Chunk Size"
+                    },
+                    "chunk_overlap": {
+                        "type": "integer",
+                        "title": "Chunk Overlap"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "chunk_size",
+                    "chunk_overlap"
+                ],
+                "title": "CharacterTextSplitterConfig"
+            },
+            "CompareRetrieverRequest": {
+                "properties": {
+                    "queries": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "title": "Queries"
+                    },
+                    "retriever_model_pairs": {
+                        "items": {
+                            "$ref": "#/components/schemas/RetrieverModelPair"
+                        },
+                        "type": "array",
+                        "title": "Retriever Model Pairs"
+                    },
+                    "index_name": {
+                        "type": "string",
+                        "title": "Index Name"
+                    },
+                    "model_params": {
+                        "additionalProperties": {
+                            "$ref": "#/components/schemas/ModelParams"
+                        },
+                        "type": "object",
+                        "title": "Model Params"
+                    },
+                    "is_rerank": {
+                        "type": "boolean",
+                        "title": "Is Rerank"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "queries",
+                    "retriever_model_pairs",
+                    "index_name",
+                    "model_params",
+                    "is_rerank"
+                ],
+                "title": "CompareRetrieverRequest"
+            },
+            "CompareRetrieverResponse": {
+                "properties": {
+                    "results": {
+                        "items": {
+                            "type": "object"
+                        },
+                        "type": "array",
+                        "title": "Results"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "results"
+                ],
+                "title": "CompareRetrieverResponse"
+            },
+            "DataLoader": {
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "document_ai"
+                        ],
+                        "const": "document_ai",
+                        "title": "Type"
+                    },
+                    "config": {
+                        "$ref": "#/components/schemas/DataLoaderConfig"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "type",
+                    "config"
+                ],
+                "title": "DataLoader"
+            },
+            "DataLoaderConfig": {
+                "properties": {
+                    "project_id": {
+                        "type": "string",
+                        "title": "Project Id"
+                    },
+                    "location": {
+                        "type": "string",
+                        "title": "Location"
+                    },
+                    "processor_name": {
+                        "type": "string",
+                        "title": "Processor Name"
+                    },
+                    "gcs_output_path": {
+                        "type": "string",
+                        "title": "Gcs Output Path"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "project_id",
+                    "location",
+                    "processor_name",
+                    "gcs_output_path"
+                ],
+                "title": "DataLoaderConfig"
+            },
+            "DocumentSplitter": {
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "recursive_character",
+                            "character"
+                        ],
+                        "title": "Type"
+                    },
+                    "config": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/RecursiveCharacterTextSplitterConfig"
+                            },
+                            {
+                                "$ref": "#/components/schemas/CharacterTextSplitterConfig"
+                            }
+                        ],
+                        "title": "Config"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "type",
+                    "config"
+                ],
+                "title": "DocumentSplitter"
+            },
+            "GCSInputConfig": {
+                "properties": {
+                    "project_name": {
+                        "type": "string",
+                        "title": "Project Name"
+                    },
+                    "bucket_name": {
+                        "type": "string",
+                        "title": "Bucket Name"
+                    },
+                    "prefix": {
+                        "type": "string",
+                        "title": "Prefix"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "project_name",
+                    "bucket_name",
+                    "prefix"
+                ],
+                "title": "GCSInputConfig"
+            },
+            "GenericVectorStoreConfig": {
+                "properties": {
+                    "index_name": {
+                        "type": "string",
+                        "title": "Index Name"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "index_name"
+                ],
+                "title": "GenericVectorStoreConfig"
+            },
+            "HTTPValidationError": {
+                "properties": {
+                    "detail": {
+                        "items": {
+                            "$ref": "#/components/schemas/ValidationError"
+                        },
+                        "type": "array",
+                        "title": "Detail"
+                    }
+                },
+                "type": "object",
+                "title": "HTTPValidationError"
+            },
+            "Input": {
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "gcs",
+                            "url"
+                        ],
+                        "title": "Type"
+                    },
+                    "config": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/GCSInputConfig"
+                            },
+                            {
+                                "$ref": "#/components/schemas/URLInputConfig"
+                            }
+                        ],
+                        "title": "Config"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "type",
+                    "config"
+                ],
+                "title": "Input"
+            },
+            "ModelParams": {
+                "properties": {
+                    "temperature": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Temperature"
+                    },
+                    "max_output_tokens": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Max Output Tokens"
+                    },
+                    "top_p": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Top P"
+                    },
+                    "top_k": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Top K"
+                    }
+                },
+                "type": "object",
+                "title": "ModelParams"
+            },
+            "PubSubMessage": {
+                "properties": {
+                    "input": {
+                        "$ref": "#/components/schemas/Input"
+                    },
+                    "data_loader": {
+                        "$ref": "#/components/schemas/DataLoader"
+                    },
+                    "document_splitter": {
+                        "$ref": "#/components/schemas/DocumentSplitter"
+                    },
+                    "vector_store": {
+                        "$ref": "#/components/schemas/VectorStore"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "input",
+                    "data_loader",
+                    "document_splitter",
+                    "vector_store"
+                ],
+                "title": "PubSubMessage"
+            },
+            "RecursiveCharacterTextSplitterConfig": {
+                "properties": {
+                    "chunk_size": {
+                        "type": "integer",
+                        "title": "Chunk Size"
+                    },
+                    "chunk_overlap": {
+                        "type": "integer",
+                        "title": "Chunk Overlap"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "chunk_size",
+                    "chunk_overlap"
+                ],
+                "title": "RecursiveCharacterTextSplitterConfig"
+            },
+            "RetrieverModelPair": {
+                "properties": {
+                    "model_name": {
+                        "type": "string",
+                        "title": "Model Name"
+                    },
+                    "retriever_name": {
+                        "type": "string",
+                        "title": "Retriever Name"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "model_name",
+                    "retriever_name"
+                ],
+                "title": "RetrieverModelPair"
+            },
+            "URLInputConfig": {
+                "properties": {
+                    "url": {
+                        "type": "string",
+                        "maxLength": 2083,
+                        "minLength": 1,
+                        "format": "uri",
+                        "title": "Url"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "url"
+                ],
+                "title": "URLInputConfig"
+            },
+            "ValidationError": {
+                "properties": {
+                    "loc": {
+                        "items": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "integer"
+                                }
+                            ]
+                        },
+                        "type": "array",
+                        "title": "Location"
+                    },
+                    "msg": {
+                        "type": "string",
+                        "title": "Message"
+                    },
+                    "type": {
+                        "type": "string",
+                        "title": "Error Type"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "loc",
+                    "msg",
+                    "type"
+                ],
+                "title": "ValidationError"
+            },
+            "VectorStore": {
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "vertex_ai"
+                        ],
+                        "const": "vertex_ai",
+                        "title": "Type"
+                    },
+                    "config": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/VertexAIVectorStoreConfig"
+                            },
+                            {
+                                "$ref": "#/components/schemas/GenericVectorStoreConfig"
+                            }
+                        ],
+                        "title": "Config"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "type",
+                    "config"
+                ],
+                "title": "VectorStore"
+            },
+            "VertexAIVectorStoreConfig": {
+                "properties": {
+                    "project_id": {
+                        "type": "string",
+                        "title": "Project Id"
+                    },
+                    "region": {
+                        "type": "string",
+                        "title": "Region"
+                    },
+                    "index_id": {
+                        "type": "string",
+                        "title": "Index Id"
+                    },
+                    "endpoint_id": {
+                        "type": "string",
+                        "title": "Endpoint Id"
+                    },
+                    "embedding_model": {
+                        "type": "string",
+                        "title": "Embedding Model"
+                    },
+                    "index_name": {
+                        "type": "string",
+                        "title": "Index Name"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "project_id",
+                    "region",
+                    "index_id",
+                    "endpoint_id",
+                    "embedding_model",
+                    "index_name"
+                ],
+                "title": "VertexAIVectorStoreConfig"
+            }
+        }
+    }
+}

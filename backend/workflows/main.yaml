@@ -1,0 +1,133 @@
+# Copyright 2024 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+main:
+  params: [args]
+  steps:
+    - init:
+        assign:
+          - tasks: ${args.tasks}
+          - results: []
+          - aggregated_results: {"answer": [], "context": [], "query": []}
+
+    - process_tasks_parallel:
+        parallel:
+          shared: [results, aggregated_results]
+          for:
+            value: task
+            in: ${tasks}
+            steps:
+              - call_rp_answer_gen:
+                  try:
+                    call: http.post
+                    args:
+                      url: https://us-central1-abhi-test-new-rp.cloudfunctions.net/answer_generation_service
+                      auth:
+                        type: OIDC
+                        audience: https://us-central1-abhi-test-new-rp.cloudfunctions.net/answer_generation_service
+                      headers:
+                        Content-Type: application/json
+                      body: ${task}
+                    result: rp_answer_gen_response
+                  retry:
+                    predicate: ${http.default_retry_predicate}
+                    max_retries: 3
+                    backoff:
+                      initial_delay: 1
+                      max_delay: 60
+                      multiplier: 2
+                  except:
+                    as: e
+                    steps:
+                      - set_error:
+                          assign:
+                            - error: ${e}
+
+              - process_answer_gen_result:
+                  switch:
+                    - condition: ${error == null}
+                      steps:
+                        - aggregate_results:
+                            assign:
+                              - aggregated_results.answer: ${list.concat(aggregated_results.answer, [rp_answer_gen_response.body.answer])}
+                              - aggregated_results.context: ${list.concat(aggregated_results.context, [rp_answer_gen_response.body.context])}
+                              - aggregated_results.query: ${list.concat(aggregated_results.query, [task.query])}
+                        - prepare_task_result:
+                            assign:
+                              - task_result:
+                                  retriever_name: ${task.retriever_name}
+                                  query: ${task.query}
+                                  model_name: ${task.model_name}
+                                  success: true
+                                  error: null
+                                  answer_gen_result: ${rp_answer_gen_response.body}
+                                  eval_service_result: null
+                        - collect_result:
+                            assign:
+                              - results: ${list.concat(results, [task_result])}
+                    - condition: ${true}
+                      steps:
+                        - set_error_result:
+                            assign:
+                              - task_result:
+                                  retriever_name: ${task.retriever_name}
+                                  query: ${task.query}
+                                  model_name: ${task.model_name}
+                                  success: false
+                                  error: ${error}
+                                  answer_gen_result: null
+                                  eval_service_result: null
+                        - collect_error_result:
+                            assign:
+                              - results: ${list.concat(results, [task_result])}
+
+    - call_rp_eval_service:
+        try:
+          call: http.post
+          args:
+            url: https://us-central1-abhi-test-new-rp.cloudfunctions.net/answer_evaluation_service
+            auth:
+              type: OIDC
+              audience: https://us-central1-abhi-test-new-rp.cloudfunctions.net/answer_evaluation_service
+            headers:
+              Content-Type: application/json
+            body: ${aggregated_results}
+          result: rp_eval_service_response
+        except:
+          as: e
+          steps:
+            - set_eval_error:
+                assign:
+                  - eval_error: ${e}
+
+    - process_eval_results:
+        for:
+          value: result
+          in: ${results}
+          steps:
+            - set_eval_result:
+                switch:
+                  - condition: ${result.success == true}
+                    steps:
+                      - assign_eval_result:
+                          assign:
+                            - result.eval_service_result: ${rp_eval_service_response.body[sys.index]}
+                  - condition: ${true}
+                    steps:
+                      - skip_eval_result:
+                          assign:
+                            - result.eval_service_result: null
+
+    - return_results:
+        return: ${results}

@@ -1,0 +1,188 @@
+# Copyright 2024 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+steps:
+  - id: 'load env vars'
+    name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        source env.vars
+        echo "PROJECT_ID: $$PROJECT_ID"
+        echo "REGION: $$REGION"
+        echo "BACKEND_STAGING_BUCKET: $$BACKEND_STAGING_BUCKET"
+
+  # --- Enable Necessary APIs ---
+  - id: 'enable-apis'
+    name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        gcloud services enable \
+          serviceusage.googleapis.com \
+          cloudfunctions.googleapis.com \
+          cloudbuild.googleapis.com \
+          artifactregistry.googleapis.com \
+          run.googleapis.com \
+          cloudresourcemanager.googleapis.com \
+          compute.googleapis.com \
+          iam.googleapis.com \
+          aiplatform.googleapis.com \
+          cloudscheduler.googleapis.com \
+          pubsub.googleapis.com \
+          firestore.googleapis.com \
+          storage-api.googleapis.com \
+          workflows.googleapis.com \
+          eventarc.googleapis.com \
+          cloudfunctions.googleapis.com \
+          documentai.googleapis.com \
+          datastore.googleapis.com \
+          dataflow.googleapis.com
+
+  - id: 'create backend staging bucket'
+    name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        source env.vars
+        if ! gsutil ls -b gs://$$BACKEND_STAGING_BUCKET > /dev/null 2>&1; then
+          gsutil mb -l $$REGION gs://$$BACKEND_STAGING_BUCKET
+          echo "Created bucket: gs://$$BACKEND_STAGING_BUCKET"
+        else
+          echo "Bucket gs://$$BACKEND_STAGING_BUCKET already exists."
+        fi
+
+  - id: 'generate firebase config'
+    name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        chmod +x generate_firebase_config.sh
+        ./generate_firebase_config.sh
+
+# --- Terraform Apply Step ---
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'terraform clear cache'
+    entrypoint: 'sh'
+    args:
+    - '-c'
+    - |
+      rm -rf .terraform
+
+  - id: 'terraform init'
+    name: 'hashicorp/terraform:1.5.0'
+    entrypoint: 'sh'
+    args:
+      - '-c'
+      - |
+        source env.vars
+        cd terraform
+        terraform init -backend-config="bucket=$$BACKEND_STAGING_BUCKET" -backend-config="prefix=$$TF_STATE_PREFIX"
+
+  - id: 'terraform plan'
+    name: 'hashicorp/terraform:1.5.0'
+    entrypoint: 'sh'
+    args:
+      - '-c'
+      - | 
+        source env.vars
+        cd terraform
+        terraform plan \
+          -var="project_id=$$PROJECT_ID" \
+          -var="region=$$REGION" \
+          -var="resource_prefix=$$RESOURCE_PREFIX" \
+          -var="backend_staging_bucket=$$BACKEND_STAGING_BUCKET" \
+          -var="tf_state_prefix=$$TF_STATE_PREFIX" \
+          -var="repository_id=$$REPOSITORY_ID" \
+          -var="format_artifact_repo=$$FORMAT_ARTIFACT_REPO" \
+          -var="rag_playground_sa_id=$$RAG_PLAYGROUND_SA_ID" \
+          -var="rag_playground_sa_display_name=$$RAG_PLAYGROUND_SA_DISPLAY_NAME" \
+          -var="rag_workflow_sa_id=$$RAG_WORKFLOW_SA_ID" \
+          -var="rag_workflow_sa_display_name=$$RAG_WORKFLOW_SA_DISPLAY_NAME" \
+          -var="workflow_name=$$WORKFLOW_NAME" \
+          -var="output_topic_name=$$OUTPUT_TOPIC_NAME" \
+          -var="input_topic_name=$$INPUT_TOPIC_NAME" \
+          -var="input_topic_subscription_name=$$INPUT_TOPIC_SUBSCRIPTION_NAME" \
+          -var="dataflow_job_name=$$DATAFLOW_JOB_NAME" \
+          -var="dataflow_metadata_filename=$$DATAFLOW_METADATA_FILENAME" \
+          -var="firestore_database_name=$$FIRESTORE_DATABASE_NAME" \
+          -var="firestore_database_type=$$FIRESTORE_DATABASE_TYPE" \
+          -var="firestore_concurrency_mode=$$FIRESTORE_CONCURRENCY_MODE" \
+          -var="firestore_app_engine_integration_mode=$$FIRESTORE_APP_ENGINE_INTEGRATION_MODE" \
+          -var="firestore_point_in_time_recovery_enablement=$$FIRESTORE_POINT_IN_TIME_RECOVERY_ENABLEMENT" \
+          -var="firestore_delete_protection_state=$$FIRESTORE_DELETE_PROTECTION_STATE" \
+          -var="firestore_deletion_policy=$$FIRESTORE_DELETION_POLICY" \
+          -var="firebase_config_file_path=$$FIREBASE_CONFIG_FILE_PATH" \
+          -var="firestore_collection_name=$$FIRESTORE_COLLECTION_NAME" \
+          -var="firestore_document_id=$$FIRESTORE_DOCUMENT_ID" \
+          -var="vertex_ai_bucket_name=$$VERTEX_AI_BUCKET_NAME" \
+          -var="vertex_ai_index_name=$$VERTEX_AI_INDEX_NAME" \
+          -var="vertex_ai_index_endpoint_name=$$VERTEX_AI_INDEX_ENDPOINT_NAME" \
+          -var="vertex_ai_deployed_index_id=$$VERTEX_AI_DEPLOYED_INDEX_ID" \
+          -var="document_ai_processor_display_name=$$DOCUMENT_AI_PROCESSOR_DISPLAY_NAME" \
+          -var="document_ai_processor_type=$$DOCUMENT_AI_PROCESSOR_TYPE"
+
+
+  - id: 'terraform apply'
+    name: 'hashicorp/terraform:1.5.0'
+    entrypoint: 'sh'
+    args:
+      - '-c'
+      - |
+        apk add --no-cache curl bash python3 which
+        ln -sf python3 /usr/bin/python
+        source env.vars
+        cd terraform
+        terraform apply -auto-approve \
+          -var="project_id=$$PROJECT_ID" \
+          -var="region=$$REGION" \
+          -var="resource_prefix=$$RESOURCE_PREFIX" \
+          -var="backend_staging_bucket=$$BACKEND_STAGING_BUCKET" \
+          -var="tf_state_prefix=$$TF_STATE_PREFIX" \
+          -var="repository_id=$$REPOSITORY_ID" \
+          -var="format_artifact_repo=$$FORMAT_ARTIFACT_REPO" \
+          -var="rag_playground_sa_id=$$RAG_PLAYGROUND_SA_ID" \
+          -var="rag_playground_sa_display_name=$$RAG_PLAYGROUND_SA_DISPLAY_NAME" \
+          -var="rag_workflow_sa_id=$$RAG_WORKFLOW_SA_ID" \
+          -var="rag_workflow_sa_display_name=$$RAG_WORKFLOW_SA_DISPLAY_NAME" \
+          -var="workflow_name=$$WORKFLOW_NAME" \
+          -var="output_topic_name=$$OUTPUT_TOPIC_NAME" \
+          -var="input_topic_name=$$INPUT_TOPIC_NAME" \
+          -var="input_topic_subscription_name=$$INPUT_TOPIC_SUBSCRIPTION_NAME" \
+          -var="dataflow_job_name=$$DATAFLOW_JOB_NAME" \
+          -var="dataflow_metadata_filename=$$DATAFLOW_METADATA_FILENAME" \
+          -var="firestore_database_name=$$FIRESTORE_DATABASE_NAME" \
+          -var="firestore_database_type=$$FIRESTORE_DATABASE_TYPE" \
+          -var="firestore_concurrency_mode=$$FIRESTORE_CONCURRENCY_MODE" \
+          -var="firestore_app_engine_integration_mode=$$FIRESTORE_APP_ENGINE_INTEGRATION_MODE" \
+          -var="firestore_point_in_time_recovery_enablement=$$FIRESTORE_POINT_IN_TIME_RECOVERY_ENABLEMENT" \
+          -var="firestore_delete_protection_state=$$FIRESTORE_DELETE_PROTECTION_STATE" \
+          -var="firestore_deletion_policy=$$FIRESTORE_DELETION_POLICY" \
+          -var="firebase_config_file_path=$$FIREBASE_CONFIG_FILE_PATH" \
+          -var="firestore_collection_name=$$FIRESTORE_COLLECTION_NAME" \
+          -var="firestore_document_id=$$FIRESTORE_DOCUMENT_ID" \
+          -var="vertex_ai_bucket_name=$$VERTEX_AI_BUCKET_NAME" \
+          -var="vertex_ai_index_name=$$VERTEX_AI_INDEX_NAME" \
+          -var="vertex_ai_index_endpoint_name=$$VERTEX_AI_INDEX_ENDPOINT_NAME" \
+          -var="vertex_ai_deployed_index_id=$$VERTEX_AI_DEPLOYED_INDEX_ID" \
+          -var="document_ai_processor_display_name=$$DOCUMENT_AI_PROCESSOR_DISPLAY_NAME" \
+          -var="document_ai_processor_type=$$DOCUMENT_AI_PROCESSOR_TYPE"
+
+
+options:
+  logging: CLOUD_LOGGING_ONLY

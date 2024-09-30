@@ -1,29 +1,33 @@
-# How to Contribute
+# How to contribute
 
-We'd love to accept your patches and contributions to this project. There are
-just a few small guidelines you need to follow.
+We'd love to accept your patches and contributions to this project.
 
-## Contributor License Agreement
+## Before you begin
 
-Contributions to this project must be accompanied by a Contributor License
-Agreement (CLA). You (or your employer) retain the copyright to your
-contribution; this simply gives us permission to use and redistribute your
-contributions as part of the project. Head over to
-<https://cla.developers.google.com/> to see your current agreements on file or
-to sign a new one.
+### Sign our Contributor License Agreement
 
-You generally only need to submit a CLA once, so if you've already submitted one
-(even if it was for a different project), you probably don't need to do it
-again.
+Contributions to this project must be accompanied by a
+[Contributor License Agreement](https://cla.developers.google.com/about) (CLA).
+You (or your employer) retain the copyright to your contribution; this simply
+gives us permission to use and redistribute your contributions as part of the
+project.
 
-## Code Reviews
+If you or your current employer have already signed the Google CLA (even if it
+was for a different project), you probably don't need to do it again.
+
+Visit <https://cla.developers.google.com/> to see your current agreements or to
+sign a new one.
+
+### Review our community guidelines
+
+This project follows
+[Google's Open Source Community Guidelines](https://opensource.google/conduct/).
+
+## Contribution process
+
+### Code reviews
 
 All submissions, including submissions by project members, require review. We
 use GitHub pull requests for this purpose. Consult
 [GitHub Help](https://help.github.com/articles/about-pull-requests/) for more
 information on using pull requests.
-
-## Community Guidelines
-
-This project follows
-[Google's Open Source Community Guidelines](https://opensource.google/conduct/).

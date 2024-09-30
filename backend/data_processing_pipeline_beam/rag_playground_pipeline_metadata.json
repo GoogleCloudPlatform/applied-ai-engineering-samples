@@ -1,0 +1,31 @@
+{
+    "name": "Document Processing Pipeline",
+    "description": "A streaming pipeline that processes documents from Pub/Sub and upserts to Vector Search",
+    "parameters": [
+        {
+            "helpText": "The Pub/Sub subscription to read from",
+            "label": "Input Pub/Sub Subscription",
+            "name": "input_subscription",
+            "regexes": [
+                "^projects/[^/]+/subscriptions/[^/]+$"
+            ]
+        },
+        {
+            "helpText": "The Pub/Sub Topic to write success message to",
+            "label": "Output Pub/Sub Topic",
+            "name": "output_topic",
+            "regexes": [
+                "^projects/[^/]+/topics/[^/]+$"
+            ]
+        },
+        {
+            "helpText": "Output file's window size in minutes",
+            "isOptional": true,
+            "label": "Window Size",
+            "name": "window_size",
+            "regexes": [
+                "^[0-9]+(\\.[0-9]+)?$"
+            ]
+        }
+    ]
+  }

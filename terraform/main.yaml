@@ -1,0 +1,146 @@
+# Copyright 2024 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+main:
+  params: [args]
+  steps:
+    - init:
+        assign:
+          - tasks: $${args.tasks}
+          - results: []
+          - aggregated_results: {"answers": [], "contexts": [], "queries": []}
+
+    - process_tasks_parallel:
+        parallel:
+          shared: [results, aggregated_results]
+          for:
+            value: task
+            in: $${tasks}
+            steps:
+              - init_task_result:
+                  assign:
+                    - task_result:
+                        retriever_name: $${task.retriever_name}
+                        query: $${task.query}
+                        model_name: $${task.model_name}
+                        success: false
+                        error: null
+                        answer_gen_result: null
+                        eval_service_result: null
+
+              - call_rp_answer_gen:
+                  try:
+                    call: http.post
+                    args:
+                      url: ${fn_url_ans_gen}
+                      auth:
+                        type: OIDC
+                        audience: ${fn_url_ans_gen}
+                      headers:
+                        Content-Type: application/json
+                      body: $${task}
+                    result: rp_answer_gen_response
+                  retry:
+                    predicate: $${http.default_retry_predicate}
+                    max_retries: 3
+                    backoff:
+                      initial_delay: 1
+                      max_delay: 60
+                      multiplier: 2
+                  except:
+                    as: e
+                    steps:
+                      - set_answer_gen_error:
+                          assign:
+                            - task_result.error: $${e}
+                            - task_result.success: false
+                            
+              - process_answer_gen_result:
+                  switch:
+                    - condition: $${task_result.error == null}
+                      steps: 
+                        - set_answer_gen_success:
+                            assign:
+                              - task_result.answer_gen_result: $${rp_answer_gen_response.body}
+                              - task_result.success: true
+                              - aggregated_results.answers: $${list.concat(aggregated_results.answers, rp_answer_gen_response.body.answer)}
+                              - aggregated_results.contexts: $${list.concat(aggregated_results.contexts, rp_answer_gen_response.body.context)}
+                              - aggregated_results.queries: $${list.concat(aggregated_results.queries, task.query)}
+
+              - collect_result:
+                  assign:
+                    - results: $${list.concat(results, task_result)}
+
+    - call_rp_eval_service:
+        try:
+          call: http.post
+          args:
+            url: ${fn_url_rp_eval}
+            auth:
+              type: OIDC
+              audience: ${fn_url_rp_eval}
+            headers:
+              Content-Type: application/json
+            body: $${aggregated_results}
+          result: rp_eval_service_response
+        except:
+          as: e
+          steps:
+            - set_eval_service_error:
+                assign:
+                  - error_results: []
+            - loop_through_results:
+                for:
+                  value: result
+                  in: $${results}
+                  steps:
+                    - add_error:
+                        assign:
+                          - error_result: $${result}
+                          - error_result.error: $${e}
+                          - error_result.success: false
+                          - error_results: $${list.concat(error_results, error_result)}
+            - update_results:
+                assign:
+                  - results: $${error_results}
+
+    - log_eval_service_response:
+        call: sys.log
+        args:
+            data: $${rp_eval_service_response}
+
+    - assign_eval_results:
+        for:
+          value: eval_result
+          index: i
+          in: $${rp_eval_service_response.body.metrics}
+          steps:
+            - log_metric:
+                call: sys.log
+                args:
+                    data: $${eval_result}
+            - log_index:
+                call: sys.log
+                args:
+                    data: $${i}
+            - log_overall:
+                call: sys.log
+                args:
+                    data: $${results[int(i)]}
+            - assign_eval_to_task:
+                assign:
+                  - results[i].eval_service_result: $${eval_result}
+
+    - return_results:
+        return: $${results}
