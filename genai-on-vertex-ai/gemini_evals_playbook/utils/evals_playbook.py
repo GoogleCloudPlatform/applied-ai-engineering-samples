@@ -1,3 +1,18 @@
+# Copyright 2024 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import os
 import itertools
 import random
 import string
@@ -12,10 +27,12 @@ import pandas as pd
 from utils import config as cfg
 from google.cloud import bigquery
 from google.cloud import aiplatform
-from vertexai.preview.evaluation import EvalResult
+from google.cloud import storage
+from vertexai.evaluation import EvalResult
 
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy import create_engine, MetaData, Column, String, Table
+from utils.config import PROJECT_ID, LOCATION, STAGING_BUCKET
 
 
 BQ_TABLE_MAP = {
@@ -24,7 +41,7 @@ BQ_TABLE_MAP = {
     "prompts":      {"table_name": cfg.BQ_T_PROMPTS, "keys": ["prompt_id"]},
     "datasets":     {"table_name": cfg.BQ_T_DATASETS, "keys": ["dataset_id"]},
     "runs":         {"table_name": cfg.BQ_T_EVAL_RUNS, "keys": ["task_id", "experiment_id", "run_id"]},
-    "run_details":  {"table_name": cfg.BQ_T_EVAL_RUN_DETAILS, "keys": ["task_id", "experiment_id", "run_id", "example_id"]}
+    "run_details":  {"table_name": cfg.BQ_T_EVAL_RUN_DETAILS, "keys": ["task_id", "experiment_id", "run_id", "dataset_row_id"]}
 }
 
 def get_table_name_keys(table_class):
@@ -53,6 +70,34 @@ def get_db_classes():
 
 def format_dt(dt: datetime.datetime):
     return dt.strftime("%m-%d-%Y_%H:%M:%S")
+
+def clean_string(source_string):
+    clean_spaces = re.sub(' ', '_', source_string)
+    return re.sub('[^a-zA-Z0-9 _\n\.]', '', clean_spaces.lower())
+
+def write_to_gcs(gcs_path, data):
+    if not gcs_path.startswith("gs://"):
+        raise Exception(f"Invalid Cloud Storage path {gcs_path}. Pass a valid path starting with gs://")
+
+    # check if data is a file or a string
+    UPLOAD_AS_FILE = False
+    if os.path.exists(data):
+        UPLOAD_AS_FILE = True
+
+    bucket = gcs_path.split("/")[2]
+    object = "/".join(gcs_path.split("/")[3:])
+    
+    # Initialize the Cloud Storage client
+    storage_client = storage.Client()
+    
+    # Get the bucket object
+    bucket = storage_client.bucket(bucket)
+    blob = bucket.blob(object)
+    if UPLOAD_AS_FILE:
+        blob.upload_from_filename(data)
+    else:
+        blob.upload_from_string(data)
+    return blob.self_link
 
 def generate_uuid(text: str):
     """Generate a uuid based on text"""
@@ -390,10 +435,10 @@ class Evals():
         )
 
         # -- DEBUGGING --
-        # print("MERGE Query:")
-        # print(merge_query)
-        # print("\nRows:")
-        # print(rows_for_query)
+        print("MERGE Query:")
+        print(merge_query)
+        print("\nRows:")
+        print(rows_for_query)
         # -- END DEBUGGING --
 
         query_job = client.query(merge_query, job_config=job_config)
@@ -404,7 +449,8 @@ class Evals():
                        experiment_id,
                        prompt,
                        model,
-                       metric_config,experiment_desc="",
+                       metric_config,
+                       experiment_desc="",
                        is_streaming=False,
                        tags=[],
                        metadata={}):
@@ -443,8 +489,7 @@ class Evals():
             experiment.safety_settings = json.dumps(safety_settings_as_dict)
         
         # add metric config
-        if isinstance(metric_config, dict):
-            experiment.metric_config = json.dumps(metric_config)    
+        experiment.metric_config = str(metric_config)
 
         # additional fields
         experiment.create_datetime = datetime.datetime.now()
@@ -465,18 +510,41 @@ class Evals():
             raise e
 
         return experiment
-    
+       
+    def save_prompt_template(self, task_id, experiment_id, prompt_id, prompt_template):
+        # Construct the full file path in the bucket
+        fmt_prompt_id = clean_string(prompt_id)
+        prefix = f'{task_id}/prompts/{experiment_id}'
+        gcs_file_path = f'gs://{STAGING_BUCKET}/{prefix}/template_{fmt_prompt_id}.txt'
+        # write to GCS
+        write_to_gcs(gcs_file_path, prompt_template)
+        print(f"Prompt template saved to {gcs_file_path} successfully!")
+        
+    def save_prompt(self, text, run_path, blob_name):
+        """
+        Saves the given text to a Google Cloud Storage bucket and returns the blob's URI.
+        Args:
+            text: The text to be saved.
+            bucket_name: The name of the GCS bucket.
+            blob_name: The desired name for the blob (file) in the bucket.
+        Returns:
+            The URI of the created blob.
+        """
+        # Construct the full file path in the bucket
+        gcs_file_path = f'gs://{STAGING_BUCKET}/{run_path}/{blob_name}.txt'
+        blob_link = write_to_gcs(gcs_file_path, text)
+        return blob_link
 
     def log_eval_run(self,
                      experiment_run_id: str,
                      experiment,
                      eval_result,
+                     run_path,
                      tags=[],
-                     metadata={}
-    ):
+                     metadata={}):
         # log run details
         if not isinstance(eval_result, EvalResult):
-            raise Exception(f"Invalid eval_result object. Expected: `vertexai.preview.evaluation.EvalResult` Actual: {type(eval_result)}")
+            raise Exception(f"Invalid eval_result object. Expected: `vertexai.evaluation.EvalResult` Actual: {type(eval_result)}")
         if isinstance(experiment, dict):
             experiment = self.Experiment(**experiment)
         if not isinstance(experiment, self.Experiment):
@@ -485,21 +553,24 @@ class Evals():
         # get run details from the Rapid Eval evaluation task
         detail_df = eval_result.metrics_table.to_dict(orient="records")
         summary_dict = eval_result.summary_metrics
-        non_metric_keys = ['context', 'reference', 'instruction', 'prompt_id', 'completed_prompt', 'response']
+        non_metric_keys = ['context', 'reference', 'instruction', 'dataset_row_id', 'completed_prompt', 'response']
+        # report_df = eval_result.metrics_table
+        print(f'detail_df.keys: {detail_df[0].keys()}')
 
         # prepare run details        
         run_details = []
         for row in detail_df:
+            row.get("prompt")
             metrics = {k: row[k] for k in row if k not in non_metric_keys}
             run_detail = dict(
                 run_id=experiment_run_id,
                 experiment_id=experiment.experiment_id,
                 task_id=experiment.task_id,
-                example_id=row.get("prompt_id"),
-                input_prompt=row.get("completed_prompt"),
+                dataset_row_id=row.get("dataset_row_id"),
+                system_instruction=row.get("instruction"),
+                input_prompt_gcs_uri=self.save_prompt(row.get("prompt"), run_path, row.get("dataset_row_id")), 
                 output_text=row.get("response"),
                 ground_truth=row.get("reference"),
-                system_instruction=row.get("instruction"),
                 metrics=json.dumps(metrics),
                 # additional fields
                 latencies=[],
@@ -521,6 +592,7 @@ class Evals():
             run_id=experiment_run_id,
             experiment_id=experiment.experiment_id,
             task_id=experiment.task_id,
+            # dataset_row_id = experiment.dataset_row_id, 
             metrics=json.dumps(summary_dict),
             # additional fields
             create_datetime=datetime.datetime.now(),
