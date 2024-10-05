@@ -7,7 +7,9 @@ Welcome to the Google Cloud Applied AI Engineering repository. This repository c
 
 ## Applied AI Engineering: Catalog
 
-* **[Generative AI on Vertex AI](./genai-on-vertex-ai/README.md)**: This section contains code samples and hands-on labs demonstrating the use of [Generative AI models and tools in Vertex AI](https://cloud.google.com/vertex-ai/docs/generative-ai/learn/overview).
+### [Generative AI on Vertex AI](./genai-on-vertex-ai/README.md)
+
+This section contains code samples and hands-on labs demonstrating the use of [Generative AI models and tools in Vertex AI](https://cloud.google.com/vertex-ai/docs/generative-ai/learn/overview).
 
 <table>
 
@@ -24,7 +26,7 @@ Welcome to the Google Cloud Applied AI Engineering repository. This repository c
         <li><a href="./genai-on-vertex-ai/gemini/prompting_recipes/">Gemini Prompting Recipes</a></li>
         <li><a href="./genai-on-vertex-ai/advanced_prompting_training/">Advanced Prompting</a></li>
         <li><a href="./genai-on-vertex-ai/vertex_foundation_tuning/">Foundation model tuning</a></li>
-      </ul>
+    </ul>
     </td>
     <td style="vertical-align: baseline;">
       <ul>
@@ -53,10 +55,15 @@ Welcome to the Google Cloud Applied AI Engineering repository. This repository c
 
 </table>
 
-* **[Google Cloud AI/ML infrastructure](./ai-infrastructure/README.md)**: Reference guides and blueprints that compile best practices, and prescriptive guidance for running large-scale AI/ML workloads on Google Cloud AI/ML infrastructure.
+### [Google Cloud AI/ML infrastructure](./ai-infrastructure/README.md)
 
-* **[Research Operationalization](./research-operationalization/)**: Code samples demonstrating operationalization of latest research models or frameworks from Google DeepMind and Research teams on Google Cloud including Vertex AI.
+This section has reference guides and blueprints that compile best practices, and prescriptive guidance for running large-scale AI/ML workloads on Google Cloud AI/ML infrastructure.
 
+### [Research Operationalization](./research-operationalization/)
+
+This section has code samples demonstrating operationalization of latest research models or frameworks from Google DeepMind and Research teams on Google Cloud including Vertex AI.
+
+### Solutions Catalog
 
 In addition to code samples in this repo, you may want to check out the following solutions published by Google Cloud Applied AI Engineering.
 
