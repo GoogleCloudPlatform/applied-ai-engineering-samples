@@ -63,7 +63,7 @@ This section has reference guides and blueprints that compile best practices, an
 
 This section has code samples demonstrating operationalization of latest research models or frameworks from Google DeepMind and Research teams on Google Cloud including Vertex AI.
 
-### Solutions Catalog
+### [Solutions Catalog](https://cloud.google.com/use-cases/generative-ai)
 
 In addition to code samples in this repo, you may want to check out the following solutions published by Google Cloud Applied AI Engineering.
 
