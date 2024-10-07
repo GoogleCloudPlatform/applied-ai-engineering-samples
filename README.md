@@ -120,7 +120,7 @@ In addition to code samples in this repo, you may want to check out the followin
 
   <tr>
     <td style="text-align: center;">
-      <img src="assets/rag_playground_banner.png" alt="flag" height="50" width="90">
+      <img src="assets/rag_playground_banner.png" alt="flag" height="50" width="120">
       <br>
       <a href="https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples/tree/rag-playground">RAG Playground</a>
     </td>
