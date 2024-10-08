@@ -193,7 +193,11 @@ The Serving Layer handles query processing, answer generation, and evaluation.
 3. **[OPTIONAL] Setup GCP Project:**
    -  You may need to do some/all of the following in case you are running on a new GCP project:
       * Create default VPC network (as automatic)
-      * Enable CloudBuild API and grant CloudBuild Service Account the role of `roles/logging.LogWriter` on the project
+      * Enable CloudBuild API and grant the CloudBuild Service Account the following roles on the project:
+        * `roles/logging.LogWriter`
+        * `roles/iam.securityAdmin`
+        * `roles/cloudfunctions.developer`
+        * `roles/firebase.admin`
 
 4. **Run the Build**
 
