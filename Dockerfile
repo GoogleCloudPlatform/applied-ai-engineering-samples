@@ -9,9 +9,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Make the bash script executable
 RUN chmod +x mkdocs.sh
 
-# Copy assets to docs folder
-RUN mkdir -p docs/assets && cp -r assets/* docs/assets/
-
 # Run the bash script to build the site
 RUN ./mkdocs.sh build
 

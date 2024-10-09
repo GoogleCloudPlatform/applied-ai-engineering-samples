@@ -14,6 +14,8 @@ fi
 # Create docs directory
 mkdir -p "${DOCS_DIR}"
 
+cp -r "${SCRIPT_DIR}/assets" "${DOCS_DIR}/assets"
+
 # Create and activate virtual environment
 if [ ! -d "${VENV_DIR}" ]; then
     echo "Creating virtual environment..."
