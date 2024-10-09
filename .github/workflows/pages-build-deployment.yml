@@ -30,4 +30,4 @@ jobs:
       - name: Build and deploy documentation
         run: |
           chmod +x ./mkdocs.sh
-          ./mkdocs.sh gh-deploy --clean
+          ./mkdocs.sh gh-deploy --force
