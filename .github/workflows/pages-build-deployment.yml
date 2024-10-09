@@ -1,10 +1,7 @@
 name: pages-build-deployment
 
 on:
-  push:
-    branches:
-      - master
-      - main
+  [push]
 
 permissions:
   contents: write
