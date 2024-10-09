@@ -1,0 +1,35 @@
+# Copyright 2024 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+docx_chunking: custom
+xml_extraction: custom2
+json_chunking: custom
+pdf_extraction: default
+pdf_chunking: default
+html_extraction: custom
+
+raw_files_path: raw_files
+docx_chunk_level: 1
+
+docai_project_id: null
+docai_dococr_processor_id: 5d106d45b46ec280
+docai_location: us
+docai_dococr_processor_version: pretrained-ocr-v2.0-2023-06-02
+
+project_id: null
+dataset_id: dataset
+table_name: parsing_table
+data_store_id: data_store_id
+datastore_location: global
+
+bucket_parse_interval: 600

@@ -1,0 +1,96 @@
+# Copyright 2024 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+serviceAccount: 'projects/$PROJECT_ID/serviceAccounts/t2x-cloudbuild@$PROJECT_ID.iam.gserviceaccount.com'
+
+options:
+  automapSubstitutions: true
+  dynamicSubstitutions: true
+  logging: 'LEGACY'
+  defaultLogsBucketBehavior: 'REGIONAL_USER_OWNED_BUCKET'
+
+substitutions:
+  _DOCKER_IMAGE_API: 'us-central1-docker.pkg.dev/${PROJECT_ID}/talk-to-docs/t2x-api'
+  _DOCKER_IMAGE_UI: 'us-central1-docker.pkg.dev/${PROJECT_ID}/talk-to-docs/t2x-ui'
+  # _RUN_TYPE will be 'plan' by default. Override with 'apply' to apply changes.
+  _RUN_TYPE: 'plan'
+
+steps:
+- id: tree
+  name: 'alpine'
+  script: apk add --no-cache tree && echo "" && tree -a && echo ""
+
+- id: build_api
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', '${_DOCKER_IMAGE_API}:latest', '-t', '${_DOCKER_IMAGE_API}:${BUILD_ID}', '-f', 'Dockerfile.api', '.']
+
+- id: push_api
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['push', '--all-tags', '${_DOCKER_IMAGE_API}']
+
+- id: build_ui
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', '${_DOCKER_IMAGE_UI}:latest', '-t', '${_DOCKER_IMAGE_UI}:${BUILD_ID}', '-f' , 'Dockerfile.ui', '.']
+
+- id: push_ui
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['push', '--all-tags', '${_DOCKER_IMAGE_UI}']
+
+- id: init
+  name: 'hashicorp/terraform:latest'
+  dir: 'terraform/main'
+  script: |
+    echo ""
+    terraform init -reconfigure -backend-config="bucket=terraform-state-${PROJECT_ID}" -backend-config="impersonate_service_account=terraform-service-account@${PROJECT_ID}.iam.gserviceaccount.com"
+    echo ""
+    echo "Terraform version:"
+    echo ""
+    terraform version
+    echo ""
+    echo "Terraform workspace: $(terraform workspace list)"
+    echo ""
+
+- id: validate
+  name: 'hashicorp/terraform:latest'
+  dir: 'terraform/main'
+  args: ['validate']
+
+# Display the format diff. Don't write changes.
+- id: fmt
+  name: 'hashicorp/terraform:latest'
+  dir: 'terraform/main'
+  args: ['fmt', '-recursive', '-diff', '-write=false']
+
+- id: plan
+  name: 'hashicorp/terraform:latest'
+  dir: 'terraform/main'
+  env:
+    - TF_VAR_project_id=${PROJECT_ID}
+    - TF_VAR_terraform_service_account=terraform-service-account@${PROJECT_ID}.iam.gserviceaccount.com
+    - TF_VAR_docker_image_api=${_DOCKER_IMAGE_API}:${BUILD_ID}
+    - TF_VAR_docker_image_ui=${_DOCKER_IMAGE_UI}:${BUILD_ID}
+  args: ['plan', '-input=false', '-out', '.terraform/tfplan']
+
+- id: apply
+  name: 'hashicorp/terraform:latest'
+  dir: 'terraform/main'
+  script: |
+    echo ""
+    echo "Detected '_RUN_TYPE' value: '${_RUN_TYPE}'"
+    echo ""
+    if [ "${_RUN_TYPE}" = "apply" ]; then
+      terraform apply -auto-approve -input=false .terraform/tfplan
+    else
+      echo "'_RUN_TYPE' substitution override not received. Defaulting to plan-only and skipping apply"
+    fi
+    echo ""

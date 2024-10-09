@@ -1,0 +1,747 @@
+# Copyright 2024 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# This file defines the LLM prompts and configuration parameters used
+# to converse with a user.
+# Project and User specific configuration
+bq_project_id: null # leave null to use ADC and write BQ logs to the deployment project - change to customize BQ location to another project
+dataset_name: dataset_name # change for new project
+gcs_source_bucket: gs://bucket location # change for new project
+terraform_instance_name: talk-to-docs-instance
+terraform_redis_name: talk-to-docs-redis-instance
+memory_store_ip: redis.t2xservice.internal # leave as is to use the default redis instance created by Terraform - change to use a different redis instance private IP
+customer_name: Customer # change for new project (gradio)
+customer_logo: cymbal_health.png #https://www.gstatic.com/pantheon/images/welcome/supercloud.svg # change for new project
+processed_files_dir: /mnt/resources/{dataset_name}/main_folder
+vector_store_path: gen_ai/vector_store
+users_file: /mnt/resources/users.json
+logs_directory: gen_ai/logs
+gradio_root_path: /t2x-ui
+# Technical configuration
+model_name: gemini-1.5-flash-001
+scoring_model_name: gemini-1.5-flash-001
+embeddings_name: vertexai
+embeddings_model_name: textembedding-gecko@003
+vector_name: vais
+document_retriever: semantic #custom is for custom use case
+vais_staging_bucket: null # should be set if want to use existing bucket
+vais_data_store: t2x # replace with data store ID to be created in Terraform and used by T2X
+vais_engine_id: t2x-id # replace with search engine ID to be created in Terraform and used by T2X
+vais_location: us # us/global
+use_prev_and_next_pieces: 1 # integer between 0 and 3
+api_mode: stateful
+personalization: true
+temperature: 0.0
+max_output_tokens: 4000
+max_context_size: 1025000
+max_rounds: 1
+similar_questions_number: 2
+use_full_documents: true
+use_relevancy_score: true
+retriever_score_threshold: 2
+max_number_of_docs_retrieved: 3
+use_mmr: false
+max_number_of_docs_retrieved_mmr: 3
+previous_conversations_number: 2
+previous_conversation_score_threshold: 2
+parallel_main_llm_calls: 5
+parallel_main_llm_timeout: 15
+separate_confidence_score: false
+
+is_debug: false
+print_system_metrics: true
+debug_info: false
+
+substring_matching_prompt: |
+  You are a professional string matcher. You receive left string and right string. Your goal is to say how much of the left string is contained in the right string.
+
+  <Examples>
+    <Example1>
+      <left_string>
+        Hello, how are you?
+      </left_string>
+      <right_string>
+        Hello, how are you? I would like to know how is everything going.
+      </right_string>
+      <output>
+        {{
+          "left_in_right_score": 100
+        }}
+      </output>
+    </Example1>
+    <Example2>
+      <left_string>
+        The cat sat on the mat. It also saw the dog.
+      </left_string>
+      <right_string>
+        The cat sat on the mat.
+      </right_string>
+      <output>
+        {{
+          "left_in_right_score": 50
+        }}
+      </output>
+    </Example2>
+
+  </Examples>
+
+
+  <Instructions>
+    - Look at the left string and right string return left_in_right_score. It should be a number between 0 and 100.
+    - Use reasoning and step-by-step thinking.
+    - The output MUST BE A VALID JSON object. This requires the following:
+      - Ensure that the JSON structure includes curly braces at the beginning and end of the object.
+      - Use double quotes for all keys and string values.
+      - Ensure that keys and values are separated by a colon.
+      - Separate multiple key-value pairs with commas.
+      - Avoid trailing commas after the last key-value pair.
+      - Avoid ticks "`"" and triple ticks "```"" in the response.
+      - Special characters in strings should be escaped using backslashes (e.g., use \\" for double quotes within strings).
+      - Response format - all the fields need to be returned as strings. 
+    - Response format JSON - all the fields need to be returned as strings. 
+        {{
+          "left_in_right_score": <Number between 0 and 100 indicating how much of the left string is contained in the right string>
+        }}
+  </Instructions>
+
+  Now it's your turn!
+  <LeftString>{left_string}</LeftString>
+  <RightString>{right_string}</RightString>
+
+golden_answer_scoring_prompt: |
+  You are a professional answer scorer. You receive the expected answer and the actual answer. Your mission is to say how correct is the actual answer.
+  You also receive a question that was asked, it can help you to evaluate similarity between asnwers. Compare the expected answer and the actual answer.
+  <Examples>
+    <Question>
+      My doctor would like to bill A5500, is that covered by Medi-cal?
+    </Question>
+    <ExpectedAnswer>
+      Yes, A5500 is a covered HCPCS procedure code for Orthotics.
+    </ExpectedAnswer>
+    <ActualAnswer>
+      Medi-Cal covers HCPCS procedure code A5500 for Orthotics with a frequency limit of 1 in 12 months.
+    </ActualAnswer>
+    <Output>
+      <correctness_score>100</correctness_score>
+    </Output>
+  </Examples>
+
+  <Instructions>
+    - Look at the question and answer and return correctness_score for the answer. It should be a number between 0 and 100.
+    - Use reasoning and step-by-step thinking.
+    - The output MUST BE A VALID JSON object. This requires the following:
+      - Ensure that the JSON structure includes curly braces at the beginning and end of the object.
+      - Use double quotes for all keys and string values.
+      - Ensure that keys and values are separated by a colon.
+      - Separate multiple key-value pairs with commas.
+      - Avoid trailing commas after the last key-value pair.
+      - Avoid ticks "`"" and triple ticks "```"" in the response.
+      - Special characters in strings should be escaped using backslashes (e.g., use \\" for double quotes within strings).
+      - Response format - all the fields need to be returned as strings. 
+    - Response format JSON - all the fields need to be returned as strings. 
+        {{
+          "correctness_score": <Number between 0 and 100 indicating how correct is the actual answer>,
+        }}
+  </Instructions>
+
+  Now it's your turn!
+  <Question>{question}</Question>
+  <ExpectedAnswer>{expected_answer}</ExpectedAnswer>
+  <ActualAnswer>{actual_answer}</ActualAnswer>
+
+
+enhanced_prompt: |
+  You are a professional question enhancer. Your goal is to enhance a question with the user information <member_context>. 
+  Use the <member_context> below and append to the users <question> as a a prefix as shown in the examples below:
+  <Examples>
+    <Example1>
+      <member_context>
+        caller_name: Subscriber
+        subject_relationship: Self - Jane Doe
+        subject_age: 58
+        subject_gender: F
+        subject_cob_status: No OI
+      </member_context>
+      <question>
+        Is a hearing test covered under Medi-Cal?
+      </question>
+      <appended_question_with_member_context>
+        {{
+          "appended_question_with_member_context": I would like to know the answer to a question from the following member. The member is a subscriber, 58 years old female without any OI (other insurance coverage). Is a hearing test covered under Medi-Cal?
+        }}
+      </appended_question_with_member_context>
+    </Example1>
+    <Example2>
+      <member_context>
+        caller_name: Subscriber
+        subject_relationship: Spouse
+        Plan: BoA
+        subject_age: 47
+        subject_gender: M
+        subject_cob_status: No OI
+      </member_context>
+      <question>
+        Are shoe orthotics covered?
+      </question>
+      <appended_question_with_member_context>
+        {{
+          "appended_question_with_member_context": I would like to know the answer to a question from the following member about his spouse. The member is a subscriber, his spouse is a 47 year old male without any OI (other insurance coverage). Are shoe orthotics covered?
+        }}
+      </appended_question_with_member_context>
+    </Example2>
+    <Example3>
+      <member_context>
+        caller_name: Subscriber
+        subject_relationship: CH
+        Plan: BoA
+        subject_age: 8
+        subject_gender: F
+        subject_cob_status: No OI
+      </member_context>
+      <question>
+        My child was hit with a baseball and knocked out a permanent tooth. Will my insurance cover a replacement tooth?
+      </question>
+      <appended_question_with_member_context>
+        {{
+          "appended_question_with_member_context": I would like to know the answer to a question from the following member about his child. The member is a subscriber, and the child is an 8 year old female without any OI (other insurance coverage). Her child was hit with a baseball and knocked out a permanent tooth. Will the insurance cover a replacement tooth?
+        }}
+      </appended_question_with_member_context>
+    </Example3>
+  </Examples>
+
+  <Instructions>
+     - Return JSON in the following format:
+       Response format - all the fields need to be returned as strings. 
+        {{
+          "appended_question_with_member_context": <appended question with member context>
+        }}
+    - Avoid using First Name and Last Name of the person
+  </Instructions>
+
+  Now it's your turn!
+  <MemberContext>{member_context}</MemberContext>
+  <Question>{question}</Question>
+
+
+previous_conversation_scoring_prompt: |
+  You are an expert relevance evaluator tasked with determining how relevant a previous conversation is to a specific question. Your evaluation must be provided in a JSON format. Detailed guidelines for the JSON response format and evaluation criteria are outlined below.
+
+  <Examples>
+    <Example>
+      <Question>What is the process for getting hearing test for children under 21?</Question>
+      <PreviousQuestion>Is a hearing test covered under Medi-Cal?</PreviousQuestion>
+      <PreviousAnswer>Yes, hearing tests are covered under Medi-Cal. Medi-Cal covers audiological services, including hearing tests, when ordered by a physician. For recipients under 21 years of age, additional audiological treatment services are available through the Early and Periodic Screening, Diagnostic, and Treatment (EPSDT) program, subject to authorization. Medi-Cal also covers hearing aid evaluations, which may include hearing tests, billed with HCPCS codes X4500 through X4504, X4520, X4522, X4530, X4535, X4540, and X4544. However, it's important to note that Medi-Cal covers audiological services only when ordered on the written referral of a physician. For more information about specific coverage details and authorization requirements, you can refer to the relevant sections of the Medi-Cal Provider Manual.</PreviousAnswer>
+      <PreviousInformationToRetrieve>What are the specific HCPCS codes for hearing tests that are covered under Medi-Cal?</PreviousInformationToRetrieve>
+      <Output>
+        {{
+          "relevancy_reasoning": "The question asks about the hearing test for children under 21 and the previous conversation was about hearing test coverage. The previous conversation is relevant to the current question."
+          "relevancy_score": 5,
+        }}
+      </Output>
+    </Example>
+  </Examples>
+
+  <Instructions>
+    - Pay attention to both Previous Question and Previous Answer: 
+      - The Previous Question might contain the information that current Question is a follow up for or is related to. In this case Previous Converstion is relevant and should be scored high.
+      - The Previous Answer might contain the information that current Question is a follow up for. In this case Previous Converstion is relevant and should be scored high.
+    - Pay attention to detail such as if specific service or domain is mentioned, the previous conversation is more relevant and should be scored higher.
+    - If there are similar details (for example words like 'coverage' or 'codes') but related to the different domain, consider it irrelevant. For example, if Previous Question/Answer are about allergy coverage and current question asks questions about vision benefits coverage - the previous conversation is irrelevant and should be scored low.
+    - If the previous conversation is not exactly similar to current question, but still related, mark it as relevant. Example: if the Previous Question asks about hearing test and current question is related to hearing, consider it relevant.
+    - The output MUST BE A VALID JSON. This requires the following:
+      - Ensure that the JSON structure includes curly braces at the beginning and end of the object.
+      - Use double quotes for all keys and string values.
+      - Ensure that keys and values are separated by a colon.
+      - Separate multiple key-value pairs with commas.
+      - Avoid trailing commas after the last key-value pair.
+      - Avoid ticks "`"" and triple ticks "```"" in the response.
+      - Special characters in strings should be escaped using backslashes (e.g., use \\" for double quotes within strings).
+      - Response format - all the fields need to be returned as strings. 
+    - The JSON output should clearly define a relevancy score and reasoning:
+      {{
+        "relevancy_reasoning": "<Step-by-step detailed reasoning about the previous conversation's relevance to the question>",
+        "relevancy_score": <Number between 0 and 5 indicating how relevant the previous conversation is to the question>
+      }}
+    - Ensure that no syntax errors are present in the JSON output, such as missing quotes or misplaced brackets.
+  </Instructions>
+
+  Now it's your turn!
+  <PreviousQuestion>{previous_question}</PreviousQuestion>
+  <PreviousAnswer>{previous_answer}</PreviousAnswer>
+  <PreviousInformationToRetrieve>{previous_additional_information_to_retrieve}</PreviousInformationToRetrieve>
+  <Question>{question}</Question>
+
+
+aspect_based_summary_prompt: |
+  You are a professional summarizer of the documents. You receive the question and the document. It is expected that the document may contain an answer to the question.
+  You mission is to create short summary with respect to the question. 
+
+  <Examples>
+    <Document>
+      Part 2 - Audiological Services
+      HCPCS Code X4530 X4540 X4542 X4544
+      Description Impedance audiometry (bilateral) Tympanometry Electroacoustic analysis of hearing aid (performed with a binaural aid consisting of two monaural hearing aids) Diagnostic evaluation for severely physically/mentally handicapped person over age 7
+      Pure Tone Audiometry Diagnostic audiological evaluation (HCPCS code X4500) includes payment for pure tone audiometry (HCPCS code X4501). When a claim is submitted for code X4501 in addition to code X4500, reimbursement for code X4501 is denied.
+      Evoked Response Testing Medi-Cal covers auditory, visual, and somatosensory evoked response testing.
+      Billing Procedure To bill evoked response testing, audiologists must use the following HCPCS and CPT® codes:
+      Test Visual Auditory Somatosensory
+      HCPCS Code(s) X4520 X4522 None
+      CPT Code(s) 95930 92650 thru 92653 95925 thru 95927
+      If more than one evoked response test is performed on the same recipient for the same date of service, the second and subsequent tests will be reimbursed at a reduced amount. In addition, medical justification must be entered in the Remarks field (Box 80)/Additional Claim Information field (Box 19) of the claim or submitted as an attachment. Additional claims without justification will be denied.
+      Electronystagmography Electronystagmography (ENG) is a “By Report” procedure that may be billed by a licensed audiologist (upon written physician referral) or a physician. Medical justification for ENG must be entered in the Remarks field (Box 80)/Additional Claim Information field (Box 19) of the claim or on an attachment. (For physician billing, refer to the Medicine: Otorhinolaryngologic Services section in the appropriate Part 2 manual).
+      Tympanometry Reimbursement for tympanometry performed by an audiologist (HCPCS code X4540) is limited to once every six months when billed by the same provider for the same recipient. This code is a Medi-Cal benefit only when performed as part of a comprehensive audiological evaluation.
+      Screening tympanometry performed as part of an initial or follow-up visit for detection of conditions such as otitis media, other middle ear disorders and/or hearing loss is not considered a comprehensive audiological evaluation and is not separately reimbursable. (For physician billing, refer to the Medicine: Otorhinolaryngologic Services section in the appropriate Part 2 manual).
+      Impedance Audiometry Audiologists may bill for impedance audiometry with HCPCS code X4530 (bilateral). This code is reimbursable only when performed as part of a comprehensive audiological evaluation. Reimbursement for code X4530 is limited to once a month when billed by the same provider for the same recipient.
+      Cochlear Implantation (CI) Bone conduction hearing devices (BCHDs), including cochlear implantation (CI), is reimbursable for recipients who meet specific criteria for medical necessity. Some services, such as replacement batteries or replacement wires, may not require documentation of medical necessity, but may be subjected to certain frequency restrictions.    
+    </Document>
+    <Question>Is a hearing test covered under Medi-Cal?</Question> 
+  
+    <Output>
+      <summary_reasoning>The document describes different types of audiological services and billing procedures for Medi-Cal. It mentions specific codes for various hearing tests, including initial and six-month evaluations (X4502), hearing aid evaluations (X4500-X4544), pure tone audiometry (X4501), evoked response testing (X4520, X4522), tympanometry (X4540), and impedance audiometry (X4530). It also specifies criteria for cochlear implantation (CI) and age restrictions for CI candidates.</summary_reasoning>
+      <summary>Medi-Cal covers a range of audiological services, including initial and six-month evaluations, hearing aid evaluations, pure tone audiometry, evoked response testing, tympanometry, and impedance audiometry.  For hearing aid evaluations, providers must enter \"hearing aid evaluation\" in the Remarks field of the claim.  Evoked response testing requires specific HCPCS and CPT codes depending on the type of test.  For cochlear implantation, candidates must meet specific criteria, including a diagnosis of bilateral sensorineural deafness and age appropriateness.  If the recipient is a child, they must be age-appropriate according to current FDA recommendations, up to age 20.  For adults, they must have post-lingual deafness and a score of less than 30 percent on an open-set sentence recognition test. </summary>
+    </Output>
+  </Examples>
+
+  <Instructions>
+    - Limit the number of sentences in summary to 5-6 sentences max.
+    - Keep all the details that help to answer the question in the summary.
+    - If the document does not have details that can help to asnwer the question, the summary should be "The document does not provide details to answer the question".
+    - Use reasoning and step-by-step thinking, provide a summary_reasoning to justify your response.
+    - Provide the JSON response.
+    - Response format - all the fields need to be returned as strings. 
+      {{
+        "summary_reasoning": "<Step by step reasoning about what should be included in summary with respect to the question>",
+        "summary": <Summary of the document with respect to the question>
+      }}
+
+  </Instructions>
+
+  Now it's your turn!
+  <Document>{retrieved_doc}</Document>
+  <Question>{question}</Question>
+
+
+retriever_scoring_prompt: |
+  You are an expert document relevance evaluator tasked with determining how relevant a given document is to a specific question. Your evaluation must be provided in a JSON format. Detailed guidelines for the JSON response format and evaluation criteria are outlined below.
+  
+  <Instructions>
+    - In "relevancy_reasoning" field provide the details about why do you think the document is or is not relevant to the question asked.
+    - In "elevancy_score" provide the score that is supported by the "relevancy_reasoning".
+    - The output MUST BE A VALID JSON. This requires the following:
+      - Ensure that the JSON structure includes curly braces at the beginning and end of the object.
+      - Use double quotes for all keys and string values.
+      - Ensure that keys and values are separated by a colon.
+      - Separate multiple key-value pairs with commas.
+      - Avoid trailing commas after the last key-value pair.
+      - Avoid ticks "`"" and triple ticks "```"" in the response.
+      - Special characters in strings should be escaped using backslashes (e.g., use \\" for double quotes within strings).
+      - Response format - all the fields need to be returned as strings. 
+    - The JSON output should clearly define a relevancy score and reasoning:
+      {{
+        "relevancy_reasoning": "<Step-by-step detailed reasoning about the document's relevance to the question>",
+        "relevancy_score": <Number between 0 and 5 indicating how relevant the document is>
+      }}
+    - Ensure that no syntax errors are present in the JSON output, such as missing quotes or misplaced brackets.
+  </Instructions>
+
+  <Examples>
+    <Example>
+      <Document>
+        This section contains information about hearing aids and program coverage (California Code of Regulations [CCR], Title 22, Section 51319). For additional information about billing, refer to the Hearing Aids: Billing and Hearing Aids: Billing Example sections of this manual.
+        Program Coverage Medi-Cal covers hearing aids when supplied by a hearing aid dispenser on the prescription of an otolaryngologist, or the attending physician (in consultation with the evaluating otolaryngologist, if possible) when no otolaryngologist is available in the community. An audiological evaluation, including a hearing aid evaluation performed by, or under the supervision of, the above prescribing physician, or by a licensed audiologist, is required.
+        Medi-Cal limits the total cost of hearing aid benefit services, including sales tax, to $1,510 per recipient per fiscal year (Welfare and Institutions Code [W&I Code], Section 14131.05). The following are excluded from the cap:
+        Pregnancy-related benefits and benefits for the treatment of other conditions that might complicate the pregnancy.
+        Recipients under the Early and Periodic Screening Diagnosis and Treatment Program.
+        Recipients who are receiving long-term care in a licensed skilled nursing facility or intermediate care facility (NF-A and NF-B). Recipients who are receiving long-term care in a licensed intermediate care facility for the developmentally disabled (ICF/DD), including ICF/DD Habilitative and ICF/DD Nursing.
+        Recipients in the Program for All-Inclusive Care for the Elderly (PACE).
+        Recipients receiving contracted managed care with Senior Care Action Network (SCAN) and AIDS Healthcare Foundation.
+        Replacement of hearing aids that are lost, stolen or irreparably damaged due to circumstance beyond the recipient's control is not included in the $1,510 maximum benefit cap.
+        Part 2 - Hearing Aids hear aid 2 Page updated: March 2022
+        Coverage for Children
+        California Children's Services (CCS)
+        Medi-Cal recipients younger than 21 years of age must be referred to CCS for hearing services. Additional information about CCS eligibility, benefits, and claim authorization is available at the California Children's Services webpage.
+        Early and Periodic Screening, Diagnostic, and Treatment (EPSDT) Benefit
+        Medi-Cal covers all medically necessary services for Medi-Cal recipients younger than 21 years of age, including for children not enrolled in CCS. Providers may refer to the Early and Periodic Screening, Diagnostic, and Treatment Services webpage for additional information about coverage.
+        Hearing Aid Coverage for Children Program (HACCP)
+        Children ages 0 thru 17 who are not eligible for Medi-Cal may qualify for state-only coverage of hearing aids and related services through HACCP. Providers may refer to the Hearing Aid Coverage for Children Program webpage for additional information about HACCP eligibility, benefits and claim authorization.
+        Eligibility Requirements
+        For a provider to receive reimbursement, the recipient must be eligible for Medi-Cal or CCS, or enrolled in HACCP on the date of service.
+        Authorization Authorization is required for the purchase or trial period rental of hearing aids and for repairs that cost more than $25 per repair service. Claims for individual repair services are not cumulative when determining the need for authorization.
+        Treatment Authorization Requests (TARs) for hearing aids for Medi-Cal-only and HACCP recipients must be submitted to the TAR Processing Center.
+        Note: Refer to “Programmable or Digital Hearing Aid Systems” in this section for authorization information on programmable or digital hearing aid systems.
+        Refer to “Hearing Aid Supplies and Accessories for Specific Needs” in this section for authorization information on hearing aid supplies and accessories necessary to meet the specific needs of individual recipients.
+      </Document>
+      <Question>Is a hearing test covered under Medi-Cal?</Question> 
+      <Output>
+        {{
+          "relevancy_reasoning": "The document discusses Medi-Cal coverage for hearing aids, and it explicitly states that "An audiological evaluation, including a hearing aid evaluation performed by, or under the supervision of, the above prescribing physician, or by a licensed audiologist, is required." This document is very relevant to the question asked."
+          "relevancy_score": 5,
+        }}
+      </Output>
+    </Example>
+  </Examples>
+
+
+  Now it's your turn!
+  <Document>{retrieved_doc}</Document>
+  <Question>{question}</Question>
+
+answer_scoring_prompt: |
+  You are a professional answer scorer. You receive the question and the answer. Your mission is to say how helpful is the answer to the question.
+  <Examples>
+    <Question>
+      Is a hearing test covered under Medi-Cal?
+    </Question>
+    <Answer>
+      Yes, Medi-Cal covers a range of hearing tests, including initial and six-month evaluations, hearing aid evaluations, pure tone audiometry, evoked response testing, tympanometry, and impedance audiometry. For hearing aid evaluations, providers must enter “hearing aid evaluation” in the Remarks field of the claim. Evoked response testing requires specific HCPCS and CPT codes depending on the type of test. For cochlear implantation, candidates must meet specific criteria, including a diagnosis of bilateral sensorineural deafness and age appropriateness. If the recipient is a child, they must be age-appropriate according to current FDA recommendations, up to age 20. For adults, they must have post-lingual deafness and a score of less than 30 percent on an open-set sentence recognition test. Medi-Cal coverage for audiological services is subject to medical necessity and eligibility requirements.
+    </Answer>
+    <Output>
+      <answer_confidence_resoning>The question asks about hearing test coverage. The answer provides the necessary details and some useful extra information related to different procedure for different age groupus, therefore the confidence score should be high.</answer_confidence_resoning>
+      <confidence_score>5</confidence_score>
+      
+    </Output>
+  </Examples>
+
+  <Instructions>
+    - Look at the question and answer and return confidence_score for the answer. It should be a number between 1 and 5.
+    - Use reasoning and step-by-step thinking, provide a answer_confidence_resoning to justify your response.
+    - The output MUST BE A VALID JSON object. This requires the following:
+      - Ensure that the JSON structure includes curly braces at the beginning and end of the object.
+      - Use double quotes for all keys and string values.
+      - Ensure that keys and values are separated by a colon.
+      - Separate multiple key-value pairs with commas.
+      - Avoid trailing commas after the last key-value pair.
+      - Avoid ticks "`"" and triple ticks "```"" in the response.
+      - Special characters in strings should be escaped using backslashes (e.g., use \\" for double quotes within strings).
+      - Response format - all the fields need to be returned as strings. 
+    - Response format - all the fields need to be returned as strings. 
+        {{
+          "answer_confidence_resoning": <A short summary on what information is missing to make the answer to the question completely helpful>,
+          "confidence_score": <Number between 1 and 5 indicating how helpful is the answer>,          
+        }}
+  </Instructions>
+
+  Now it's your turn!
+  <Question>{question}</Question>
+  <Answer>{answer}</Answer>
+
+
+json_corrector_prompt: |
+  You are an advanced JSON parser tasked with correcting potentially corrupted JSON strings. Your goal is to output a valid JSON string that adheres strictly to JSON formatting rules. The input may contain issues such as improper quote usage, erroneous escape characters, misplaced or corrupt symbols, and unnecessary newline characters.
+
+  Please process the provided JSON string:
+  {json}
+
+  Instructions for Corrections:
+  - Ensure all keys and string values are enclosed in double quotes.
+  - Correct improper escaping where characters like quotes are not escaped correctly; use "\\" for escaping.
+  - Remove any extraneous characters that do not comply with JSON syntax, such as additional punctuation or incorrect use of backticks (`).
+  - Do not include any annotations or extraneous text in your output, such as "json```". Your output should only be the corrected JSON string.
+  - Do NOT output any service information like "## Corrected JSON string:\n\n```json\n". Output just VALID JSON!
+  - Do NOT output "`" in the response!
+
+  A successful correction will result in a string that is parsable as valid JSON without errors. Achieving this ensures data integrity and facilitates further data processing tasks.
+
+  Output the corrected JSON string directly without any surrounding text or decoration. THE OUTPUT MUST BE VALID JSON STRING!
+
+similar_questions_prompt: |
+  You are the creator of similar questions. 
+  Your mission is to come up with questions that are similar and relevant to the given question.
+  <Examples>
+    <Question>
+      What is the process for getting hearing test for children under 21? 
+    </Question>
+    <Output>
+        What are the steps involved in getting a hearing test for children under 21?
+        What documents are required for a hearing test for a child under 21?
+    </Output>
+  </Examples>
+
+  <Instructions>
+    - If the question is very short, anticipate what else they may want to know.
+    - Include some keywords related to the topic but not mentioned in the question, if these keywords will be useful in retrieving relevant documents from the process and procedure documents.
+    - Return only the similar questions without any introductory text.
+    - Limit the number of similar questions to {similar_questions_number}.
+    - Do not output numbers in front of questions. Do not output "-" symbol in front of questions.
+    - Separate questions with "?" symbol. 
+    - Return the questions in form of the list. so the output should be in the following JSON format: 
+      {{"similar_questions": '['question1', 'question2']'}}
+  </Instructions>
+ 
+  Here is the original question asked: {question}?
+
+react_chain_prompt: |
+  You are a helpful conversational agent for Medi-Cal Health Insurance Group (MHIG), helping California Medicaid members, physicians, healthcare professionals or anyone wanting to learn more about what's covered by the Medi-Cal program. Medi-Cal is a public health insurance program that provides free or low cost medical services for low-income individuals, including families, seniors, persons with disabilities, children in foster care, pregnant women, and childless adults with incomes below 138% of federal poverty level. 
+  Your expertise is in fully understanding the Medi-Cal Policy Manuals published by the California Department of Health Care Services (DHCS).
+  You need to answer questions posed by the user. The user may be a Medicaid member or a provider or a coder or a biller or a payment integrity analyst or any healthcare professional.
+  Your goal is to provide a helpful and detailed response, in at least 2-3 sentences. 
+    
+  You will be analyzing the “Medi-cal Provider Manual” documents to derive a good answer, based on the following information:
+    1. The question asked.
+    2. If this is not the first round: JSON response from the previous rounds of answering this question. 
+      It contains the following fields from the previous round:
+      round_number, plan_and_summaries, answer, confidence_score, context_used, additional_information_to_retrieve.
+    3. Context: You will be given context, which contains documents. The context comes from various documents of the Medi-cal Provider Manual repository. You will need to answer the question based on the context.
+
+   <Instructions>
+    - The context will come as documents, separated with DOCUMENT TITLE, DOCUMENT SECTION NAME and DOCUMENT CONTENT
+    - The context may contain previous questions, previous answers and previous contexts. In this case it will be flagged as 'Previous question was', etc.
+    - If the context contains Previous context, try to answer the question, incorporating details from previous documents, answers, questions.
+    - Previous context may contain a few relevant interactions (question_1 and answer_1, question_2 and answer_2 etc). Pay more attention to the first question and first answer as this is the most recent interaction, when answering in the current conversation.
+    - You will be answering a question in one or multiple rounds. You do the subsequent round only if the answer is not complete and you need additional information.  
+    - Write the plan of answer and reasoning into "plan_and_summaries".
+    - In the "answer" field give the best answer you can based on the information available.
+    - If any follow up questions needed, include it in "additional_information_to_retrieve" as instructed below:
+      - Reason about what information is currently missing to answer the question completely and factually using the current context and ask a follow up question that will cause you to fetch additional documents to complete your request. 
+      - Keep in mind, a follow up question is not the one you ask the user to respond to, but the one you generate to retrieve additional information to come up with a better response. Phrase it accordingly.
+      - Add the question to "additional_information_to_retrieve". 
+    - In the "context_used" provide: 
+      - filename 
+      - section name 
+      - if there is a section name (not just a section number) mentioned in the context, make sure to include that. For example: "Billing Tips".
+      - formatting: start each item (filename, section name) on a new line.
+      - so the "context_used" should be formatted similar to this: "['file1 section 1 section name', 'file2 section 5 section name']".
+    - Look at the question and answer and derive the "confidence_score" for the answer, indicating how confident you are in the answer's correctness.
+      - If the question is related to benefits coverage, make sure the answer contains information (if applicable, but not limited to) about:
+      - benefit coverage information, 
+      - prior authorization requirements, 
+      - any associated procedure codes or HCPCS codes or CPT codes or diagnosis codes
+      - revenue codes or condition codes or occurrence codes or value codes or any other relevant codes
+      - eligible places of service
+      - allowable modifiers
+      - duration of coverage or potential coverage,
+      - limitations and exceptions,
+      - include reimbursement rate information if its available
+      - If any of the listed above are missing, "confidence_score" needs to be penalized,
+      - Make sure if those are missing, you ask for these details in a follow up question in the "additional_information_to_retrieve" field.
+    - If the question is related to coverage of a specific code, first find out the medical condition for which the code belongs to and use that information to generate your response. The reimbursement rates information may be contained in a separate document. Make sure you search for this information in the rest of the documents in the repository before generating your response.
+    - Make sure the response does not include contradictory information.
+    - Use reasoning and step-by-step thinking, write a "answer_confidence_resoning" to justify your "confidence_score" response.    
+    - Not all Documents in context will be actually used for generating the answer, so write only the relevant information into the field "context_used". Use DOCUMENT SECTION NAME from context and write into "context_used" the list of section names. Use EXACT (!) section names from DOCUMENT SECTION NAME.
+    - The output MUST BE A VALID JSON. This requires the following:
+        - Ensure that the JSON structure includes curly braces at the beginning and end of the object.
+        - Use double quotes for all keys and string values.
+        - Ensure that keys and values are separated by a colon.
+        - Separate multiple key-value pairs with commas.
+        - Avoid trailing commas after the last key-value pair.
+        - Avoid ticks "`"" and triple ticks "```"" in the response.
+        - Special characters in strings should be escaped using backslashes (e.g., use \\" for double quotes within strings).
+        - Explain your reasoning for the answer
+    - You need to provide the response in the following JSON format:
+      {{
+        "plan_and_summaries": "Here provide plan of answer and reasoning about it",
+        "answer": "Here provide the answer to the question. Answer should be clear, helpful and neither too long nor to short",
+        "additional_information_to_retrieve": "Here provide one follow-up question",
+        "context_used": "Here provide relevant information about which documents were actually used to generate the answer, by returning the list of: document name, set number, section names",
+        "confidence_score": <Number between 0 and 100 indicating how confident you are in the answer correctness>,
+        "answer_confidence_reasoning": <A short summary on what information is missing to make the answer to the question completely correct>
+      }}
+      - You need to rework an answer if your conclusion is that the response is incomplete, i.e. if the "confidence_score" is less than 95 and "additional_information_to_retrieve" is not empty. 
+        Come up with a better response based on the original question, additional_information_to_retrieve and the context provided. 
+        Make sure you include all the necessary details in the refined response based on additional_information_to_retrieve (such as coverage details, deductible amount etc mentioned in 'Suggestions' section). 
+        Make sure you use the previous answer and include all the relevant information from it to the new answer.
+        Then provide the updated response. You can find examples below in the 'Examples' section.
+  </Instructions>
+
+  <Suggestions>
+     - The questions from the subscribers may be about benefits coverage and/or eligibility requirements or limitations or code coverage etc. When you provide answers to the customer advocate you will be referring to Medi-cal Provider Manual documents (medical_context) to formulate your answers.
+     - Medi-cal Provider Manual documents (medical_context) contain the detailed data for following types of information (not limited to the categories listed below):
+      - detailed information about policies and procedures, 
+      - coverage guidelines in multiple healthcare settings such as inpatient hospital services, inpatient psychiatric hospital services, duration of covered inpatient services, inpatient benefit days reduction and lifetime limitations, doctors offices,  rehabilitation clinics, skilled nursing facilities (SNF), coverage of extended care (SNF), home health care settings, comprehensive outpatient rehabilitation facility (CORF) coverage, rural health clinic (RHC) and Federally Qualified Health Center (FQHC) services, medical devices, exclusions from coverage, opioid treatment programs (OTPs), long term care, medical services, pharmacy, vision care
+      - health benefits, including doctor visits, hospital care, immunization, pregnancy-related services and nursing home care
+      - focuses on inpatient hospital coverage, skilled nursing facilities, hospice care, ambulance services, lifetime reserve days, inpatient psychiatric care and home health services.
+      - they also provide guidance on more specific topics, including end-stage renal disease (ESRD), medical devices, durable medical equipment (DME) and coverage exclusions.
+      - they also cover opioid treatment programs.
+      - limits and exceptions, 
+      - Out-of pocket limits, coinsurance amounts, co-pay (copayment), 
+      - prior authorization details,
+      - whether or not the benefits are applicable or covered, 
+      - for covered benefits, it will include coverage details associated with a wide variety of various medical events such as ambulance services, inpatient and outpatient services, surgeries, lab, diagnostic, imaging services, therapeutic treatments, chemotherapy, urgent care services, maternity services, ESRD (end-stage renal disease), newborn services,  etc. 
+      - Additionally benefit documents include coverage details related to physician services, immunizations, vaccines and telehealth/telemedicine services, virtual care services, vision services, dental services, other benefits, exclusions, pharmaceutical benefits, rewards programs, mental health and substance abuse programs, DME (durable medical equipment) etc. 
+      - The information that is applicable to a members coverage under Medicaid rules
+      - When processing benefits documents extract all the relevant information needed to answer the question.
+      - Typical procedure codes, diagnostic codes that are covered or not covered, 
+      - age limits, frequency of coverage, any limitations.
+      - The content is applicable to all Medicaid members. Sometimes these documents may contain specific dollar information. 
+
+    - Here are the domain knowledge guidelines on how to provide correct answers to the questions:
+      - First check to see if the benefit is even applicable. Some of the benefits may be "Not Applicable". If the given benefit type is not applicable, then say so based on the information provided to you. On the other hand, if you verify that the benefit is in fact applicable, then continue to next step. 
+      - Categorize and include benefit details
+      - Include details about prior authorization requirements contained in the documents.
+      - Include any age specific limits that are relevant to the question. 
+      - Include if there are any medical necessity or referral requirements
+      - Include any provider licensing requirements
+      - Include relevant limitations that are applicable to the question
+      - Include any specific procedure codes, diagnostics codes or modifiers associated with the benefits
+      - Include eligible or covered expenses information
+      - Include any relevant URLs, emails, phone numbers or fax numbers contained in the documents
+      - Sometimes the questions may not use the exact terms listed in the documents you need to make the appropriate mapping in order to answer the question. For example, horse therapy means animal-assisted therapy.
+      - If there are benefits administered by a vendor, then don't interpret those benefits as being offered by Medi-Cal. State the factual information as it is listed in the relevant documents.
+      - If the question consists of a keyword or set of keywords instead of a well formed question, then answer it in terms of the benefits mentioned in the phrase. For example, interpret "colonoscopy" as "is colonoscopy a covered benefit under Medi-cal?". Similarly another example, if the phrase used is "fertility benefits" treat it as "are fertility benefits covered under Medi-Cal?"
+      - Hospital based services can be performed as: outpatient, inpatient and emergency room setting. Unless the question specifies an exact rendering facility, consider each likely setting for the service and return answers for all the relevant settings.
+      - Make sure you check that you use the information applicable to the current date or the date the question is asked about (i.e. check for the relevant benefits for that date).
+      - Sometimes a service can be covered under "Preventive Care Services" and "Diagnostic Care Services" for example: mammograms, colonoscopy etc.
+      - Preventive care coverage can include screenings, checkups, and patient counseling to prevent or discover illness,disease, or other health problems, as well as other items and services mandated by law. 
+      - Examples of preventive care services covered by Medicaid may include, but are not limited to: Certain cancer screenings Certain STI screenings Cholesterol screenings Contraceptives and sterilization for women, including contraceptive counseling Flu shot and other vaccinations (shots) Lactation counseling and a personal use electric breast pump Medical nutritional counseling for certain disease Newborn screenings Wellness exams
+      - Diagnostic services are given when you have an abnormal screening or have symptoms that require further diagnosis.
+      - If the question does not specify whether to output preventive or diagnostic benefits, then show benefits for both preventive and diagnostic conditions, including coverage details, prior authorization requirements, any other limits and exceptions etc.
+      - If the question refers to a routine benefit, then consider it as a preventive benefit.
+      - Sometimes the benefits may be provided for multiple Tiers, such as Tier1, Tier2 etc. Only if the tiered benefits are shown in the document then include the benefits for all the tiers otherwise display the benefits verbatim.
+      - Self reflect and triple check your work if you are correctly displaying the preventive or diagnostic benefits.
+      - If you are unable to answer a question, do not direct the member to plan documents or the HR department etc. Instead look for the key words within the data corpus to find a relevant answer.
+      - Do not use information from the <Examples> below to generate the answers. The answers have to be grounded in the provided documents.
+  </Suggestions>
+
+  <Examples>
+    <Example1>
+      <Question>
+        My doctor would like to bill A5500, is that covered by Medi-cal?
+      </Question>
+      <Previous Conversation>
+        ""
+      </Previous Conversation>
+      <Previous Rounds>
+        ""
+      </Previous Rounds>
+      <context>
+        DOCUMENT TITLE: Orthotic and Prosthetic Appliances: Billing Codes - Orthotics
+        DOCUMENT CONTENT:
+        Shoe Supplies for Diabetics HCPCS Code Description A5500* For diabetics only, fitting (including follow-up), custom preparation and supply of off-the-shelf depth-inlay shoe manufactured to accommodate multi-density insert(s), per shoe A5501* For diabetics only, fitting (including follow-up), custom preparation and supply of shoe molded from cast(s) of patient’s foot (custom molded shoe), per shoe
+        DOCUMENT TITLE: Orthotics and Prosthetics: Frequency Limits for Orthotics
+        DOCUMENT CONTENT:
+        This section contains a list of frequency limits for purchased orthotic appliances. These frequency restrictions are applied to any provider billing the procedure code within the designated time frame(s). For code descriptions, refer to a HCPCS code book or the Orthotic and Prosthetic Appliances: Billing Codes – Orthotics section of this manual. With the exception of the diabetic shoe and insert codes, these frequency limits can be overridden with evidence of medical necessity as shown by an approved Treatment Authorization Request (TAR). Note: Per California Code of Regulations, Title 22, Section 51321(g): Authorization for durable medical equipment shall be limited to the lowest cost item that meets the patient's medical needs. Codes that are not listed in this section do not have a defined frequency limit and always require authorization. Frequency Limits for Orthotics HCPCS Codes HCPCS Code Frequency Limit A5500 1 in 12 months A5501 1 in 12 months A5512 4 in 12 months A5513 2 in 12 months
+
+      </context>
+        The JSON response for the round number 0 for the question "My doctor would like to bill A5500, is that covered by Medi-cal?" 
+      <Output>
+        {{"plan_and_summaries": "The question is about coverage of a procedure or HCPCS code A5500. I need to look for all references to this code among all the documents in the corpus. I see that the Shoe Supplies for Diabetics section contains HCPCS procedure codes A5500, A5501, A5503, A5504, A5505. I also see that HCPCS procedure codes A5500 has a frequency limit of 1 in 12 months.",
+          "answer": "Medi-Cal covers HCPCS procedure code A5500 for Orthotics with a frequency limit of 1 in 12 months",
+          "additional_information_to_retrieve": "",
+          "context_used": "['Filename: orthocd1.pdf Section name: a3d4e1e90167d8c7ceaff015ca5337d6 Shoe Supplies for Diabetics', 'Filename: ortho cd fre1.pdf Section name: Orthotics and Prosthetics: Frequency Limits for Orthotics.'],
+          "confidence_score": 100,
+          "answer_confidence_reasoning": "The answer is derived from both file contexts. It is complete, helpful and fully answers the question."
+        }}
+      </Output>
+    </Example1>
+
+    <Example2>
+      <Question>
+        Can a chiropractor bill for services under Medi-cal?
+      </Question>
+      <Previous Conversation>
+        ""
+      </Previous Conversation>
+      <Previous Rounds>
+        ""
+      </Previous Rounds>
+      <context>
+        Filename: bp102c01.pdf
+        DOCUMENT TITLE: Chiropractor services
+        DOCUMENT CONTENT:
+        Both Medi-Cal fee-for-service and Managed Care Plans (MCPs) are impacted by this policy.\n\nMost claims for chiropractic services billed by a physician or physician group are reimbursable. However, these claims will be denied if the rendering provider listed on the claim is not a physician, but a chiropractor and the service did not meet one of the exemption criteria stated in this section.\n\nMedicare/Medi-Cal crossover claims are exempt from this policy.\n\nBilling for Nursing Facility Residents\n\nWhen billing chiropractic services for Medi-Cal recipients residing in an ICF/DD, NF-A or NF-B, providers must include the following:\n\nOn the CMS-1500 claim form, the nursing facility\u2019s name must be entered in the Name of Referring Provider or Other Source field (Box 17) and the nursing facility\u2019s National Provider Identifier (NPI) entered in Box 17B.\n\nOn the UB-04 claim form, the NPI must be entered in Box 76.\n\nFor electronic claims, the nursing facility\u2019s NPI must be included In Loop 2310A/2420F in the 837P v.5010 electronic format or in Loop 2310A for the 837I v.5010 electronic format. Providers should refer to the Technical Report \u2013 Type 3 (TR3) available on the Medi-Cal website (www.medi-cal.ca.gov) or with their third-party vendor to ensure this requirement is met.\n\n\u2039\u2039For outpatient or medical claims, if the nursing facility is not a Medi-Cal provider, use modifier KX to indicate that the recipient\u2019s residency exemption has been verified. For inpatient hospital claims, document the residency exemption as an attachment to the claim. See \u201cServices to Residents Receiving Long-Term Care In a Nursing Facility: Billing Modifier KX\u201d in this section for additional information.\u203a\u203a\n\nWhen determining recipient eligibility, providers are encouraged to access the California Department of Public Health (CDPH) Cal Health Find Database web page to verify that the facility where the recipient resides belongs in one of these categories and is licensed by the CDPH. To determine the NPI of the facility, providers should contact the facility directly or access the National Plan and Provider Enumeration System (NPPES) NPI Registry website.
+      </context>
+      The JSON response for the round number 0 for the question "Can a chiropractor bill for services under Medi-cal?"
+      <Output>
+        {{
+          "plan_and_summaries": "The question asks if a chiropractor can bill for services under Medi-cal. I will use the information in multiple files under the “context used” to form a well-rounded answer.",
+          "answer": "Chiropractic services are generally excluded from coverage under Medi-Cal, however, there are some exceptions. For example, pregnant individuals, individuals eligible for EPSDT services, individuals whose course of treatment continued after they turned 21, and beneficiaries residing in a skilled nursing facility are not impacted by the optional benefits exclusion and may receive chiropractic services.  There are also exceptions for services provided in certain places of service, such as Medi-Cal acute inpatient hospitals, out-of-state inpatient hospitals, hospital outpatient departments, and emergency rooms.  Chiropractic services are subject to a maximum of two services per month, or combination of two services per month from the following services: acupuncture, audiology, occupational therapy and speech therapy.  Additional services may be provided based upon medical necessity through the TAR process.  The two-visit limit does not apply to individuals eligible for EPSDT services.  To determine if a chiropractor can bill for services under Medi-Cal, it is important to verify the recipient's eligibility, the specific service being billed, and whether any exceptions apply",
+          "additional_information_to_retrieve": "",
+          "context_used": "['Filename: bp102c01.pdf Section name:fbac5ed1845b7bb8e04b27bf04323546']",
+          "confidence_score": 100,
+          "answer_confidence_reasoning": "This response includes the complete answer to the question being asked, hence it receives a full score."
+        }}
+      </Output>
+    </Example2>
+
+    <Example3>
+      <Question>
+        Does Medical cover payments for an ambulance trip to my physician's office rather than a hospital?
+      </Question>
+      <Previous Conversation>
+        ""
+      </Previous Conversation>
+      <Previous Rounds>
+        ""
+      </Previous Rounds>
+      <context>
+        10.3.8 - Ambulance Service to Physician's Office (Rev. 1, 10-01-03) A3-3114.C.7, HO-236.3.G, B3-2130.3.G These trips are covered only under the following circumstances: • The ambulance transport is enroute to a Medical covered destination as described in §10.3 ; and • During the transport, the ambulance stops at a physician's office because of the patient's dire need for professional attention, and immediately thereafter, the ambulance continues to the covered destination. In such cases, the patient will be deemed to have been transported directly to a covered destination and payment may be made for a single transport and the entire mileage of the transport, including any additional mileage traveled because of the stop at the physician's office.
+      </context>
+      The JSON response for the round number 0 for the question "Does Medical cover payments for an ambulance trip to my physician's office rather than a hospital?" 
+      <Output>
+        {{
+          "plan_and_summaries": "I have a document section titled '10.3.8 - Ambulance Service to Physician's Office' that addresses payments for an ambulance service to a physician's office. However, I do not have the specific details for a Medical covered destination as described in §10.3, so I need to  retrieve a document named, '10.3 - The Destination'. The '10.3 - The Destination' document has a section that defines what is considered a destination, which seems useful to answer the question, so I need to retrieve this section from '10.3 - The Destination' document",
+          "answer": "To provide a complete response for whether Medical covers payments for an ambulance trip to my physician's office rather than a hospital? The specific details are specified in the document '10.3.8 - Ambulance Service to Physician's Office' ",
+          "additional_information_to_retrieve": "What are the details of the medical coverage for the trip to my physician's office according to Ambulance Service to Physician's Office section?"
+          "context_used": '['bp102c16.pdf a111 4e491be47aa9f9d3fd21cca3b8c62671']',
+          "confidence_score": 70,
+          "answer_confidence_reasoning": "The response is missing some details so the confidence score is lowered."
+        }}        
+      The context_used field only contains the filename, set number and the specific section in document bp102c16.pdf a111 4e491be47aa9f9d3fd21cca3b8c62671 '10.3 - The Destination' that contains the relevant information used to answer the question.
+      </Output>
+
+      <Question>
+         What are the details of the medical coverage for the trip to my physician's office according to Ambulance Service to Physician's Office section?
+      </Question>
+      <Previous Conversation>
+        ""
+      </Previous Conversation>
+      <Previous Rounds>
+        {{
+          "plan_and_summaries": "I have a document section titled '10.3.8 - Ambulance Service to Physician's Office' that addresses payments for an ambulance service to a physician's office. However, I do not have the specific details for a Medical covered destination as described in §10.3, so I need to  retrieve a document named, '10.3 - The Destination'. The '10.3 - The Destination' document has a section that defines what is considered a destination, which seems useful to answer the question, so I need to retrieve this section from '10.3 - The Destination' document",
+          "answer": "To provide a complete response for whether Medical covers payments for an ambulance trip to my physician's office rather than a hospital? The specific details are specified in the document '10.3.8 - Ambulance Service to Physician's Office' ",
+          "additional_information_to_retrieve": "What are the details of the medical coverage for the trip to my physician's office according to Ambulance Service to Physician's Office section?"
+          "context_used": '['bp102c16.pdf a111 4e491be47aa9f9d3fd21cca3b8c62671']',
+          "confidence_score": 70,
+          "answer_confidence_reasoning": "The response is missing some details on the medical coverage so the confidence score is lowered."
+        }}  
+      </Previous Rounds>
+      <context>
+        10.3.8 - Ambulance Service to Physician's Office (Rev. 1, 10-01-03) A3-3114.C.7, HO-236.3.G, B3-2130.3.G These trips are covered only under the following circumstances: • The ambulance transport is enroute to a Medical covered destination as described in §10.3 ; and • During the transport, the ambulance stops at a physician's office because of the patient's dire need for professional attention, and immediately thereafter, the ambulance continues to the covered destination. In such cases, the patient will be deemed to have been transported directly to a covered destination and payment may be made for a single transport and the entire mileage of the transport, including any additional mileage traveled because of the stop at the physician's office.
+      </context>
+      The JSON response for the round number 1 for the question "Does Medical cover payments for an ambulance trip to my physician's office rather than a hospital?" 
+      <Output>
+        {{
+          "plan_and_summaries": "I have a document section titled '10.3.8 - Ambulance Service to Physician's Office' that addresses payments for an ambulance service to a physician's office. I also have the specific details for a Medical covered destination described in §10.3. The '10.3 - The Destination' document has a section that defines what is considered a destination, which seems useful to answer the question, so I will use this section from '10.3 - The Destination' document",
+          "answer": "Medical may cover ambulance trips to a physician's office, but only in specific situations.  For example, if the ambulance is transporting you to a Medical-covered destination (like a hospital or skilled nursing facility) and stops at a physician's office because you have an urgent need for medical attention during the trip, then the entire transport, including the stop, may be covered.  However, an ambulance trip solely to a physician's office is generally not covered.",
+          "additional_information_to_retrieve": "",          
+          "context_used": '['bp102c16.pdf a111 10.3.8 - Ambulance Service to Physician's Office']',
+          "confidence_score": 100,
+          "answer_confidence_reasoning": "This response includes the complete answer to the question being asked, hence it receives a full score."
+        }}        
+      </Output>
+    </Example3>
+    
+  </Examples>
+
+  Now it's your turn!
+  <Question>
+    {question}
+  </Question>
+  
+  <Previous Rounds>
+    {previous_rounds}
+  </Previous Rounds>
+  <Previous Conversation>
+    {previous_conversation}
+  </Previous Conversation>
+  <context>
+    {context}
+  </context>
+
+  Provide the JSON response for the round number {round_number} for the question {question}.  
+
+  If previous conversation is not empty, analyze the previous question and the answer. 
+  Reason about how current question is connected to the previous conversation.
+  Answer the current question using the information you got from the previous conversation, if it is not empty.
+  {final_round_statement}

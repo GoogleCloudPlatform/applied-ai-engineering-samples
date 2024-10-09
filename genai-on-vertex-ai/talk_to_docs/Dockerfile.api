@@ -1,0 +1,40 @@
+FROM ubuntu:24.10
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        apt-transport-https \ 
+        ca-certificates \ 
+        curl \
+        make \
+        git \
+        && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN useradd t2x
+
+ENV MINICONDA_VERSION=latest
+RUN curl -sL "https://repo.anaconda.com/miniconda/Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh" -o /miniconda.sh && \
+    bash /miniconda.sh -b -p /miniconda && \
+    rm /miniconda.sh
+
+ENV PATH=/miniconda/bin:${PATH}
+
+RUN conda install -y python=3.11 && \
+    conda clean -afy
+
+WORKDIR /app
+
+COPY --chown=t2x . .
+
+RUN pip3 install .
+
+USER t2x
+
+EXPOSE 8080
+
+CMD ["uvicorn", "gen_ai.deploy.api:app", "--reload", "--host", "0.0.0.0", "--port", "8080"]
