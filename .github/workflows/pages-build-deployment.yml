@@ -30,16 +30,4 @@ jobs:
       - name: Build and deploy documentation
         run: |
           chmod +x ./mkdocs.sh
-          ./mkdocs.sh gh-deploy --force
-
-  report-build-status:
-    needs: build-and-deploy
-    runs-on: ubuntu-latest
-    steps:
-      - name: Report build status
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh api -X POST "repos/$GITHUB_REPOSITORY/pages/telemetry" \
-            -f "type=build" \
-            -f "status=success"
+          ./mkdocs.sh gh-deploy --clean
