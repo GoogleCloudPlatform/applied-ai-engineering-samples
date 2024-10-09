@@ -20,7 +20,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r docs/requirements.txt
       
       - name: Configure Git
         run: |
@@ -29,5 +29,6 @@ jobs:
       
       - name: Build and deploy documentation
         run: |
+          cd docs
           chmod +x ./mkdocs.sh
           ./mkdocs.sh gh-deploy --force

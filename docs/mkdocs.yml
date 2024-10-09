@@ -9,6 +9,8 @@ site_description: >-
 repo_name: GoogleCloudPlatform/applied-ai-engineering-samples
 repo_url: https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples
 
+docs_dir: docs
+
 # Configuration
 theme:
   name: material
@@ -173,21 +175,6 @@ extra_javascript:
 
 nav:
   - Home: index.md
-  - AI Infrastructure:
-    - Overview: ai-infrastructure/README.md
-    - Terraform Modules:
-      - Bootstrap: ai-infrastructure/terraform-modules/bootstrap/README.md
-      - GKE AIML: ai-infrastructure/terraform-modules/gke-aiml/README.md
-      - Kueue Config: ai-infrastructure/terraform-modules/kueue-config/README.md
-      - Metrics Tracking: ai-infrastructure/terraform-modules/metrics-tracking/README.md
-      - Workload Identity: ai-infrastructure/terraform-modules/workload-identity/README.md
-    - TPU Training on GKE:
-      - Overview: ai-infrastructure/tpu-training-on-gke/README.md
-      - Examples:
-        - Overview: ai-infrastructure/tpu-training-on-gke/examples/README.md
-        - JobSet: ai-infrastructure/tpu-training-on-gke/examples/jobset/README.md
-        - XPK: ai-infrastructure/tpu-training-on-gke/examples/xpk/README.md
-      - Images: ai-infrastructure/tpu-training-on-gke/images/README.md
   - GenAI on Vertex AI:
     - Overview: genai-on-vertex-ai/README.md
     - Advanced Prompting Training:
@@ -271,3 +258,18 @@ nav:
     - TimesFM:
       - Overview: research-operationalization/timesfm/README.md
       - Operationalizing TimesFM: research-operationalization/timesfm/operationalizing_timesfm_on_vertexai.ipynb
+  - AI Infrastructure:
+    - Overview: ai-infrastructure/README.md
+    - Terraform Modules:
+      - Bootstrap: ai-infrastructure/terraform-modules/bootstrap/README.md
+      - GKE AIML: ai-infrastructure/terraform-modules/gke-aiml/README.md
+      - Kueue Config: ai-infrastructure/terraform-modules/kueue-config/README.md
+      - Metrics Tracking: ai-infrastructure/terraform-modules/metrics-tracking/README.md
+      - Workload Identity: ai-infrastructure/terraform-modules/workload-identity/README.md
+    - TPU Training on GKE:
+      - Overview: ai-infrastructure/tpu-training-on-gke/README.md
+      - Examples:
+        - Overview: ai-infrastructure/tpu-training-on-gke/examples/README.md
+        - JobSet: ai-infrastructure/tpu-training-on-gke/examples/jobset/README.md
+        - XPK: ai-infrastructure/tpu-training-on-gke/examples/xpk/README.md
+      - Images: ai-infrastructure/tpu-training-on-gke/images/README.md
