@@ -1,0 +1,48 @@
+name: pages-build-deployment
+
+on:
+  push:
+    branches:
+      - master
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Configure Git
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+      
+      - name: Build and deploy documentation
+        run: |
+          chmod +x ./mkdocs.sh
+          ./mkdocs.sh gh-deploy --force
+
+  report-build-status:
+    needs: build-and-deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Report build status
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api -X POST "repos/$GITHUB_REPOSITORY/pages/telemetry" \
+            -f "type=build" \
+            -f "status=success"
