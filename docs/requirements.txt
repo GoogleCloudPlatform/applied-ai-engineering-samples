@@ -1,0 +1,5 @@
+mkdocs
+mkdocs-material
+mkdocs-jupyter
+mkdocs-bootswatch
+mkdocs-minify-plugin
