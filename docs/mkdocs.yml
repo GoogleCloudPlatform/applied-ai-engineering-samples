@@ -67,9 +67,10 @@ theme:
     text: Open Sans
     code: Roboto Mono
   copyright: |
-  The code samples in this repository are maintained by the Google Cloud Applied AI Engineering team.<br>
-  Copyright &copy; 2019-2024 Google LLC<br>
-  <a href='https://cloud.google.com/'><img src='assets/aaie_favicon.png'></a>
+    The code in this repository is maintained by the Google Cloud Applied AI Engineering team.<br>
+    Copyright &copy; 2019-2024 Google LLC<br>
+    <a href='https://cloud.google.com/'><img src='assets/aaie_favicon.png'/></a>
+
   icon:
     admonition:
       note: octicons/tag-16
