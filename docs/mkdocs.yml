@@ -178,12 +178,12 @@ nav:
   - Home: index.md
   - GenAI on Vertex AI:
     - Overview: genai-on-vertex-ai/README.md
-    - Foundation Models:
+    - Foundation Models: genai-on-vertex-ai/gemini/README.md
       - Gemini Prompting Recipes: genai-on-vertex-ai/gemini/prompting_recipes/README.md
         - Long Context Windows: genai-on-vertex-ai/gemini/prompting_recipes/long_context_window/README.md
           - Long Context Text: genai-on-vertex-ai/gemini/prompting_recipes/long_context_window/gemini_long_context_text.ipynb
           - Long Context Video: genai-on-vertex-ai/gemini/prompting_recipes/long_context_window/gemini_long_context_video.ipynb
-        - PDF Processing:
+        - PDF Processing: genai-on-vertex-ai/gemini/prompting_recipes/pdf_processing_with_gemini/README.md
           - Extract PDF Pages: genai-on-vertex-ai/gemini/prompting_recipes/pdf_processing_with_gemini/1_extract_pdf_pages_with_gemini.ipynb
           - PDF Info Extraction: genai-on-vertex-ai/gemini/prompting_recipes/pdf_processing_with_gemini/2_pdf_info_extraction_with_gemini.ipynb
         - Multimodal: genai-on-vertex-ai/gemini/prompting_recipes/multimodal/README.md
@@ -194,24 +194,24 @@ nav:
         - CoT & ReAct: genai-on-vertex-ai/advanced_prompting_training/cot_react.ipynb
       - Vertex Foundation Tuning: genai-on-vertex-ai/vertex_foundation_tuning/README.md
         - Model Tuning: genai-on-vertex-ai/vertex_foundation_tuning/vertexai-model-tuning.ipynb
-    - Evaluation:
+    - Evaluation: genai-on-vertex-ai/gemini/README.md
       - Gemini Evals Playbook: genai-on-vertex-ai/gemini/evals_playbook/README.md
         - Setup Playbook: genai-on-vertex-ai/gemini/evals_playbook/notebooks/0_gemini_evals_playbook_setup.ipynb
         - Evaluate: genai-on-vertex-ai/gemini/evals_playbook/notebooks/1_gemini_evals_playbook_evaluate.ipynb
         - Grid Search: genai-on-vertex-ai/gemini/evals_playbook/notebooks/2_gemini_evals_playbook_gridsearch.ipynb
       - Vertex GenAI Evaluation Services: genai-on-vertex-ai/vertex_evaluation_services/README.md
-        - Computation-based Evaluation:
+        - Computation-based Evaluation: genai-on-vertex-ai/vertex_evaluation_services/computation-based-evaluation/
           - Classification with text-bison: genai-on-vertex-ai/vertex_evaluation_services/computation-based-evaluation/1_evaluate_bison_classification_sdk.ipynb
           - Classification with tuned models: genai-on-vertex-ai/vertex_evaluation_services/computation-based-evaluation/2_evaluate_tuned_classification_sdk.ipynb
           - QA with text-bison: genai-on-vertex-ai/vertex_evaluation_services/computation-based-evaluation/3_evaluate_bison_qa_pipeline.ipynb
           - Classification with text-bison (Alternative): genai-on-vertex-ai/vertex_evaluation_services/computation-based-evaluation/4_evaluate_tuned_classification.ipynb
         - Evaluation RAG Systems: genai-on-vertex-ai/vertex_evaluation_services/evaluation-rag-systems/evaluation_rag_use_cases.ipynb
-        - Theory:
+        - Theory: genai-on-vertex-ai/vertex_evaluation_services/theory/
           - Classification: genai-on-vertex-ai/vertex_evaluation_services/theory/Theory_Evaluate_1_Classification.ipynb
           - Summarization: genai-on-vertex-ai/vertex_evaluation_services/theory/Theory_Evaluate_2_Summarization.ipynb
           - Text Generation: genai-on-vertex-ai/vertex_evaluation_services/theory/Theory_Evaluate_3_Text_Generation.ipynb
           - Q&A: genai-on-vertex-ai/vertex_evaluation_services/theory/Theory_Evaluate_4_QandA.ipynb
-    - RAG & Grounding:
+    - RAG & Grounding:  genai-on-vertex-ai/retrieval_augmented_generation/README.md
       - Vertex AI Search: genai-on-vertex-ai/vertex_ai_search/README.md
         - Custom Attributes by URL Pattern: genai-on-vertex-ai/vertex_ai_search/custom_attributes_by_url_pattern.ipynb
         - Ingesting Unstructured Documents: genai-on-vertex-ai/vertex_ai_search/ingesting_unstructured_documents_with_metadata.ipynb
@@ -220,7 +220,7 @@ nav:
         - Query Level Boosting: genai-on-vertex-ai/vertex_ai_search/query_level_boosting_filtering_and_facets.ipynb
       - DIY RAG: genai-on-vertex-ai/retrieval_augmented_generation/README.md
         - Building Grounded RAG App: genai-on-vertex-ai/retrieval_augmented_generation/diy_rag_with_vertexai_apis/build_grounded_rag_app_with_vertex.ipynb
-    - Agents:
+    - Agents: genai-on-vertex-ai/agents/
       - Reasoning Engine: genai-on-vertex-ai/agents/reasoning_engine/langchain_on_reasoning_engine/README.md
       - Vertex AI Extensions: genai-on-vertex-ai/vertex_ai_extensions/README.md
         - Business Analyst Workflow: genai-on-vertex-ai/vertex_ai_extensions/notebooks/business_analyst_workflow_vertexai_extensions.ipynb
@@ -228,7 +228,7 @@ nav:
         - Game Review Analysis: genai-on-vertex-ai/vertex_ai_extensions/notebooks/game_review_analysis_vertexai_extensions.ipynb
         - Pandas Code Interpreter: genai-on-vertex-ai/vertex_ai_extensions/notebooks/pandas_code_interpreter.ipynb
         - Web Developer Workflow: genai-on-vertex-ai/vertex_ai_extensions/notebooks/web_developer_workflow_vertexai_extensions.ipynb
-    - Others
+    - Others: genai-on-vertex-ai/
       - Developer Productivity: genai-on-vertex-ai/developer_productivity_with_genai/README.md
         - Code Generation: genai-on-vertex-ai/developer_productivity_with_genai/1_codey_code_gen_example.ipynb
         - Code Fine-tuning: genai-on-vertex-ai/developer_productivity_with_genai/2_codey_code_fine_tune_example.ipynb
@@ -244,7 +244,7 @@ nav:
     - TimesFM: research-operationalization/timesfm/README.md
       - Operationalizing TimesFM: research-operationalization/timesfm/operationalizing_timesfm_on_vertexai.ipynb
   - AI Infrastructure: ai-infrastructure/README.md
-    - Terraform Modules:
+    - Terraform Modules: ai-infrastructure/terraform-modules/
       - Bootstrap: ai-infrastructure/terraform-modules/bootstrap/README.md
       - GKE AIML: ai-infrastructure/terraform-modules/gke-aiml/README.md
       - Kueue Config: ai-infrastructure/terraform-modules/kueue-config/README.md
