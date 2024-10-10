@@ -66,7 +66,10 @@ theme:
   font:
     text: Open Sans
     code: Roboto Mono
-  copyright: Copyright &copy; 2024 Google LLC
+  copyright: |
+  The code samples in this repository are maintained by the Google Cloud Applied AI Engineering team.<br>
+  Copyright &copy; 2019-2024 Google LLC<br>
+  <a href='https://cloud.google.com/'><img src='assets/aaie_favicon.png'></a>
   icon:
     admonition:
       note: octicons/tag-16
@@ -210,7 +213,7 @@ nav:
       - Vertex GenAI Evaluation Services: 
         - Overview: genai-on-vertex-ai/vertex_evaluation_services/README.md
         - Computation-based Evaluation: 
-          - Overview: genai-on-vertex-ai/vertex_evaluation_services/computation-based-evaluation/
+          - Overview: genai-on-vertex-ai/vertex_evaluation_services/computation-based-evaluation/1_evaluate_bison_classification_sdk.ipynb
           - Classification with text-bison: genai-on-vertex-ai/vertex_evaluation_services/computation-based-evaluation/1_evaluate_bison_classification_sdk.ipynb
           - Classification with tuned models: genai-on-vertex-ai/vertex_evaluation_services/computation-based-evaluation/2_evaluate_tuned_classification_sdk.ipynb
           - QA with text-bison: genai-on-vertex-ai/vertex_evaluation_services/computation-based-evaluation/3_evaluate_bison_qa_pipeline.ipynb
@@ -218,7 +221,7 @@ nav:
         - Evaluation RAG Systems: 
           - Overview: genai-on-vertex-ai/vertex_evaluation_services/evaluation-rag-systems/evaluation_rag_use_cases.ipynb
         - Theory: 
-          - Overview: genai-on-vertex-ai/vertex_evaluation_services/theory/
+          - Overview: genai-on-vertex-ai/vertex_evaluation_services/theory/Theory_Evaluate_1_Classification.ipynb
           - Classification: genai-on-vertex-ai/vertex_evaluation_services/theory/Theory_Evaluate_1_Classification.ipynb
           - Summarization: genai-on-vertex-ai/vertex_evaluation_services/theory/Theory_Evaluate_2_Summarization.ipynb
           - Text Generation: genai-on-vertex-ai/vertex_evaluation_services/theory/Theory_Evaluate_3_Text_Generation.ipynb
@@ -236,9 +239,10 @@ nav:
         - Overview: genai-on-vertex-ai/retrieval_augmented_generation/README.md
         - Building Grounded RAG App: genai-on-vertex-ai/retrieval_augmented_generation/diy_rag_with_vertexai_apis/build_grounded_rag_app_with_vertex.ipynb
     - Agents: 
-      - Overview: genai-on-vertex-ai/agents/
-      - Reasoning Engine: 
-        - Overview: genai-on-vertex-ai/agents/reasoning_engine/langchain_on_reasoning_engine/README.md
+      # - Overview: genai-on-vertex-ai/agents/
+      # - Reasoning Engine: 
+      #   - Overview: genai-on-vertex-ai/agents/reasoning_engine/langchain_on_reasoning_engine/README.md
+      - Overview: genai-on-vertex-ai/vertex_ai_extensions/README.md      
       - Vertex AI Extensions: 
         - Overview: genai-on-vertex-ai/vertex_ai_extensions/README.md
         - Business Analyst Workflow: genai-on-vertex-ai/vertex_ai_extensions/notebooks/business_analyst_workflow_vertexai_extensions.ipynb
@@ -247,7 +251,7 @@ nav:
         - Pandas Code Interpreter: genai-on-vertex-ai/vertex_ai_extensions/notebooks/pandas_code_interpreter.ipynb
         - Web Developer Workflow: genai-on-vertex-ai/vertex_ai_extensions/notebooks/web_developer_workflow_vertexai_extensions.ipynb
     - Others: 
-      - Overview: genai-on-vertex-ai/
+      - Overview: genai-on-vertex-ai/README.md
       - Developer Productivity: 
         - Overview: genai-on-vertex-ai/developer_productivity_with_genai/README.md
         - Code Generation: genai-on-vertex-ai/developer_productivity_with_genai/1_codey_code_gen_example.ipynb
