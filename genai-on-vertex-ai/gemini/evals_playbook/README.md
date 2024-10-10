@@ -1,9 +1,24 @@
+![gemini_evals_banner](../../../assets/gemini_evals_banner.png)
+
 <h1 align="center">Vertex AI: Gemini Evaluations Playbook</h1>
 <h3 align="center">Experiment, Evaluate & Analyze model performance for your use cases</h3>
 
 ## ✨ Overview
 
 The **Gemini Evaluations Playbook** provides recipes to streamline the experimentation and evaluation of Generative AI models for your use cases using [Vertex Generative AI Evaluation service](https://cloud.google.com/vertex-ai/generative-ai/docs/models/evaluation-overview). This enables you to track and align model performance with your objectives, while providing insights to optimize the model under different conditions and configurations.
+
+## 📏 Experimentation and evaluation workflow
+
+[Prompting strategies and best practices](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/prompts/prompt-design-strategies) are essential for getting started with Gemini, but they're only the first step. To ensure your Generative AI solution with Gemini delivers repeatable and scalable performance, you need a systematic experimentation and evaluation process. This involves meticulous tracking of each experimental configuration, including prompt templates (system instructions, context, and few-shot learning examples), and model parameters like temperature and max output tokens.
+
+Your evaluation should go beyond overall results and report granular metrics for each experiment and not just final results for the evaluation exercise.
+
+By following this process, you'll not only maximize your GenAI solution's performance but also identify anti-patterns and system-level design improvements early on. This proactive approach is far more efficient than discovering issues after deployment.
+
+![evals-process-workflow](../../../assets/gemini_evals_process_flow.png)
+
+> [!NOTE]
+> Refer [here](https://developers.googleblog.com/en/enhance-your-prompts-with-vertex-ai-prompt-optimizer/) for adding automation to your experimentation workflow with the Vertex AI Prompt Optimizer.
 
 ## 📏 Architecture
 
@@ -38,7 +53,7 @@ Analyze insights from evaluation to iteratively refine prompts, model configurat
 ### STEP 1. Clone the repository
    
 ```shell
-git clone https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples.git && cd applied-ai-engineering-samples/genai-on-vertex-ai/gemini_evals_playbook
+git clone https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples.git && cd applied-ai-engineering-samples/genai-on-vertex-ai/gemini/evals_playbook
 ```
 
 ### STEP 2. Prepare your environment
