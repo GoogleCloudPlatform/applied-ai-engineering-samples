@@ -176,8 +176,7 @@ extra_javascript:
 
 nav:
   - Home: index.md
-  - GenAI on Vertex AI:
-    - Overview: genai-on-vertex-ai/README.md
+  - GenAI on Vertex AI: genai-on-vertex-ai/README.md
     - Foundation Models: genai-on-vertex-ai/gemini/README.md
       - Gemini Prompting Recipes: genai-on-vertex-ai/gemini/prompting_recipes/README.md
         - Long Context Windows: genai-on-vertex-ai/gemini/prompting_recipes/long_context_window/README.md
