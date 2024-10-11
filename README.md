@@ -1,3 +1,19 @@
+<p align="center">
+  <a href="https://googlecloudplatform.github.io/applied-ai-engineering-samples/">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/GoogleCloudPlatform/applied-ai-engineering-samples/refs/heads/add-docs/assets/aaie_logo_dark.png">
+      <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/GoogleCloudPlatform/applied-ai-engineering-samples/refs/heads/add-docs/assets/aaie_logo_light.png">
+    </picture>
+  </a>
+</p>
+
+---
+
+**Documentation**: <a href="https://googlecloudplatform.github.io/applied-ai-engineering-samples/" target="_blank">https://googlecloudplatform.github.io/applied-ai-engineering-samples/</a>
+
+**Source Code**: <a href="https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples" target="_blank">https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples</a>
+
+---
 # Google Cloud Applied AI Engineering
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
