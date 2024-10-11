@@ -1,30 +1,35 @@
 <p align="center">
   <a href="https://googlecloudplatform.github.io/applied-ai-engineering-samples/">
-    <img id="aaie-logo" alt="Applied AI Engineering Samples">
   </a>
 </p>
 
-<script>
-  const logoImg = document.getElementById('aaie-logo');
-  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    logoImg.src = "https://raw.githubusercontent.com/GoogleCloudPlatform/applied-ai-engineering-samples/refs/heads/add-docs/assets/aaie_logo_dark.png";
-  } else {
-    logoImg.src = "https://raw.githubusercontent.com/GoogleCloudPlatform/applied-ai-engineering-samples/refs/heads/add-docs/assets/aaie_logo_light.png";
-  }
-</script>
+<center>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/GoogleCloudPlatform/applied-ai-engineering-samples/refs/heads/add-docs/assets/aaie_logo_dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/GoogleCloudPlatform/applied-ai-engineering-samples/refs/heads/add-docs/assets/aaie_logo_light.png">
+  <img alt="Shows an illustrated sun in light mode and a moon with stars in dark mode." src="https://user-images.githubusercontent.com/25423296/163456779-a8556205-d0a5-45e2-ac17-42d089e3c3f8.png">
+</picture>
+</center>
+
+<br>
+
 ---
 
-**Documentation**: <a href="https://googlecloudplatform.github.io/applied-ai-engineering-samples/" target="_blank">https://googlecloudplatform.github.io/applied-ai-engineering-samples/</a>
+<br>
+
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+
+**Documentation**: <a href="https://googlecloudplatform.github.io/applied-ai-engineering-samples" target="_blank">https://googlecloudplatform.github.io/applied-ai-engineering-samples/</a>
 
 **Source Code**: <a href="https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples" target="_blank">https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples</a>
 
 ---
-# Google Cloud Applied AI Engineering
 
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+<br>
 
 Welcome to the Google Cloud Applied AI Engineering repository. This repository contains reference guides, blueprints, code samples, and hands-on labs developed by the Google Cloud Applied AI Engineering team.
 
+<br>
 
 ## Applied AI Engineering: Catalog
 
