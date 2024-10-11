@@ -1,12 +1,17 @@
 <p align="center">
   <a href="https://googlecloudplatform.github.io/applied-ai-engineering-samples/">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/GoogleCloudPlatform/applied-ai-engineering-samples/refs/heads/add-docs/assets/aaie_logo_dark.png">
-      <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/GoogleCloudPlatform/applied-ai-engineering-samples/refs/heads/add-docs/assets/aaie_logo_light.png">
-    </picture>
+    <img id="aaie-logo" alt="Applied AI Engineering Samples">
   </a>
 </p>
 
+<script>
+  const logoImg = document.getElementById('aaie-logo');
+  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    logoImg.src = "https://raw.githubusercontent.com/GoogleCloudPlatform/applied-ai-engineering-samples/refs/heads/add-docs/assets/aaie_logo_dark.png";
+  } else {
+    logoImg.src = "https://raw.githubusercontent.com/GoogleCloudPlatform/applied-ai-engineering-samples/refs/heads/add-docs/assets/aaie_logo_light.png";
+  }
+</script>
 ---
 
 **Documentation**: <a href="https://googlecloudplatform.github.io/applied-ai-engineering-samples/" target="_blank">https://googlecloudplatform.github.io/applied-ai-engineering-samples/</a>
