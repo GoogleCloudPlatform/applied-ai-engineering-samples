@@ -170,8 +170,8 @@ plugins:
       enabled: true
   - mkdocs-jupyter
 
-# extra_css:
-#   - stylesheets/extra.css
+extra_css:
+  - docs/stylesheets/extra.css
 
 extra_javascript:
   - javascripts/mathjax.js

@@ -40,6 +40,8 @@ copy_image_files() { rsync -a --include='*/' --include='*.{png,jpg,jpeg,gif,svg}
 
 # Copy main README.md (from the project root)
 cp "${PROJECT_ROOT}/README.md" "${DOCS_DIR}/index.md"
+mkdir -p "${DOCS_DIR}/stylesheets"
+cp -r "${PROJECT_ROOT}/docs/stylesheets" "${DOCS_DIR}/stylesheets"
 
 # Process each main directory (source files from PROJECT_ROOT)
 for dir in ai-infrastructure genai-on-vertex-ai research-operationalization; do
