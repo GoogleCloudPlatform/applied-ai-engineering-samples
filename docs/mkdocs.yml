@@ -1,0 +1,287 @@
+site_name: Google Cloud Applied AI Engineering
+site_url: https://googlecloudplatform.github.io/applied-ai-engineering-samples/
+site_author: Applied AI Engineering, Google Cloud
+site_description: >-
+  This repository contains code samples and best practices from Google Cloud 
+  Applied AI Engineering, focusing on building scalable and efficient AI systems on Google Cloud.
+
+# Repository
+repo_name: GoogleCloudPlatform/applied-ai-engineering-samples
+repo_url: https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples
+
+
+docs_dir: docs
+
+# Configuration
+theme:
+  name: material
+  features:
+    - announce.dismiss
+    - content.action.edit
+    - content.action.view
+    - content.code.annotate
+    - content.code.copy
+    - content.code.select
+    - content.footnote.tooltips
+    - content.tabs.link
+    - content.tooltips
+    - header.autohide
+    - navigation.expand
+    - navigation.footer
+    - navigation.indexes
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.instant.progress
+    - navigation.prune
+    - navigation.top
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.tracking
+    - search.highlight
+    - search.share
+    - search.suggest
+    - toc.follow
+    # - toc.integrate
+  favicon: assets/aaie_favicon.png
+  logo: assets/aaie_favicon.png
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/link
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Open Sans
+    code: Roboto Mono
+  copyright: |
+    The code in this repository is maintained by the Google Cloud Applied AI Engineering team.<br>
+    Copyright &copy; 2019-2024 Google LLC<br>
+    <a href='https://cloud.google.com/'><img src='assets/aaie_favicon.png'/></a>
+
+  icon:
+    admonition:
+      note: octicons/tag-16
+      abstract: octicons/checklist-16
+      info: octicons/info-16
+      tip: octicons/squirrel-16
+      success: octicons/check-16
+      question: octicons/question-16
+      warning: octicons/alert-16
+      failure: octicons/x-circle-16
+      danger: octicons/zap-16
+      bug: octicons/bug-16
+      example: octicons/beaker-16
+      quote: octicons/quote-16
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples
+    - icon: fontawesome/brands/google
+      link: https://cloud.google.com/
+
+  generator: false
+
+  analytics: 
+    provider: google
+    property: G-6T56LKHEP0
+
+    feedback:
+      title: Was this page helpful?
+      ratings:
+        - icon: material/thumb-up-outline
+          name: This page was helpful
+          data: 1
+          note: >-
+            Thanks for your feedback!
+        - icon: material/thumb-down-outline
+          name: This page could be improved
+          data: 0
+          note: >- 
+            Thanks for your feedback! Help us improve this page by
+            using our <a href="..." target="_blank" rel="noopener">feedback form</a>.
+
+# Extensions
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink:
+      normalize_issue_symbols: true
+      repo_url_shorthand: true
+      user: squidfunk
+      repo: mkdocs-material
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets:
+      auto_append:
+        - includes/mkdocs.md
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+      combine_header_slug: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+
+# Plugins
+plugins:
+  - search:
+      enabled: true
+  - mkdocs-jupyter
+
+# extra_css:
+#   - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+nav:
+  - Home: index.md
+  - GenAI on Vertex AI:
+    - Overview: genai-on-vertex-ai/README.md
+    - Foundation Models:
+      - Gemini Prompting Recipes: 
+        - Overview: genai-on-vertex-ai/gemini/prompting_recipes/README.md
+        - Long Context Windows: 
+          - Overview: genai-on-vertex-ai/gemini/prompting_recipes/long_context_window/README.md
+          - Long Context Text: genai-on-vertex-ai/gemini/prompting_recipes/long_context_window/gemini_long_context_text.ipynb
+          - Long Context Video: genai-on-vertex-ai/gemini/prompting_recipes/long_context_window/gemini_long_context_video.ipynb
+        - PDF Processing: 
+          - Overview: genai-on-vertex-ai/gemini/prompting_recipes/pdf_processing_with_gemini/README.md
+          - Extract PDF Pages: genai-on-vertex-ai/gemini/prompting_recipes/pdf_processing_with_gemini/1_extract_pdf_pages_with_gemini.ipynb
+          - PDF Info Extraction: genai-on-vertex-ai/gemini/prompting_recipes/pdf_processing_with_gemini/2_pdf_info_extraction_with_gemini.ipynb
+        - Multimodal: 
+          - Overview: genai-on-vertex-ai/gemini/prompting_recipes/multimodal/README.md
+          - Audio Prompting: genai-on-vertex-ai/gemini/prompting_recipes/multimodal/multimodal_prompting_audio.ipynb
+          - Image Prompting: genai-on-vertex-ai/gemini/prompting_recipes/multimodal/multimodal_prompting_image.ipynb
+          - Video Prompting: genai-on-vertex-ai/gemini/prompting_recipes/multimodal/multimodal_prompting_video.ipynb
+      - Advanced Prompting Training: 
+        - Overview: genai-on-vertex-ai/advanced_prompting_training/README.md
+        - CoT & ReAct: genai-on-vertex-ai/advanced_prompting_training/cot_react.ipynb
+      - Vertex Foundation Tuning: 
+        - Overview: genai-on-vertex-ai/vertex_foundation_tuning/README.md
+        - Model Tuning: genai-on-vertex-ai/vertex_foundation_tuning/vertexai-model-tuning.ipynb
+    - Evaluation: 
+      - Overview: genai-on-vertex-ai/gemini/README.md
+      - Gemini Evals Playbook: 
+        - Overview: genai-on-vertex-ai/gemini/evals_playbook/README.md
+        - Setup Playbook: genai-on-vertex-ai/gemini/evals_playbook/notebooks/0_gemini_evals_playbook_setup.ipynb
+        - Evaluate: genai-on-vertex-ai/gemini/evals_playbook/notebooks/1_gemini_evals_playbook_evaluate.ipynb
+        - Grid Search: genai-on-vertex-ai/gemini/evals_playbook/notebooks/2_gemini_evals_playbook_gridsearch.ipynb
+      - Vertex GenAI Evaluation Services: 
+        - Overview: genai-on-vertex-ai/vertex_evaluation_services/README.md
+        - Computation-based Evaluation: 
+          - Overview: genai-on-vertex-ai/vertex_evaluation_services/computation-based-evaluation/1_evaluate_bison_classification_sdk.ipynb
+          - Classification with text-bison: genai-on-vertex-ai/vertex_evaluation_services/computation-based-evaluation/1_evaluate_bison_classification_sdk.ipynb
+          - Classification with tuned models: genai-on-vertex-ai/vertex_evaluation_services/computation-based-evaluation/2_evaluate_tuned_classification_sdk.ipynb
+          - QA with text-bison: genai-on-vertex-ai/vertex_evaluation_services/computation-based-evaluation/3_evaluate_bison_qa_pipeline.ipynb
+          - Classification with text-bison (Alternative): genai-on-vertex-ai/vertex_evaluation_services/computation-based-evaluation/4_evaluate_tuned_classification.ipynb
+        - Evaluation RAG Systems: 
+          - Overview: genai-on-vertex-ai/vertex_evaluation_services/evaluation-rag-systems/evaluation_rag_use_cases.ipynb
+        - Theory: 
+          - Overview: genai-on-vertex-ai/vertex_evaluation_services/theory/Theory_Evaluate_1_Classification.ipynb
+          - Classification: genai-on-vertex-ai/vertex_evaluation_services/theory/Theory_Evaluate_1_Classification.ipynb
+          - Summarization: genai-on-vertex-ai/vertex_evaluation_services/theory/Theory_Evaluate_2_Summarization.ipynb
+          - Text Generation: genai-on-vertex-ai/vertex_evaluation_services/theory/Theory_Evaluate_3_Text_Generation.ipynb
+          - Q&A: genai-on-vertex-ai/vertex_evaluation_services/theory/Theory_Evaluate_4_QandA.ipynb
+    - RAG & Grounding: 
+      - Overview: genai-on-vertex-ai/retrieval_augmented_generation/README.md
+      - Vertex AI Search: 
+        - Overview: genai-on-vertex-ai/vertex_ai_search/README.md
+        - Custom Attributes by URL Pattern: genai-on-vertex-ai/vertex_ai_search/custom_attributes_by_url_pattern.ipynb
+        - Ingesting Unstructured Documents: genai-on-vertex-ai/vertex_ai_search/ingesting_unstructured_documents_with_metadata.ipynb
+        - Inline Ingestion of Documents: genai-on-vertex-ai/vertex_ai_search/inline_ingestion_of_documents.ipynb
+        - Parsing and Chunking: genai-on-vertex-ai/vertex_ai_search/parsing_and_chunking_with_BYO.ipynb
+        - Query Level Boosting: genai-on-vertex-ai/vertex_ai_search/query_level_boosting_filtering_and_facets.ipynb
+      - DIY RAG: 
+        - Overview: genai-on-vertex-ai/retrieval_augmented_generation/README.md
+        - Building Grounded RAG App: genai-on-vertex-ai/retrieval_augmented_generation/diy_rag_with_vertexai_apis/build_grounded_rag_app_with_vertex.ipynb
+    - Agents: 
+      # - Overview: genai-on-vertex-ai/agents/
+      # - Reasoning Engine: 
+      #   - Overview: genai-on-vertex-ai/agents/reasoning_engine/langchain_on_reasoning_engine/README.md
+      - Overview: genai-on-vertex-ai/vertex_ai_extensions/README.md      
+      - Vertex AI Extensions: 
+        - Overview: genai-on-vertex-ai/vertex_ai_extensions/README.md
+        - Business Analyst Workflow: genai-on-vertex-ai/vertex_ai_extensions/notebooks/business_analyst_workflow_vertexai_extensions.ipynb
+        - Data Science Code Interpreter: genai-on-vertex-ai/vertex_ai_extensions/notebooks/data_science_code_interpreter.ipynb
+        - Game Review Analysis: genai-on-vertex-ai/vertex_ai_extensions/notebooks/game_review_analysis_vertexai_extensions.ipynb
+        - Pandas Code Interpreter: genai-on-vertex-ai/vertex_ai_extensions/notebooks/pandas_code_interpreter.ipynb
+        - Web Developer Workflow: genai-on-vertex-ai/vertex_ai_extensions/notebooks/web_developer_workflow_vertexai_extensions.ipynb
+    - Others: 
+      - Overview: genai-on-vertex-ai/README.md
+      - Developer Productivity: 
+        - Overview: genai-on-vertex-ai/developer_productivity_with_genai/README.md
+        - Code Generation: genai-on-vertex-ai/developer_productivity_with_genai/1_codey_code_gen_example.ipynb
+        - Code Fine-tuning: genai-on-vertex-ai/developer_productivity_with_genai/2_codey_code_fine_tune_example.ipynb
+        - Iterative Debugging: genai-on-vertex-ai/developer_productivity_with_genai/3_codey_iterative_debugging_example.ipynb
+        - COBOL to Java Migration: genai-on-vertex-ai/developer_productivity_with_genai/4_codey_cobol_java_migration_example.ipynb
+        - Talk to Codebase: genai-on-vertex-ai/developer_productivity_with_genai/5_codey_talk_to_codebase_example.ipynb
+        - Talk to Code JIRA Doc: genai-on-vertex-ai/developer_productivity_with_genai/6_codey_talk_to_code_JIRA_doc_example.ipynb
+        - E2E Use Cases: genai-on-vertex-ai/developer_productivity_with_genai/7_codey_e2e_use_cases_example.ipynb
+        - Fine-tuning Dataset Generation: genai-on-vertex-ai/developer_productivity_with_genai/utilities/codey_fine_tuning_dataset_generation.ipynb
+      - LangChain Observability: genai-on-vertex-ai/langchain_observability_snippet/langchain-observability-snippet.ipynb
+      - Natural Language to SQL: genai-on-vertex-ai/natural_language_to_sql/natural_language_to_sql.ipynb
+  - Research Operationalization: 
+    - Overview: research-operationalization/README.md
+    - TimesFM: 
+      - Overview: research-operationalization/timesfm/README.md
+      - Operationalizing TimesFM: research-operationalization/timesfm/operationalizing_timesfm_on_vertexai.ipynb
+  - AI Infrastructure: 
+    - Overview: ai-infrastructure/README.md
+    - Terraform Modules:
+      - Bootstrap: ai-infrastructure/terraform-modules/bootstrap/README.md
+      - GKE AIML: ai-infrastructure/terraform-modules/gke-aiml/README.md
+      - Kueue Config: ai-infrastructure/terraform-modules/kueue-config/README.md
+      - Metrics Tracking: ai-infrastructure/terraform-modules/metrics-tracking/README.md
+      - Workload Identity: ai-infrastructure/terraform-modules/workload-identity/README.md
+    - TPU Training on GKE:
+      - Overview: ai-infrastructure/tpu-training-on-gke/README.md
+      - Examples: 
+        - Overview: ai-infrastructure/tpu-training-on-gke/examples/README.md
+        - JobSet: ai-infrastructure/tpu-training-on-gke/examples/jobset/README.md
+        - XPK: ai-infrastructure/tpu-training-on-gke/examples/xpk/README.md
+      - Images: ai-infrastructure/tpu-training-on-gke/images/README.md
