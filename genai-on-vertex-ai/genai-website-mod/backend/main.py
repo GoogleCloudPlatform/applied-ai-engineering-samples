@@ -27,12 +27,12 @@ from models.vertex_search_models import (
     VertexSearchFollowupRequest,
 )
 from routers.cache import router as cache_router
-from routers.hello import router as hello_router
 from routers.page_content_dispatch import router as content_update_dispatch_router
 from routers.vertex_imagen import router as vertex_imagen_router
 from routers.vertex_llm import router as vertex_llm_router
 from routers.vertex_search import router as vertex_search_router
 from routers.vertex_search import trigger_first_search, trigger_followup_search
+from routers.vertex_llm_video import router as vertex_llm_video_router
 from utils.content_cache import ContentCache
 from utils.content_utils import ContentState
 from views.magi import magi_follow_up_controls
@@ -67,8 +67,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(hello_router, prefix="/hello", tags=["hello"])
-
+app.include_router(vertex_llm_video_router, prefix="/video", tags=["video", "llm"])
 
 def get_state_by_action(action: str) -> ContentState:
     if action.lower() == "edit":
@@ -319,7 +318,6 @@ async def test_editing(request: Request, action: str):
 
 
 # include backend routers
-app.include_router(hello_router, prefix="/hello", tags=["hello"])
 app.include_router(vertex_imagen_router, prefix="/imagen", tags=["imagen"])
 app.include_router(
     vertex_search_router, prefix="/vertex-search", tags=["vertex-search"]
