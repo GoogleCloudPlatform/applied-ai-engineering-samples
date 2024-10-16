@@ -1,0 +1,164 @@
+main:
+    params: [args]
+    steps:
+
+    # Initialize variables.
+    - init:
+        assign:
+            - project_id: ${sys.get_env("GOOGLE_CLOUD_PROJECT_ID")}
+            - location: ${sys.get_env("LOCATION")}
+            - global_lb_domain: ${sys.get_env("GLOBAL_LB_DOMAIN")}
+            - audience: '${"https://" + global_lb_domain + "/t2x-api"}'
+            - health_check_url: '${audience + "/health"}'
+            - create_metadata_url: '${audience + "/create-metadata"}'
+            - purge_docs_url: '${audience + "/purge-documents"}'
+            - import_docs_url: '${audience + "/import-documents"}'
+            - get_operation_url: '${audience + "/get-operation"}'
+
+          # Required POST request body.
+            - request_body:
+                branch: "default_branch"
+                bucket_name: '${"t2x-staging-" + project_id}'
+                collection: "default_collection"
+                company_name: ${sys.get_env("COMPANY_NAME")}
+                data_store_id: ${sys.get_env("DATA_STORE_ID")}
+                dataset_name: ${args.dataset_name}
+                engine_id: ${sys.get_env("SEARCH_ENGINE_ID")}
+                location: ${sys.get_env("LOCATION")}
+                metadata_filename: "metadata.jsonl"
+                metadata_folder: "data-store-metadata"
+                source_folder: "source-data"
+
+    
+    # Log the input arguments.
+    - log_args:
+        call: sys.log
+        args:
+            data: ${args}
+            severity: INFO
+
+    # Test the health check route.
+    - health_check:
+        call: http.get
+        args:
+            url: ${health_check_url}
+            auth:
+                type: OIDC
+                audience: ${audience}
+        result: health_check_response
+
+    # Log the health check response.
+    - log_health_check_response:
+        call: sys.log
+        args:
+            data: ${health_check_response}
+            severity: INFO
+
+    # Create metadata.
+    - create_metadata:
+        call: http.post
+        args:
+            url: ${create_metadata_url}
+            body: ${request_body}
+            auth:
+                type: OIDC
+                audience: ${audience}
+            headers:
+                Content-Type: application/json
+        result: create_metadata_response
+
+    # Log the response from the create metadata request.
+    - log_create_metadata_response:
+        call: sys.log
+        args:
+            data: ${create_metadata_response}
+            severity: INFO
+
+    # Purge documents.
+    - purge_documents:
+        call: http.post
+        args:
+            url: ${purge_docs_url}
+            body: ${request_body}
+            auth:
+                type: OIDC
+                audience: ${audience}
+            headers:
+                Content-Type: application/json
+        result: purge_docs_response
+
+    # Log the response from the purge documents request.
+    - log_purge_docs_response:
+        call: sys.log
+        args:
+            data: ${purge_docs_response}
+            severity: INFO
+
+    # Import documents.
+    - import_documents:
+        call: http.post
+        args:
+            url: ${import_docs_url}
+            body: ${request_body}
+            auth:
+                type: OIDC
+                audience: ${audience}
+            headers:
+                Content-Type: application/json
+        result: import_docs_response
+
+    # Log the response from the import documents request.
+    - log_import_docs_response:
+        call: sys.log
+        args:
+            data: ${import_docs_response}
+            severity: INFO
+
+    # Get the 'name' value from the import documents response.
+    - get_operation_name:
+        assign:
+            - operation_name: ${import_docs_response.body.name}
+
+    # Log the operation name.
+    - log_operation_name:
+        call: sys.log
+        args:
+            data: ${operation_name}
+            severity: INFO
+
+    # Get the operation status.
+    - get_operation_status:
+        call: http.get
+        args:
+            url: ${get_operation_url}
+            query:
+                location: ${location}
+                operation_name: ${operation_name}
+            auth:
+                type: OIDC
+                audience: ${audience}
+        result: operation_status
+
+    # Log the operation status.
+    - log_operation_status:
+        call: sys.log
+        args:
+            data: ${operation_status}
+            severity: INFO
+
+    # Check if the operation is done.
+    - check_operation_done:
+        switch:
+          - condition: ${operation_status.body.done}
+            next: return_results
+
+    # Wait for 20 seconds before checking the operation status again.
+    - wait:
+        call: sys.sleep
+        args:
+            seconds: 20
+        next: get_operation_status
+
+    # Return the results.
+    - return_results:
+        return: ${operation_status}
