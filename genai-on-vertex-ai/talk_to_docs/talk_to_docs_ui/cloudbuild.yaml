@@ -1,0 +1,35 @@
+serviceAccount: 'projects/$PROJECT_ID/serviceAccounts/t2x-cloudbuild@$PROJECT_ID.iam.gserviceaccount.com'
+
+options:
+  automapSubstitutions: true
+  dynamicSubstitutions: true
+  logging: 'LEGACY'
+  defaultLogsBucketBehavior: 'REGIONAL_USER_OWNED_BUCKET'
+
+substitutions:
+  # _DOCKER_IMAGE_API: 'us-central1-docker.pkg.dev/${PROJECT_ID}/talk-to-docs/t2x-api'
+  # _DOCKER_IMAGE_UI: 'us-central1-docker.pkg.dev/${PROJECT_ID}/talk-to-docs/t2x-ui'
+  _DOCKER_IMAGE_NEWUI: 'us-central1-docker.pkg.dev/${PROJECT_ID}/talk-to-docs/t2x-new-ui'
+  # _RUN_TYPE will be 'plan' by default. Override with 'apply' to apply changes.
+  # _RUN_TYPE: 'plan'
+
+steps:
+- id: tree
+  name: 'alpine'
+  script: apk add --no-cache tree && echo "" && tree -a && echo ""
+
+- id: build_new_ui
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', '${_DOCKER_IMAGE_NEWUI}:latest', '-t', '${_DOCKER_IMAGE_NEWUI}', '-f', 'Dockerfile', '.']
+
+- id: push_api
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['push', '--all-tags', '${_DOCKER_IMAGE_NEWUI}']
+
+# - id: build_ui
+#   name: 'gcr.io/cloud-builders/docker'
+#   args: ['build', '-t', '${_DOCKER_IMAGE_UI}:latest', '-t', '${_DOCKER_IMAGE_UI}:${BUILD_ID}', '-f' , 'Dockerfile.ui', '.']
+
+# - id: push_ui
+#   name: 'gcr.io/cloud-builders/docker'
+#   args: ['push', '--all-tags', '${_DOCKER_IMAGE_UI}']
