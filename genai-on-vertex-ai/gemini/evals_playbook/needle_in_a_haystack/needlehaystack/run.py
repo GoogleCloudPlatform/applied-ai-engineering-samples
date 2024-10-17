@@ -12,8 +12,8 @@ class CommandArgs():
     gcp_project_id: str
     provider: str = "google"
     evaluator: str = "google"
-    model_name: str = "gemini-1.5-pro-001"
-    evaluator_model_name: Optional[str] = "gemini-1.5-pro-001"
+    model_name: str = "gemini-1.5-pro"
+    evaluator_model_name: Optional[str] = "gemini-1.5-pro"
     dynamic_needle: Optional[bool] = True
     needle: Optional[str] = "\nThe best thing to do in San Francisco is eat a sandwich and sit in Dolores Park on a sunny day.\n"
     haystack_dir: Optional[str] = "PaulGrahamEssays"
@@ -58,12 +58,6 @@ def get_model_to_test(args: CommandArgs) -> ModelProvider:
         ValueError: If the specified provider is not supported.
     """
     match args.provider.lower():
-        case "openai":
-            return OpenAI(model_name=args.model_name)
-        case "anthropic":
-            return Anthropic(model_name=args.model_name)
-        case "cohere":
-            return Cohere(model_name=args.model_name)
         case "google":
             return Google(model_name=args.model_name, project_id=args.gcp_project_id)
         case _:
