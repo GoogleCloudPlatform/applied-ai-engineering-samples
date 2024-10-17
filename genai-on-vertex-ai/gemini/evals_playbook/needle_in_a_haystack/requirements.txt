@@ -1,0 +1,6 @@
+google-cloud-aiplatform
+jsonargparse
+langchain
+langchain_community
+langchain-google-vertexai
+sentencepiece
