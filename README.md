@@ -17,7 +17,27 @@
 
 <br>
 
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+<div style="display: flex; justify-content: space-between;">
+  <div>
+    <a href="LICENSE">
+      <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License">
+    </a>
+  </div>
+  <div>
+    <a href="https://idx.google.com/import?url=https%3A%2F%2Fgithub.com%2FGoogleCloudPlatform%2Fapplied-ai-engineering-samples">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="https://cdn.idx.dev/btn/open_light_32.svg">
+        <source media="(prefers-color-scheme: light)" srcset="https://cdn.idx.dev/btn/open_dark_32.svg">
+        <img height="32" alt="Export to IDX" src="https://cdn.idx.dev/btn/open_purple_32.svg">
+      </picture>
+    </a>
+  </div>
+</div>
+
+
+
+
+
 
 **Documentation**: <a href="https://googlecloudplatform.github.io/applied-ai-engineering-samples" target="_blank">https://googlecloudplatform.github.io/applied-ai-engineering-samples/</a>
 
