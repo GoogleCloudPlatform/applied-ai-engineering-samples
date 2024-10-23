@@ -1,9 +1,55 @@
-# Google Cloud Applied AI Engineering
+<p align="center">
+  <a href="https://googlecloudplatform.github.io/applied-ai-engineering-samples/">
+  </a>
+</p>
 
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+<center>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/GoogleCloudPlatform/applied-ai-engineering-samples/refs/heads/add-docs/assets/aaie_logo_dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/GoogleCloudPlatform/applied-ai-engineering-samples/refs/heads/add-docs/assets/aaie_logo_light.png">
+  <img alt="Shows an illustrated sun in light mode and a moon with stars in dark mode." src="https://user-images.githubusercontent.com/25423296/163456779-a8556205-d0a5-45e2-ac17-42d089e3c3f8.png">
+</picture>
+</center>
+
+<br>
+
+---
+
+<br>
+
+<div style="display: flex; justify-content: space-between;">
+  <div>
+    <a href="LICENSE">
+      <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License">
+    </a>
+  </div>
+  <div>
+    <a href="https://idx.google.com/import?url=https%3A%2F%2Fgithub.com%2FGoogleCloudPlatform%2Fapplied-ai-engineering-samples">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="https://cdn.idx.dev/btn/open_light_32.svg">
+        <source media="(prefers-color-scheme: light)" srcset="https://cdn.idx.dev/btn/open_dark_32.svg">
+        <img height="32" alt="Export to IDX" src="https://cdn.idx.dev/btn/open_purple_32.svg">
+      </picture>
+    </a>
+  </div>
+</div>
+
+
+
+
+
+
+**Documentation**: <a href="https://googlecloudplatform.github.io/applied-ai-engineering-samples" target="_blank">https://googlecloudplatform.github.io/applied-ai-engineering-samples/</a>
+
+**Source Code**: <a href="https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples" target="_blank">https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples</a>
+
+---
+
+<br>
 
 Welcome to the Google Cloud Applied AI Engineering repository. This repository contains reference guides, blueprints, code samples, and hands-on labs developed by the Google Cloud Applied AI Engineering team.
 
+<br>
 
 ## Applied AI Engineering: Catalog
 
