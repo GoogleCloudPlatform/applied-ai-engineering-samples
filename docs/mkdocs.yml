@@ -228,7 +228,7 @@ nav:
           - Text Generation: genai-on-vertex-ai/vertex_evaluation_services/theory/Theory_Evaluate_3_Text_Generation.ipynb
           - Q&A: genai-on-vertex-ai/vertex_evaluation_services/theory/Theory_Evaluate_4_QandA.ipynb
         - Gemini Curate Evaluation data:
-          - Overview: genai-on-vertex-ai/vertex_evaluation_services/gemini-curate-evaluation-data/README.
+          - Overview: genai-on-vertex-ai/vertex_evaluation_services/gemini-curate-evaluation-data/README.md
           - Curation of eval data using Gemini: genai-on-vertex-ai/vertex_evaluation_services/gemini-curate-evaluation-data/curate_new_evals.ipynb
 
     - RAG & Grounding: 
