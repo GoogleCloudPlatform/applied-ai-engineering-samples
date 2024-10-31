@@ -245,8 +245,10 @@ nav:
         - Building Grounded RAG App: genai-on-vertex-ai/retrieval_augmented_generation/diy_rag_with_vertexai_apis/build_grounded_rag_app_with_vertex.ipynb
     - Agents: 
       # - Overview: genai-on-vertex-ai/agents/
-      # - Reasoning Engine: 
-      #   - Overview: genai-on-vertex-ai/agents/reasoning_engine/langchain_on_reasoning_engine/README.md
+      - Reasoning Engine: 
+        - Langchain on Reasoning Engine:
+          - Overview: genai-on-vertex-ai/agents/reasoning_engine/langchain_on_reasoning_engine/README.md
+          - Multimodal Support Concierge Agent: genai-on-vertex-ai/agents/reasoning_engine/langchain_on_reasoning_engine/multimodal_google_nest_support_agent_w_langchain_reasoning_engine.ipynb
       - Overview: genai-on-vertex-ai/vertex_ai_extensions/README.md      
       - Vertex AI Extensions: 
         - Overview: genai-on-vertex-ai/vertex_ai_extensions/README.md
