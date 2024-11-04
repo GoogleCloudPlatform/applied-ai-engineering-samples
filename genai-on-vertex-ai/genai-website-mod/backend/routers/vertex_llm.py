@@ -30,7 +30,11 @@ from models.vertex_llm_models import (
     VertexTranslateRequest,
     VertexTranslateResponse,
 )
-from utils.vertex_llm_utils import llm_code_generate, llm_generate, llm_generate_gemini
+from utils.vertex_llm_utils import (
+    llm_code_generate,
+    llm_generate,
+    llm_generate_gemini,
+)
 
 with open("./config.toml", "rb") as f:
     config = toml.load(f)
@@ -42,12 +46,11 @@ ai_translate_inline_prompt = config["vertex-llm"]["ai_translate_inline_prompt"]
 
 router = APIRouter()
 
-
 @router.post("/vertex_llm")
 def vertex_llm_call(data: VertexLLMRequest) -> VertexLLMResponse:
     try:
         response = llm_generate_gemini(
-            prompt="translate to hindi: " + data.prompt,
+            prompt = "translate to hindi: " + data.prompt,
         )
 
     except Exception as e:

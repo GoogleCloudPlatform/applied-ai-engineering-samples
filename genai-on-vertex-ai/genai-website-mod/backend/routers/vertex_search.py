@@ -53,7 +53,9 @@ document_client = discoveryengine.DocumentServiceClient()
 
 def create_new_conversation():
     converse_request = discoveryengine.CreateConversationRequest(
-        parent=f"projects/{project_id}/locations/{datastore_location}/collections/default_collection/dataStores/{datastore_id}",  # noqa: E501
+        parent=(f"projects/{project_id}/locations/{datastore_location}/"
+                f"collections/default_collection/dataStores/{datastore_id}"
+        ),  # noqa: E501
         conversation=discoveryengine.Conversation(),
     )
     conversation = converse_client.create_conversation(request=converse_request)
