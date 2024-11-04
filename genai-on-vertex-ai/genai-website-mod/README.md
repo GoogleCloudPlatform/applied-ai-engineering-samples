@@ -56,6 +56,7 @@ The website modernization solution unlocks several key benefits:
    │ ├── vertex_imagen_models.py       # Data models for Vertex AI Imagen integration
    │ ├── vertex_llm_models.py          # Data models for Vertex LLMs
    │ └── vertex_search_models.py       # Data models for Vertex AI Search integration
+   │ └── vertex_llm_video_models.py     # Data models for Vertex AI Gemini (ask video) integration
 
    ├── routers/                        # FastAPI routers for different application functionalities
    │ ├── cache.py                      # Router for cache management
@@ -63,6 +64,7 @@ The website modernization solution unlocks several key benefits:
    │ ├── page_content_dispatch.py      # Router for managing webpage content edits
    │ ├── vertex_imagen.py              # Router for Vertex AI Imagen integration
    │ ├── vertex_llm.py                 # Router for Vertex AI Language Model integration
+   │ ├── vertex_llm_video.py           # Router for Vertex AI Ask Video integration
    │ └── vertex_search.py              # Router for Vertex AI Search integration
 
    ├── static/                         # Contains static assets - images and JS files
@@ -94,6 +96,7 @@ The website modernization solution unlocks several key benefits:
    │ ├── faq.html                      # Template for the FAQ page
    │ ├── home.html                     # Template for the home page
    │ └── magi.html                     # Template for the Magi search results
+   │ └── magi-video.html               # Template for the Ask Video search results
 
    └── utils/                          # Utility modules for the application
    │  ├── blog_utils.py                # Utilities for managing blog content

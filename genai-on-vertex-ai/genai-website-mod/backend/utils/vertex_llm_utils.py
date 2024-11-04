@@ -14,7 +14,7 @@
 
 from vertexai.language_models import CodeGenerationModel, TextGenerationModel
 # from vertexai.preview.generative_models import GenerativeModel
-from vertexai.generative_models import GenerativeModel
+from vertexai.generative_models import GenerativeModel, Part
 
 def llm_generate(
     prompt: str,

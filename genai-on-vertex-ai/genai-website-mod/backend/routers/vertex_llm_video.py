@@ -63,6 +63,8 @@ def video_chat(req: VertexLLMVideoChatRequest) -> VertexLLMVideoResponse:
         uri=req.video_url,
         # safety_settings=safety_settings
     )
+    print (f"video1: {video1}")
+    print (f"pronmpt: {req.prompt}")
     resp = chat.send_message(
         [video1, req.prompt]
     )
