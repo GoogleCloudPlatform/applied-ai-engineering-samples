@@ -12,6 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+locals {
+  node_pool_types = [for node_pool_name, node_pool in var.tpu_node_pools : node_pool.tpu_type]
+  chips_per_tpu_type = { for tpu_type in distinct(local.node_pool_types) :
+    tpu_type => sum([for tpu_type_name in local.node_pool_types :
+  local.tpu_types[tpu_type_name][1] * local.tpu_types[tpu_type_name][4] if tpu_type_name == tpu_type]) }
+}
 
 output "node_pool_sa_email" {
   description = "The email of the node pool sa"
@@ -48,4 +54,14 @@ output "artifact_registry_id" {
 output "artifact_registry_image_path" {
   description = "The URI of an Artifact Registry if created"
   value       = try(module.registry[0].image_path, null)
+}
+
+output "tpu_resources" {
+  description = "Summary of TPU resources in the cluster"
+  value = [for tpu_type, num_chips in local.chips_per_tpu_type :
+    {
+      name      = tpu_type
+      num_chips = num_chips
+    }
+  ]
 }

@@ -14,25 +14,25 @@
 
 
 variable "cluster_name" {
-  description = "Name of the GKE cluster."
+  description = "The name of the GKE cluster."
   type        = string
   nullable    = false
 }
 
 variable "location" {
-  description = "Location of the GKE cluster."
+  description = "The location of the GKE cluster."
   type        = string
   nullable    = false
 }
 
 variable "project_id" {
-  description = "Project id of existing or created project."
+  description = "The project id of existing or created project."
   nullable    = false
   type        = string
 }
 
 variable "namespace" {
-  description = "Namespace for the service account."
+  description = "The namespace for the service account."
   type        = string
   nullable    = false
 }
@@ -44,7 +44,7 @@ variable "namespace_create" {
 }
 
 variable "ksa_name" {
-  description = "Name for the Kubernetes Service Account"
+  description = "The name for the Kubernetes Service Account"
   type        = string
   nullable    = false
 }
@@ -56,7 +56,7 @@ variable "kubernetes_service_account_create" {
 }
 
 variable "wid_sa_name" {
-  description = "Name for the workload identity Google Service Account"
+  description = "The name for the workload identity Google Service Account"
   type        = string
   nullable    = false
 }
@@ -68,7 +68,7 @@ variable "google_service_account_create" {
 }
 
 variable "wid_sa_roles" {
-  description = "Roles to assign to a Google service account"
+  description = "The roles to assign to a Google service account"
   type        = list(string)
   default     = []
 }

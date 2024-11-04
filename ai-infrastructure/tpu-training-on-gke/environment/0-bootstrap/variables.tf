@@ -13,7 +13,28 @@
 # limitations under the License.
 
 variable "deletion_protection" {
-  description = "Prevent Terraform from destroying data storage resources (storage buckets, GKE clusters). When this field is set, a terraform destroy or terraform apply that would delete data storage resources will fail."
+  description = "Prevent Terraform from destroying the provisioned automation bucket"
+  type        = bool
+  default     = true
+  nullable    = false
+}
+
+variable "create_automation_sa" {
+  description = "Whether to create an automation service account"
+  type        = bool
+  default     = true
+  nullable    = false
+}
+
+variable "create_automation_bucket" {
+  description = "Whether to create an automation bucket"
+  type        = bool
+  default     = true
+  nullable    = false
+}
+
+variable "enable_apis" {
+  description = "Whether to attempt to enable APIs on the project"
   type        = bool
   default     = true
   nullable    = false
@@ -38,15 +59,15 @@ variable "automation_sa_name" {
 }
 
 variable "services" {
-  description = "Additional services to enable"
+  description = "Services to enable in the project"
   type        = list(string)
-  default     = ["aiplatform.googleapis.com"]
+  default     = []
   nullable    = false
 }
 
 variable "roles" {
-  description = "Additional roles to add to an automation account"
+  description = "Project level roles to add to an automation account"
   type        = list(string)
-  default     = ["roles/aiplatform.user"]
+  default     = []
   nullable    = false
 }

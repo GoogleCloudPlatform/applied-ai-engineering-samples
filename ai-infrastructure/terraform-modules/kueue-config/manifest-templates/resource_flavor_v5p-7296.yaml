@@ -1,0 +1,9 @@
+
+apiVersion: kueue.x-k8s.io/v1beta1
+kind: ResourceFlavor
+metadata:
+  name: v5p-7296
+spec:
+  nodeLabels:
+    cloud.google.com/gke-tpu-accelerator: tpu-v5p-slice 
+    cloud.google.com/gke-tpu-topology: 4x12x76 
