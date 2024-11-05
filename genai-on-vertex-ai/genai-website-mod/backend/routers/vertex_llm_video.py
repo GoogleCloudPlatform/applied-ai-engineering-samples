@@ -30,7 +30,7 @@ router = APIRouter()
 
 @router.post(path="/api/video-chat")
 def video_chat(req: VertexLLMVideoChatRequest) -> VertexLLMVideoResponse:
-
+    print(f"video_chat:{req}")
     generation_config = {
         "max_output_tokens": req.max_output_tokens,
         "temperature": req.temperature,
@@ -45,11 +45,15 @@ def video_chat(req: VertexLLMVideoChatRequest) -> VertexLLMVideoResponse:
     )
     
     if req.conversation_logs is not None and len(req.conversation_logs) > 0:
-        history = [
-            {
-                "role": log["role"],
-                "parts": log["parts"]
-            } for log in req.conversation_logs]
+        try:
+            history = [
+                {
+                    "role": log["role"],
+                    "parts": log["parts"]
+                } for log in req.conversation_logs]
+        except Exception as err:
+            print(f"[Error]Error parsing conversation log:{err}")
+            history = None
     else:
         history = None
         # history=[
@@ -64,8 +68,12 @@ def video_chat(req: VertexLLMVideoChatRequest) -> VertexLLMVideoResponse:
         # safety_settings=safety_settings
     )
     print (f"video1: {video1}")
-    print (f"pronmpt: {req.prompt}")
-    resp = chat.send_message(
-        [video1, req.prompt]
-    )
+    print (f"prompt: {req.prompt}")
+    try:
+        resp = chat.send_message(
+            [video1, req.prompt]
+        )
+    except Exception as error:
+        print(f"[Error]{error}")
+        return VertexLLMVideoResponse(response="Something went wrong, please try again later.")
     return VertexLLMVideoResponse(response=resp.text)
