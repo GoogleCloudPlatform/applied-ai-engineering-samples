@@ -3,7 +3,7 @@ from typing import Optional
 
 from jsonargparse import CLI
 
-from . import LLMNeedleHaystackTester, LLMMultiNeedleHaystackTester
+from . import LLMNeedleHaystackTester
 from .evaluators import Evaluator, GoogleEvaluator
 from .providers import ModelProvider, Google
 
@@ -34,15 +34,8 @@ class CommandArgs():
     final_context_length_buffer: Optional[int] = 200
     seconds_to_sleep_between_completions: Optional[float] = None
     print_ongoing_status: Optional[bool] = True
-    # LangSmith parameters
-    eval_set: Optional[str] = "multi-needle-eval-pizza-3"
-    # Multi-needle parameters
-    multi_needle: Optional[bool] = False
-    needles: list[str] = field(default_factory=lambda: [
-        " Figs are one of the secret ingredients needed to build the perfect pizza. ", 
-        " Prosciutto is one of the secret ingredients needed to build the perfect pizza. ", 
-        " Goat cheese is one of the secret ingredients needed to build the perfect pizza. "
-    ])
+
+
 
 def get_model_to_test(args: CommandArgs) -> ModelProvider:
     """
@@ -94,12 +87,7 @@ def main():
     args.model_to_test = get_model_to_test(args)
     args.evaluator = get_evaluator(args)
     
-    if args.multi_needle == True:
-        print("Testing multi-needle")
-        tester = LLMMultiNeedleHaystackTester(**args.__dict__)
-    else: 
-        print("Testing single-needle")
-        tester = LLMNeedleHaystackTester(**args.__dict__)
+    tester = LLMNeedleHaystackTester(**args.__dict__)
     tester.start_test()
 
 if __name__ == "__main__":
