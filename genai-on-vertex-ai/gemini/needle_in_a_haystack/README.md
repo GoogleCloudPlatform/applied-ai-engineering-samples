@@ -4,6 +4,23 @@ This repository is a fork of [Greg Kamradt's](https://twitter.com/GregKamradt) c
 
 Original Repository: https://github.com/gkamradt/LLMTest_NeedleInAHaystack
 
+
+## What is the 'Needle in a Haystack' Test?
+
+The 'Needle in a Haystack' test is a common technique used to evaluate the performance of a language model on long context windows. The basic idea is to place a random fact or statement (the 'needle') in the middle of a long context window (the 'haystack') and then ask the model to retrieve this statement. By varying the depth of the needle within the haystack and the length of the context window, we can measure how well the model can retrieve the correct statement.
+
+### Steps
+
+1. Place a random fact or statement (the 'needle') in the middle of a long context window (the 'haystack')
+2. Ask the model to retrieve this statement
+3. Compare the model's response to the actual needle (we use an LLM to score the similarity)
+4. Iterate over various document depths (where the needle is placed) and context lengths to measure performance robustly
+
+The output 
+
+This test has been used in a number of papers to evaluate the performance of LLMs on long context windows, including the [Gemini 1.5 paper](https://arxiv.org/pdf/2403.05530).
+
+## Differences from Original Repository
 This fork adds support for using **Google Gemini** (and only Google Gemini) models as the provider and evaluator.
 
 It also differs in that the needle behavior matches that used in the [Gemini 1.5 paper](https://arxiv.org/pdf/2403.05530). Quoting from the paper:
@@ -13,22 +30,29 @@ the needle is i.e., “The special magic {city} number is: {number}” where the
 number are varied for each query, and query the model to return the magic number for a specific
 city.
 
-This dynamic needle is prevent false positives from caching. To revert to the original static needle behavior use `--dynamic_needle=False`
-
-
-
-## The Test
-
-1. Place a random fact or statement (the 'needle') in the middle of a long context window (the 'haystack')
-2. Ask the model to retrieve this statement
-3. Iterate over various document depths (where the needle is placed) and context lengths to measure performance
+This dynamic needle is to prevent false positives due to caching. To revert to the original static needle behavior use `--dynamic_needle=False`
 
 
 ## Getting Started
 
+### Setup Google Cloud Project
+
+1. Make sure that [billing is enabled for your Google Cloud project](https://cloud.google.com/billing/docs/how-to/verify-billing-enabled#confirm_billing_is_enabled_on_a_project).
+2. Make sure that the [Vertex AI API](https://console.cloud.google.com/flows/enableapi?apiid=aiplatform.googleapis.com) is enabled for your project.
+
+
+### Clone Repository
+
+You may run the following commands from your local terminal or from [Google Cloud Shell](https://cloud.google.com/shell/docs/overview). We tested the code using Python 3.11 but other versions may work.
+
+```zsh
+git clone https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples.git
+cd applied-ai-engineering-samples/genai-on-vertex-ai/gemini/needle_in_a_haystack
+```
+
 ### Setup Virtual Environment
 
-We recommend setting up a virtual environment to isolate Python dependencies, ensuring project-specific packages without conflicting with system-wide installations.
+We recommend setting up a virtual environment to isolate Python dependencies, ensuring project-specific packages without conflicting with system-wide installations. 
 
 ```zsh
 python3 -m venv venv
@@ -43,8 +67,14 @@ pip install -e .
 
 ### Quickstart
 
+Run a test with a single context length and document depth.
 ```zsh
 needlehaystack.run_test --gcp_project_id <YOUR_PROJECT_ID>  --document_depth_percents "[50]" --context_lengths "[200]"
+```
+
+Run a test with 11 different context lengths ranging from 4,000 to 2,000,000 tokens and 11 evenly spaced document depths for each context length. This will result in 11*11 = 121 tests and take a while to run.
+```zsh
+needlehaystack.run_test --gcp_project_id <YOUR_PROJECT_ID> --document_depth_percent_intervals 11 --context_lengths "[4000,8000,16000,32000,64000,128000,256000,512000,1000000,1500000,2000000]"
 ```
 
 ### Detailed Instructions
@@ -76,43 +106,6 @@ You can then run the analysis with the following command line arguments:
 - `document_depth_percent_interval_type` - Determines the distribution of depths to iterate over. 'linear' or 'sigmoid
 - `seconds_to_sleep_between_completions` - Default: None, set # of seconds if you'd like to slow down your requests
 - `print_ongoing_status` - Default: True, whether or not to print the status of test as they complete
-
-`LLMMultiNeedleHaystackTester` parameters:
-
-- `multi_needle` - True or False, whether to run multi-needle
-- `needles` - List of needles to insert in the context
-
-
-## Multi Needle Evaluator
-
-To enable multi-needle insertion into our context, use `--multi_needle True`.
-
-This inserts the first needle at the specified `depth_percent`, then evenly distributes subsequent needles through the remaining context after this depth.
-
-For even spacing, it calculates the `depth_percent_interval` as:
-
-```
-depth_percent_interval = (100 - depth_percent) / len(self.needles)
-```
-
-So, the first needle is placed at a depth percent of `depth_percent`, the second at `depth_percent + depth_percent_interval`, the third at `depth_percent + 2 * depth_percent_interval`, and so on.
-
-Following example shows the depth percents for the case of 10 needles and depth_percent of 40%.
-
-```
-depth_percent_interval = (100 - 40) / 10 = 6
-
-Needle 1: 40
-Needle 2: 40 + 6 = 46
-Needle 3: 40 + 2 * 6 = 52
-Needle 4: 40 + 3 * 6 = 58
-Needle 5: 40 + 4 * 6 = 64
-Needle 6: 40 + 5 * 6 = 70
-Needle 7: 40 + 6 * 6 = 76
-Needle 8: 40 + 7 * 6 = 82
-Needle 9: 40 + 8 * 6 = 88
-Needle 10: 40 + 9 * 6 = 94
-```
 
 
 ## License
