@@ -34,7 +34,7 @@ class LLMMultiNeedleHaystackTester(LLMNeedleHaystackTester):
 
         super().__init__(*args, model_to_test=model_to_test, **kwargs)
         self.needles = needles
-        self.evaluator = evaluator
+        self.evaluation_model = evaluator
         self.model_to_test = model_to_test
         self.eval_set = eval_set
         self.model_name = self.model_to_test.model_name
@@ -160,6 +160,7 @@ class LLMMultiNeedleHaystackTester(LLMNeedleHaystackTester):
         """
         if self.save_results:
             if self.result_exists(context_length, depth_percent):
+                print(f"Skipping {context_length} tokens, {depth_percent}% depth because result already exists.")
                 return
 
         # Go generate the required length context and place your needle statement in
@@ -167,73 +168,62 @@ class LLMMultiNeedleHaystackTester(LLMNeedleHaystackTester):
 
         test_start_time = time.time()
 
-        # LangSmith
-        ## TODO: Support for other evaluators 
-        if self.evaluator.__class__.__name__ == "LangSmithEvaluator":  
-            print("EVALUATOR: LANGSMITH")
-            chain = self.model_to_test.get_langchain_runnable(context)
-            self.evaluator.evaluate_chain(chain, context_length, depth_percent, self.model_to_test.model_name, self.eval_set, len(self.needles), self.needles, self.insertion_percentages)
-            test_end_time = time.time()
-            test_elapsed_time = test_end_time - test_start_time
+        # Prepare your message to send to the model you're going to evaluate
+        prompt = self.model_to_test.generate_prompt(context, self.retrieval_question)
+        # Go see if the model can answer the question to pull out your random fact
+        response = await self.model_to_test.evaluate_model(prompt)
+        # Compare the reponse to the actual needle you placed
+        score = self.evaluation_model.evaluate_response(response, self.retrieval_question, self.needle)
 
-        else:
-            print("EVALUATOR: OpenAI Model")
-            # Prepare your message to send to the model you're going to evaluate
-            prompt = self.model_to_test.generate_prompt(context, self.retrieval_question)
-            # Go see if the model can answer the question to pull out your random fact
-            response = await self.model_to_test.evaluate_model(prompt)
-            # Compare the reponse to the actual needle you placed
-            score = self.evaluation_model.evaluate_response(response)
+        test_end_time = time.time()
+        test_elapsed_time = test_end_time - test_start_time
 
-            test_end_time = time.time()
-            test_elapsed_time = test_end_time - test_start_time
+        results = {
+        # 'context' : context, # Uncomment this line if you'd like to save the context the model was asked to retrieve from. Warning: This will become very large.
+        'model' : self.model_to_test.model_name,
+        'context_length' : int(context_length),
+        'depth_percent' : float(depth_percent),
+        'version' : self.results_version,
+        'needle' : self.needle,
+        'model_response' : response,
+        'score' : score,
+        'test_duration_seconds' : test_elapsed_time,
+        'test_timestamp_utc' : datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S%z')
+        }
 
-            results = {
-            # 'context' : context, # Uncomment this line if you'd like to save the context the model was asked to retrieve from. Warning: This will become very large.
-            'model' : self.model_to_test.model_name,
-            'context_length' : int(context_length),
-            'depth_percent' : float(depth_percent),
-            'version' : self.results_version,
-            'needle' : self.needle,
-            'model_response' : response,
-            'score' : score,
-            'test_duration_seconds' : test_elapsed_time,
-            'test_timestamp_utc' : datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S%z')
-            }
+        self.testing_results.append(results)
 
-            self.testing_results.append(results)
+        if self.print_ongoing_status:
+            print (f"-- Test Summary -- ")
+            print (f"Duration: {test_elapsed_time:.1f} seconds")
+            print (f"Context: {context_length} tokens")
+            print (f"Depth: {depth_percent}%")
+            print (f"Score: {score}")
+            print (f"Response: {response}\n")
 
-            if self.print_ongoing_status:
-                print (f"-- Test Summary -- ")
-                print (f"Duration: {test_elapsed_time:.1f} seconds")
-                print (f"Context: {context_length} tokens")
-                print (f"Depth: {depth_percent}%")
-                print (f"Score: {score}")
-                print (f"Response: {response}\n")
+        context_file_location = f'{self.model_name.replace(".", "_")}_len_{context_length}_depth_{int(depth_percent*100)}'
 
-            context_file_location = f'{self.model_name.replace(".", "_")}_len_{context_length}_depth_{int(depth_percent*100)}'
+        if self.save_contexts:
+            results['file_name'] = context_file_location
 
-            if self.save_contexts:
-                results['file_name'] = context_file_location
+            # Save the context to file for retesting
+            if not os.path.exists('contexts'):
+                os.makedirs('contexts')
 
-                # Save the context to file for retesting
-                if not os.path.exists('contexts'):
-                    os.makedirs('contexts')
+            with open(f'contexts/{context_file_location}_context.txt', 'w') as f:
+                f.write(context)
+            
+        if self.save_results:
+            # Save the context to file for retesting
+            if not os.path.exists('results'):
+                os.makedirs('results')
 
-                with open(f'contexts/{context_file_location}_context.txt', 'w') as f:
-                    f.write(context)
-                
-            if self.save_results:
-                # Save the context to file for retesting
-                if not os.path.exists('results'):
-                    os.makedirs('results')
+            # Save the result to file for retesting
+            with open(f'results/{context_file_location}_results.json', 'w') as f:
+                json.dump(results, f)
 
-                # Save the result to file for retesting
-                with open(f'results/{context_file_location}_results.json', 'w') as f:
-                    json.dump(results, f)
-
-            if self.seconds_to_sleep_between_completions:
-                await asyncio.sleep(self.seconds_to_sleep_between_completions)
+        if self.seconds_to_sleep_between_completions:
+            await asyncio.sleep(self.seconds_to_sleep_between_completions)
 
     async def bound_evaluate_and_log(self, sem, *args):
             async with sem:
