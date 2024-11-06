@@ -16,12 +16,11 @@ The 'Needle in a Haystack' test is a common technique used to evaluate the perfo
 3. Compare the model's response to the actual needle (we use an LLM to score the similarity)
 4. Iterate over various document depths (where the needle is placed) and context lengths to measure performance robustly
 
-The output 
 
 This test has been used in a number of papers to evaluate the performance of LLMs on long context windows, including the [Gemini 1.5 paper](https://arxiv.org/pdf/2403.05530).
 
 ## Differences from Original Repository
-This fork adds support for using **Google Gemini** (and only Google Gemini) models as the provider and evaluator.
+This fork adds support for using **Google Gemini** (and only Google Gemini) models.
 
 It also differs in that the needle behavior matches that used in the [Gemini 1.5 paper](https://arxiv.org/pdf/2403.05530). Quoting from the paper:
 
@@ -65,7 +64,7 @@ source venv/bin/activate
 pip install -e .
 ```
 
-### Quickstart
+### Sample Test Configurations
 
 Run a test with a single context length and document depth.
 ```zsh
@@ -77,11 +76,13 @@ Run a test with 11 different context lengths ranging from 4,000 to 2,000,000 tok
 needlehaystack.run_test --gcp_project_id <YOUR_PROJECT_ID> --document_depth_percent_intervals 11 --context_lengths "[4000,8000,16000,32000,64000,128000,256000,512000,1000000,1500000,2000000]"
 ```
 
-### Detailed Instructions
+The results will be saved to the `results/` directory, one .json file per test.
 
-Start using the package by calling the entry point `needlehaystack.run_test` from command line.
+In the event of an individual test failure due to rate limits or other issues, the program will print the exception and move on to the next test. If you re-run the command at a later time it will check the `results/` directory and skip any tests that have already been completed.
 
-You can then run the analysis with the following command line arguments:
+### Configuration Options
+
+You may modify your test configuration with the following options:
 
 - `gcp_project_id` - The GCP project ID used to run the test. 
 - `model_name` - Model name of the language model accessible by the provider. Defaults to `gemini-1.5-pro`

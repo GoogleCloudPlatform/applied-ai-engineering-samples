@@ -175,15 +175,19 @@ class LLMNeedleHaystackTester:
         prompt = self.model_to_test.generate_prompt(context, self.retrieval_question)
 
         test_start_time = time.time()
+        
+        try:
+            # Go see if the model can answer the question to pull out your random fact
+            response = await self.model_to_test.evaluate_model(prompt)
+            # Compare the reponse to the actual needle you placed
+            score = self.evaluation_model.evaluate_response(response, self.retrieval_question, self.needle)
+        except Exception as e:
+            print(f"Error evaluating model with {context_length} tokens, {depth_percent}% depth: {e}")
+            return
 
-        # Go see if the model can answer the question to pull out your random fact
-        response = await self.model_to_test.evaluate_model(prompt)
 
         test_end_time = time.time()
         test_elapsed_time = test_end_time - test_start_time
-
-        # Compare the reponse to the actual needle you placed
-        score = self.evaluation_model.evaluate_response(response, self.retrieval_question, self.needle)
 
         results = {
             # 'context' : context, # Uncomment this line if you'd like to save the context the model was asked to retrieve from. Warning: This will become very large.
