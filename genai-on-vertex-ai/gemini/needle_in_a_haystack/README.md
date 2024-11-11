@@ -1,6 +1,6 @@
 # Needle In A Haystack - Pressure Testing LLMs
 
-This repository is a fork of [Greg Kamradt's](https://twitter.com/GregKamradt) needle-in-a-haystack repository. 
+This [repository](https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples/tree/main/genai-on-vertex-ai/gemini/needle_in_a_haystack) is a fork of [Greg Kamradt's](https://twitter.com/GregKamradt) needle-in-a-haystack repository. 
 
 Original Repository: https://github.com/gkamradt/LLMTest_NeedleInAHaystack
 

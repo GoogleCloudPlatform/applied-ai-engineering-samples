@@ -57,7 +57,7 @@ class Google(ModelProvider):
                     f.write(chunk)
         self.tokenizer = sentencepiece.SentencePieceProcessor(local_vocab_file)
 
-        resource_path = pkg_resources.resource_filename('needlehaystack', 'providers/Gemini_prompt.txt')
+        resource_path = pkg_resources.resource_filename('needlehaystack', 'providers/gemini_prompt.txt')
 
         # Generate the prompt structure for the model
         # Replace the following file with the appropriate prompt structure
