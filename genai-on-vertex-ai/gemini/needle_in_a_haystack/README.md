@@ -1,6 +1,6 @@
 # Needle In A Haystack - Pressure Testing LLMs
 
-This repository is a fork of [Greg Kamradt's](https://twitter.com/GregKamradt) code. 
+This repository is a fork of [Greg Kamradt's](https://twitter.com/GregKamradt) needle-in-a-haystack repository. 
 
 Original Repository: https://github.com/gkamradt/LLMTest_NeedleInAHaystack
 
@@ -20,7 +20,7 @@ The 'Needle in a Haystack' test is a common technique used to evaluate the perfo
 This test has been used in a number of papers to evaluate the performance of LLMs on long context windows, including the [Gemini 1.5 paper](https://arxiv.org/pdf/2403.05530).
 
 ## Differences from Original Repository
-This fork adds support for using **Google Gemini** (and only Google Gemini) models.
+This fork adds support for using **Vertex AI Gemini** (and only Vertex AI Gemini) models.
 
 It also differs in that the needle behavior matches that used in the [Gemini 1.5 paper](https://arxiv.org/pdf/2403.05530). Quoting from the paper:
 
@@ -38,6 +38,9 @@ This dynamic needle is to prevent false positives due to caching. To revert to t
 
 1. Make sure that [billing is enabled for your Google Cloud project](https://cloud.google.com/billing/docs/how-to/verify-billing-enabled#confirm_billing_is_enabled_on_a_project).
 2. Make sure that the [Vertex AI API](https://console.cloud.google.com/flows/enableapi?apiid=aiplatform.googleapis.com) is enabled for your project.
+
+
+You can run the following steps in [Cloud Shell](https://cloud.google.com/shell/docs/using-cloud-shell) or [Vertex AI Workbench](https://cloud.google.com/vertex-ai-notebooks) or [Colab Enterprise](https://cloud.google.com/colab/docs/introduction).
 
 
 ### Clone Repository
@@ -71,7 +74,7 @@ Run a test with a single context length and document depth.
 needlehaystack.run_test --gcp_project_id <YOUR_PROJECT_ID>  --document_depth_percents "[50]" --context_lengths "[200]"
 ```
 
-Run a test with 11 different context lengths ranging from 4,000 to 2,000,000 tokens and 11 evenly spaced document depths for each context length. This will result in 11*11 = 121 tests and take a while to run.
+Run a test with 11 different context lengths ranging from 4,000 to 2,000,000 tokens and 11 evenly spaced document depths for each context length. This will result in 11*11 = 121 tests and can take a while to run.
 ```zsh
 needlehaystack.run_test --gcp_project_id <YOUR_PROJECT_ID> --document_depth_percent_intervals 11 --context_lengths "[4000,8000,16000,32000,64000,128000,256000,512000,1000000,1500000,2000000]"
 ```
@@ -82,7 +85,7 @@ In the event of an individual test failure due to rate limits or other issues, t
 
 The results will be saved to the `results/` directory, one .json file per test.
 
-You may generate a visualization of these results using the notebook [Visualize.ipynb](needlehaystack/Visualize.ipynb) that will look like the below:
+You may generate a visualization of these results using the notebook [niah_visualize.ipynb](needlehaystack/niah_visualize.ipynb) that will look like the below:
 
 ![heatmap](img/heatmap.png)
 
