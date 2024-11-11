@@ -211,6 +211,7 @@ nav:
         - Setup Playbook: genai-on-vertex-ai/gemini/evals_playbook/notebooks/0_gemini_evals_playbook_setup.ipynb
         - Evaluate: genai-on-vertex-ai/gemini/evals_playbook/notebooks/1_gemini_evals_playbook_evaluate.ipynb
         - Grid Search: genai-on-vertex-ai/gemini/evals_playbook/notebooks/2_gemini_evals_playbook_gridsearch.ipynb
+      - Gemini Needle In A Haystack: genai-on-vertex-ai/gemini/needle_in_a_haystack/README.md
       - Vertex GenAI Evaluation Services: 
         - Overview: genai-on-vertex-ai/vertex_evaluation_services/README.md
         - Computation-based Evaluation: 
