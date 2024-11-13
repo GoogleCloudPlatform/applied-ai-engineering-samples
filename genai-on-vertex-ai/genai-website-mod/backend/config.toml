@@ -9,6 +9,9 @@ serving_config = "default_config"
 recs_datastore_id = ""
 recs_serving_config_id = ""
 
+[video]
+video_url = "https://www.youtube.com/watch?v=St1up9PwnUY"
+
 [imagen]
 generation_model_name = "imagegeneration@005"
 caption_model_name = "imagetext@002"

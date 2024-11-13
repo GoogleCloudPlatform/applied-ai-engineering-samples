@@ -86,7 +86,7 @@ def execute_search_ask_video(thequery: str):
     """
     request_data = VertexLLMVideoChatRequest(
         prompt=thequery,
-        video_url="https://www.youtube.com/watch?v=St1up9PwnUY",
+        video_url=config["video"]["video_url"],
     )
     
     # Directly call the video_chat function
