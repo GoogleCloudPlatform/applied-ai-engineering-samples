@@ -1,5 +1,5 @@
 [global]
-project_id = "kalschi-csm-5"
+project_id = ""
 location = "us-central1"
 
 datastore_location = "global"
@@ -12,13 +12,13 @@ recs_serving_config_id = ""
 [imagen]
 generation_model_name = "imagegeneration@005"
 caption_model_name = "imagetext@002"
-bucket_name = "kalschi-for-wsm-images"
+bucket_name = ""
 generation_negative_prompt = "nsfw, porn"
 refine_prompt_template = """{}"""
 
 [blog]
-blog_bucket = "kalschi-for-wsm"
-image_bucket = "kalschi-for-wsm-image"
+blog_bucket = ""
+image_bucket = ""
 
 [vertex-llm]
 

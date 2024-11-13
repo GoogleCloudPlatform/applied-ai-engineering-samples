@@ -56,16 +56,11 @@ def video_chat(req: VertexLLMVideoChatRequest) -> VertexLLMVideoResponse:
             history = None
     else:
         history = None
-        # history=[
-        #         {"role": "user", "parts": "Hello"},
-        #         {"role": "model", "parts": "Great to meet you. What would you like to know?"},
-        #     ]
         
     chat = model.start_chat(history=history)
     video1 = Part.from_uri(
         mime_type="video/mp4",
         uri=req.video_url,
-        # safety_settings=safety_settings
     )
     print (f"video1: {video1}")
     print (f"prompt: {req.prompt}")
