@@ -1,6 +1,6 @@
 [global]
 project_id = ""
-location = ""
+location = "us-central1"
 
 datastore_location = "global"
 datastore_id = ""
@@ -8,6 +8,9 @@ serving_config = "default_config"
 
 recs_datastore_id = ""
 recs_serving_config_id = ""
+
+[video]
+video_url = "https://www.youtube.com/watch?v=St1up9PwnUY"
 
 [imagen]
 generation_model_name = "imagegeneration@005"

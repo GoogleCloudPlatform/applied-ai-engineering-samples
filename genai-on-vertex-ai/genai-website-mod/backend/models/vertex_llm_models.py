@@ -23,7 +23,6 @@ class VertexLLMRequest(BaseModel):
     top_p: float = 0.8
     top_k: int = 40
 
-
 class VertexLLMResponse(BaseModel):
     response: str
 

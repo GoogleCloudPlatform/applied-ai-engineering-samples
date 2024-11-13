@@ -151,7 +151,7 @@ class WSMImage extends ImageTool {
     input.id = `image_generative_ai_action_input_${name}`;
     input.setAttribute('data-placeholder', 'Prompt...');
     input.width = '100px';
-    input.setAttribute('class', 'cdx-input image-tool__caption');
+    input.setAttribute('class', 'cdx-input ce-paragraphLineBreakable cdx-block');
     const button = document.createElement('button');
     button.id = `image_generative_ai_action_button_${name}`;
     button.value = 'Generate';

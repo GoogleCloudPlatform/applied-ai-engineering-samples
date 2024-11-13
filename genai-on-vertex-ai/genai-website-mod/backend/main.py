@@ -26,13 +26,15 @@ from models.vertex_search_models import (
     VertexSearchFirstConvRequest,
     VertexSearchFollowupRequest,
 )
+from models.vertex_llm_video_models import VertexLLMVideoChatRequest
+from routers.vertex_llm_video import video_chat
 from routers.cache import router as cache_router
-from routers.hello import router as hello_router
 from routers.page_content_dispatch import router as content_update_dispatch_router
 from routers.vertex_imagen import router as vertex_imagen_router
 from routers.vertex_llm import router as vertex_llm_router
 from routers.vertex_search import router as vertex_search_router
 from routers.vertex_search import trigger_first_search, trigger_followup_search
+from routers.vertex_llm_video import router as vertex_llm_video_router
 from utils.content_cache import ContentCache
 from utils.content_utils import ContentState
 from views.magi import magi_follow_up_controls
@@ -67,8 +69,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(hello_router, prefix="/hello", tags=["hello"])
-
+app.include_router(vertex_llm_video_router, prefix="/video", tags=["video", "llm"])
 
 def get_state_by_action(action: str) -> ContentState:
     if action.lower() == "edit":
@@ -78,6 +79,29 @@ def get_state_by_action(action: str) -> ContentState:
     else:
         return ContentState.PRODUCTION
 
+def execute_search_ask_video(thequery: str):
+    """
+    This is a "Ask Video" feature of execute_first_search. As one of two
+    implementation of the web search feature in this app.
+    """
+    request_data = VertexLLMVideoChatRequest(
+        prompt=thequery,
+        video_url=config["video"]["video_url"],
+    )
+    
+    # Directly call the video_chat function
+    response = video_chat(req=request_data)
+
+    # Process the response
+    if response.response:
+        message_pairs = [{"user": thequery, "bot": response.response}]
+    else:
+        message_pairs = [{"user": thequery, "bot": "Sorry I cannot process your request now"}]
+
+    search_results = []
+    conversation_name = "ask_video_conversation"
+
+    return message_pairs, search_results, conversation_name
 
 def execute_first_search(thequery: str):
     search_query = VertexSearchFirstConvRequest(search_query=thequery)
@@ -267,18 +291,13 @@ async def search(request: Request, thequery: Annotated[str, Form()]):
         },
     )
 
-
-@app.post("/web/magi-follow", response_class=HTMLResponse)
-async def search_follow_up(
-    request: Request, thequery: Annotated[str, Form()], conversation_name: str
-):
-    print(f"CONV {conversation_name}")
-    messages, search_results, conversation_name = execute_follow_up_search(
-        thequery, conversation_name
-    )
+@app.post("/web/magi-video", response_class=HTMLResponse)
+async def search(request: Request, thequery: Annotated[str, Form()]):
+    print(f"REACHED magi-video: {thequery}\n {request}")
+    messages, search_results, conversation_name = execute_search_ask_video(thequery)
 
     return templates.TemplateResponse(
-        "magi.html",
+        "magi-video.html",
         {
             "request": request,
             "magi_follow_up_controls": magi_follow_up_controls,
@@ -287,7 +306,6 @@ async def search_follow_up(
             "conversation_name": conversation_name,
         },
     )
-
 
 @app.get("/test", response_class=HTMLResponse)
 async def test_read_only(request: Request):
@@ -319,7 +337,6 @@ async def test_editing(request: Request, action: str):
 
 
 # include backend routers
-app.include_router(hello_router, prefix="/hello", tags=["hello"])
 app.include_router(vertex_imagen_router, prefix="/imagen", tags=["imagen"])
 app.include_router(
     vertex_search_router, prefix="/vertex-search", tags=["vertex-search"]

@@ -1,20 +1,80 @@
-{% extends "base.html" %} {% block page %}
+{% extends "base.html" %}
 
-<div
-    id="editorjs"
-    class="p-5"
-    style="max-width: 70%; margin-left: auto; margin-right: auto"></div>
-<script src="/static/js/common-editor.js"></script>
-<script>
-    const homeContent = JSON.parse('{{ home_content|tojson }}');
 
-    editor = new EditorJS({
-        holder: 'editorjs',
-        autofocus: true,
-        readOnly: '{{read_only}}' === 'true',
-        tools: main_tools,
-        data: homeContent,
-    });
-</script>
+{% block page %}
+<div style="text-align: center; justify-content:space-around; ">
+    <iframe width="560" height="315"
+        src="https://www.youtube.com/embed/St1up9PwnUY?si=w_1cSe3V67EzIPx0"
+        title="YouTube video player" frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen></iframe>
+    <div style="display: flex; flex-direction: row; justify-content: center;
+                margin-left: auto; margin-right: auto;">
+        <div>
+            <input  style="border: 1px solid rgb(228, 204, 204); height: 40px; width: 510px;"
+                type="text"
+                id="search-bar-query"
+                name="thequery"
+                title="Search"
+                type="search"
+                placeholder="Ask Video ..."
+                hx-trigger="keydown[keyCode==13] from:input"
+                hx-post="/web/magi-video"
+                hx-indicator="#loading-initial-video"
+                hx-include="#search-bar-query"
+                hx-target="#magi-container-target2"
+                aria-label="Search" />
+        </div>
+        <div class="search-controls">            
+            <div class="search-controls-magnifier">
+                <button
+                    type="submit"
+                    hx-post="/web/magi-video"
+                    hx-indicator="#loading-initial-video"
+                    hx-include="#search-bar-query"
+                    hx-target="#magi-container-target2"
+                    style="border: 1px solid rgb(228, 204, 204); height: 40px; border-radius: 5px;">
+                    <span class="google-symbols"> search_spark </span>
+                </button>
+            </div>
+        </div>
+        
+    </div>
+    <div id="loading-initial-video" class="htmx-indicator">
+        <div class="magi-container"  style="margin-top: 20px;">
+            <div class="magi-container-loading">Generating ...</div>
+            <div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text"></div>
+            </div>
+            <div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text"></div>
+            </div>
+        </div>
+    </div>
+    <div id="magi-container-target2" style="margin-top: 20px;"></div>
+</div>
+    <div id="editorjs" class="p-5"
+        style="max-width: 70%; margin-left: auto; margin-right: auto"></div>
+    <script src="/static/js/common-editor.js"></script>
+    <script>
+        const homeContent = JSON.parse('{{ home_content|tojson }}');
 
-{% endblock %}
+        editor = new EditorJS({
+            holder: 'editorjs',
+            autofocus: true,
+            readOnly: '{{read_only}}' === 'true',
+            tools: main_tools,
+            data: homeContent,
+        });
+    </script>
+
+    {% endblock %}
