@@ -15,6 +15,8 @@
 from vertexai.language_models import CodeGenerationModel, TextGenerationModel
 # from vertexai.preview.generative_models import GenerativeModel
 from vertexai.generative_models import GenerativeModel, Part
+from google.cloud.aiplatform import telemetry
+from utils.consts import USER_AGENT
 
 def llm_generate(
     prompt: str,
@@ -25,31 +27,32 @@ def llm_generate(
     top_k: int = 40,
 ) -> str:
     model = TextGenerationModel.from_pretrained(model_name)
-    response = model.predict(
-        prompt,
-        max_output_tokens=max_output_tokens,
-        temperature=temperature,
-        top_p=top_p,
-        top_k=top_k,
-    )
+    with telemetry.tool_context_manager(USER_AGENT):
+        response = model.predict(
+            prompt,
+            max_output_tokens=max_output_tokens,
+            temperature=temperature,
+            top_p=top_p,
+            top_k=top_k,
+        )
 
-    return response.text
+        return response.text
 
 
 def llm_code_generate(prompt: str, model_name: str = "code-bison-32k@002") -> str:
     model = CodeGenerationModel.from_pretrained(model_name)
     parameters = {"max_output_tokens": 8192, "temperature": 0.0}
+    with telemetry.tool_context_manager(USER_AGENT):
+        response = model.predict(prompt, **parameters)
 
-    response = model.predict(prompt, **parameters)
-
-    return response.text
+        return response.text
 
 
 def llm_generate_gemini(prompt: str, model_name: str = "gemini-1.5-pro-001") -> str:
     model = GenerativeModel("gemini-1.5-pro-001")
+    with telemetry.tool_context_manager(USER_AGENT):
+        response = model.generate_content(
+            prompt, generation_config={"max_output_tokens": 8192, "temperature": 0.0}
+        )
 
-    response = model.generate_content(
-        prompt, generation_config={"max_output_tokens": 8192, "temperature": 0.0}
-    )
-
-    return response.text
+        return response.text

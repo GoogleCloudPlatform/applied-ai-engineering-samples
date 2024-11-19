@@ -15,7 +15,8 @@
 from typing import List
 
 from google.cloud import discoveryengine_v1beta as discoveryengine
-
+from google.cloud.aiplatform import telemetry
+from utils.consts import USER_AGENT
 
 def search_followup(
     conversation_client: discoveryengine.ConversationalSearchServiceClient,
@@ -28,24 +29,25 @@ def search_followup(
     summary_result_count: int = 5,
     include_citations: bool = True,
 ) -> List[discoveryengine.ConverseConversationResponse]:
-    request = discoveryengine.ConverseConversationRequest(
-        name=conversation_name,
-        query=discoveryengine.TextInput(input=query),
-        serving_config=conversation_client.serving_config_path(
-            project=project_id,
-            location=datastore_location,
-            data_store=datastore_id,
-            serving_config=serving_config_id,
-        ),
-        summary_spec=discoveryengine.SearchRequest.ContentSearchSpec.SummarySpec(
-            summary_result_count=summary_result_count,
-            include_citations=include_citations,
-        ),
-    )
+    with telemetry.tool_context_manager(USER_AGENT):
+        request = discoveryengine.ConverseConversationRequest(
+            name=conversation_name,
+            query=discoveryengine.TextInput(input=query),
+            serving_config=conversation_client.serving_config_path(
+                project=project_id,
+                location=datastore_location,
+                data_store=datastore_id,
+                serving_config=serving_config_id,
+            ),
+            summary_spec=discoveryengine.SearchRequest.ContentSearchSpec.SummarySpec(
+                summary_result_count=summary_result_count,
+                include_citations=include_citations,
+            ),
+        )
 
-    response = conversation_client.converse_conversation(request)
+        response = conversation_client.converse_conversation(request)
 
-    return response
+        return response
 
 
 def get_document_from_ids(
@@ -56,19 +58,20 @@ def get_document_from_ids(
     document_id: str,
     branch: str = "default_branch",
 ) -> List[discoveryengine.Document]:
-    request = discoveryengine.GetDocumentRequest(
-        name=document_client.document_path(
-            project=project_id,
-            location=datastore_location,
-            data_store=datastore_id,
-            branch=branch,
-            document=document_id,
+    with telemetry.tool_context_manager(USER_AGENT):
+        request = discoveryengine.GetDocumentRequest(
+            name=document_client.document_path(
+                project=project_id,
+                location=datastore_location,
+                data_store=datastore_id,
+                branch=branch,
+                document=document_id,
+            )
         )
-    )
 
-    response = document_client.get_document(request)
+        response = document_client.get_document(request)
 
-    return response
+        return response
 
 
 def recommend_items(
@@ -85,18 +88,19 @@ def recommend_items(
     user_event.user_pseudo_id = user_pseudo_id
     user_event.documents = [{"id": documents}]
 
-    request = discoveryengine.RecommendRequest(
-        serving_config=recommendation_client.serving_config_path(
-            project=project_id,
-            location=datastore_location,
-            data_store=datastore_id,
-            serving_config=serving_config_id,
-        ),
-        user_event=user_event,
-    )
+    with telemetry.tool_context_manager(USER_AGENT):
+        request = discoveryengine.RecommendRequest(
+            serving_config=recommendation_client.serving_config_path(
+                project=project_id,
+                location=datastore_location,
+                data_store=datastore_id,
+                serving_config=serving_config_id,
+            ),
+            user_event=user_event,
+        )
 
-    response = recommendation_client.recommend(request)
-    return response
+        response = recommendation_client.recommend(request)
+        return response
 
 
 def search_regular(
@@ -128,12 +132,13 @@ def search_regular(
     )
 
     # Create SearchRequest
-    request = discoveryengine.SearchRequest(
-        content_search_spec=content_spec,
-        serving_config=serving_config,
-        query=search_query,
-        page_size=5,
-    )
+    with telemetry.tool_context_manager(USER_AGENT):
+        request = discoveryengine.SearchRequest(
+            content_search_spec=content_spec,
+            serving_config=serving_config,
+            query=search_query,
+            page_size=5,
+        )
 
-    response = search_client.search(request)
-    return response
+        response = search_client.search(request)
+        return response
