@@ -231,6 +231,8 @@ nav:
         - Gemini Curate Evaluation data:
           - Overview: genai-on-vertex-ai/vertex_evaluation_services/gemini-curate-evaluation-data/README.md
           - Curation of eval data using Gemini: genai-on-vertex-ai/vertex_evaluation_services/gemini-curate-evaluation-data/curate_new_evals.ipynb
+        - Tendency-based Evaluation:
+          - Overview: genai-on-vertex-ai/vertex_evaluation_services/tendency-based-evaluation/Beyond_Single_Runs_Tendency_Analysis_of_Non_Deterministic_Eval_Tasks.ipynb
 
     - RAG & Grounding: 
       - Overview: genai-on-vertex-ai/retrieval_augmented_generation/README.md
