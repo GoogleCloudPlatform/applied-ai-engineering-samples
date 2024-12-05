@@ -47,9 +47,6 @@ st.sidebar.text("")
 st.sidebar.text("")
 
 
-# /locations/global/engines/agenticscm_1724844048143/data/documents?e=13802955&mods=-autopush_coliseum&project=msubasioglu-genai-sa
-# projects/742157128610/locations/global/collections/default_collection/engines/aircraft-manuals-scm_1724843980774 
-
 st.sidebar.header('', divider='blue')
 
 
@@ -89,19 +86,13 @@ if st.sidebar.button("Analyze Image"):
 
 
 
-# st.title('SCM Agents')
-
-
-# st.text("")
 
 
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-# for msg in st.session_state.messages:
-#     # st.chat_message(msg["role"],avatar="🤖").write(msg["content"])
-#     st.chat_message(msg["role"]).write(msg["content"])
+
 
 
 
@@ -116,8 +107,7 @@ if prompt := st.chat_input():
         "trace": response_list, 
         "response": response
     }
-    # st.session_state.messages.append({"role": "assistant", "content": out_dict})
-    # st.chat_message("assistant").json(out_dict)  
+
     st.chat_message("assistant").write(out_dict['response'])
 
     # Expander for the trace
