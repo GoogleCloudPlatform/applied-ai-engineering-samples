@@ -1,0 +1,12 @@
+project_id: MY_PROJECT_ID
+location: us-central1
+
+app_id_manuals: SEARCH_APP_ID
+app_id_safety_reports: OTHER_SEARCH_APP_ID
+
+gcal_api_key: API_KEY
+johnSmith_gcal_ID: 'ID3@group.calendar.google.com'
+
+bq_project_id: MY_BQ_PROJECT_ID
+dataset_id: MY_DATASET_ID
+table_id: DATASET_TABLE_ID
