@@ -1,0 +1,6 @@
+﻿ItemType,ItemParentReference,TransformationStage,TransformationSiteId,TransformationSiteCountry,Destination,TransformationType,Id,Quantity,UnitOfQuantity,Name,Description,PriceAmount,PriceCurrency,PriceType,HsCode,SupplierId,Origin,Sorting,ProductMaterialNr,STLAL,MSTAE
+product,,,,CH,DE,manufacture,100,1,pcs,Slat for Airplane wings TL 2000 Sport Sting,Slat for Airplane wings TL 2000 Sport Sting,500,EUR,EXW,84669300,,,,,,
+material,100,,,,,,101,1,pcs,Alloy Steel Bar,,100,EUR,,72285000,1,CN,,,,
+material,100,,,,,,102,10,pcs,Machine Screws,,3,EUR,,73181500,,XX,,,,
+material,100,,,,,,103,2,pcs,Ball Bearings,,80,EUR,,84821000,2,DE,,,,
+material,100,,,,,,104,1,pcs,Titanium Guide Insert,,50,EUR,,81089000,3,JP,,,,
