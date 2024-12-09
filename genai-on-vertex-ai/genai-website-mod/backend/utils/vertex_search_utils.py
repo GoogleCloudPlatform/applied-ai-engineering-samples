@@ -16,6 +16,8 @@ from typing import List
 
 from google.cloud import discoveryengine_v1beta as discoveryengine
 from google.cloud.aiplatform import telemetry
+from vertexai.generative_models import GenerativeModel, Part
+
 from utils.consts import USER_AGENT
 
 def search_followup(
@@ -47,7 +49,7 @@ def search_followup(
 
         response = conversation_client.converse_conversation(request)
 
-        return response
+    return response
 
 
 def get_document_from_ids(
@@ -69,9 +71,9 @@ def get_document_from_ids(
             )
         )
 
-        response = document_client.get_document(request)
+    response = document_client.get_document(request)
 
-        return response
+    return response
 
 
 def recommend_items(
@@ -87,7 +89,6 @@ def recommend_items(
     user_event.event_type = "view-item"
     user_event.user_pseudo_id = user_pseudo_id
     user_event.documents = [{"id": documents}]
-
     with telemetry.tool_context_manager(USER_AGENT):
         request = discoveryengine.RecommendRequest(
             serving_config=recommendation_client.serving_config_path(
@@ -100,7 +101,7 @@ def recommend_items(
         )
 
         response = recommendation_client.recommend(request)
-        return response
+    return response
 
 
 def search_regular(
@@ -141,4 +142,4 @@ def search_regular(
         )
 
         response = search_client.search(request)
-        return response
+    return response
