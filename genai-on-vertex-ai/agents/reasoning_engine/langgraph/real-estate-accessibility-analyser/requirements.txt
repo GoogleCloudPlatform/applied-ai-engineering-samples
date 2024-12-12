@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+google-cloud-storage
+google-cloud-firestore
+python-multipart
+streamlit
+google-cloud-aiplatform[langchain,reasoningengine]
+cloudpickle==3.0.0
+pydantic==2.7.4
+langgraph
+langchain-google-vertexai
+requests
+pillow

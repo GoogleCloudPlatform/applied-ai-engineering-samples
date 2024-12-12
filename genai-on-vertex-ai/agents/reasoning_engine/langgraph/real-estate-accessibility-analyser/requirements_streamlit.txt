@@ -1,0 +1,4 @@
+streamlit
+google-cloud-aiplatform[reasoningengine]
+pillow
+google-cloud-storage

@@ -1,0 +1,4 @@
+fastapi
+uvicorn
+google-cloud-firestore
+pydantic==2.7.4
