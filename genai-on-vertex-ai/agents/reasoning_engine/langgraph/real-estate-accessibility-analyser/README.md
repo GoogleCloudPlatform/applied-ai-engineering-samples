@@ -58,7 +58,7 @@ python -m src.agent.agent
 ```
 This command runs `src/agent/agent.py`, which creates and deploys the agent as a Vertex AI Reasoning Engine. This demonstrates how easily complex agents can be managed using the Reasoning Engine.
 
-**Important:** After deployment, you need to edit `src/config.py` and set the correct `AGENT_NAME` with the name of the deployed Reasoning Engine. The engine name will be printed to the console upon successful execution of the previous step.
+**Important:** After deployment, you need to edit `src/config.py` and set the correct `AGENT_NAME` with the name of the deployed Reasoning Engine. The engine name will be printed to the console upon successful execution of the previous step. The `AGENT_NAME` should be in the format: `projects/<PROJECT_ID>/locations/<LOCATION>/reasoningEngines/<ENGINE_ID>`.
 
 ### 5. Deploy the Streamlit Application
 ```bash
