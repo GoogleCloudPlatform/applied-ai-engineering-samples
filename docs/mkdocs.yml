@@ -183,6 +183,12 @@ nav:
   - GenAI on Vertex AI:
     - Overview: genai-on-vertex-ai/README.md
     - Foundation Models:
+      - Gemini 2.0:
+        - Overview: genai-on-vertex-ai/gemini_2_0/README.md
+        - Multimodal Analysis & Reasoning: 
+          - Overview: genai-on-vertex-ai/gemini_2_0/ui_ux_tooling/README.md
+          - Spatial Reasoning (SDK): genai-on-vertex-ai/gemini_2_0/ui_ux_tooling/spatial_reasoning_SDK_for_gemini2.ipynb
+          - Interactive Spatial Reasoning: genai-on-vertex-ai/gemini_2_0/ui_ux_tooling/spatial_reasoning_app_for_gemini2.ipynb
       - Gemini Prompting Recipes: 
         - Overview: genai-on-vertex-ai/gemini/prompting_recipes/README.md
         - Long Context Windows: 
