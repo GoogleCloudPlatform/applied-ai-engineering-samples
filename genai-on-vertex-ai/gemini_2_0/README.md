@@ -1,4 +1,4 @@
-# Gemini 2.0 on Vertex AIL: Advanced Text, Multimodal Reasoning and Beyond
+# Gemini 2.0 on Vertex AI: Advanced Text, Multimodal Reasoning and Beyond
 
 This folder contains code samples and guidance for how to leverage the latest [Gemini 2.0](https://cloud.google.com/vertex-ai/generative-ai/docs/gemini-v2) features and modeling capabilities.
 
