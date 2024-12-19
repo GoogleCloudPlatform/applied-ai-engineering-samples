@@ -156,7 +156,3 @@ jobs:
         punctuation-pattern: "'"
         only_check_changed_files: true
         longest_word: "10"
-        exclude: |
-                  .github/workflows/spelling.yaml
-                  .github/spelling/allow.txt
-                  .github/spelling/excludes.txt
