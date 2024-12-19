@@ -1136,5 +1136,4 @@ ytd
 yticks
 zakarid
 zaxis
-RajeshThallam
-Abhishekbhagwat
+Thallam
