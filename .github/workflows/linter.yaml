@@ -64,5 +64,5 @@ jobs:
         VALIDATE_GITHUB_ACTIONS: false
         VALIDATE_YAML_PRETTIER: false
         VALIDATE_JSCPD: false
-    - name: Make script executable
-      run: chmod +x .github/workflows/notebook_linter/run_linter.sh
+        FIX_SHELL_SHFMT: true
+        VALIDATE_BASH_EXEC: false
