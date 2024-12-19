@@ -10,7 +10,7 @@ The module assumes that Kueue API has been already installed on the GKE cluster.
 ## Examples 
 
 ```
-module "wid" {
+module "kueue" {
   source             = "github.com/GoogleCloudPlatform/applied-ai-engineering-samples//ai-infrastructure/terraform-modules/jobset-kueue"
   cluster_name       = "gke-cluster" 
   location           = "us-central1"
