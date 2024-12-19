@@ -195,3 +195,4 @@ data/
 
 # files
 scratchpad.md
+.idx/dev.nix
