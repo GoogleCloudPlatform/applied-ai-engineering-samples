@@ -2,7 +2,7 @@
 
 This notebook provides a practical demonstration of utilizing the AG2 framework with Vertex AI's Reasoning Engine to conduct collaborative research using multiple AI agents. It showcases the following key features and functionalities:
 
-## Functionality:
+## Functionality
 
 * **Multi-Agent Collaboration:** Creates a research team of specialized AI agents, including a Researcher, Data Analyst, Literature Reviewer, and Fact Checker. These agents work together using AG2's group chat functionality to efficiently conduct research and generate reports.
 
@@ -14,7 +14,7 @@ This notebook provides a practical demonstration of utilizing the AG2 framework 
 
 * **Report Persistence:** Provides the option to save the generated literature review to a file for offline review, editing, and collaboration.
 
-## What This Notebook Covers:
+## What This Notebook Covers
 
 1. **Environment Setup:** Guides users through installing the necessary dependencies, including AG2 and the Vertex AI SDK, as well as setting up authentication for Google Cloud access.
 
@@ -27,6 +27,5 @@ This notebook provides a practical demonstration of utilizing the AG2 framework 
 5. **Monitoring:** Guides users on how to monitor the deployment progress and status within the Google Cloud Platform (GCP) console.
 
 6. **Report Persistence:** Demonstrates how to save the generated literature review to a file for offline access and further analysis.  
-
 
 This notebook serves as a valuable resource for understanding and implementing multi-agent research workflows with AG2 and deployed on Google Cloud's Vertex AI via the Reasoning Engine.
