@@ -1,6 +1,6 @@
 # AG2 Multi-Agent Research Notebook: Overview
 
-This notebook provides a practical demonstration of utilizing the AG2 framework with Vertex AI's Reasoning Engine to conduct collaborative research using multiple AI agents. It showcases the following key features and functionalities:
+This notebook provides a practical demonstration of utilizing the AG2 (formerly Autogen) framework, a framework for developing and deploying multi-agent AI systems, with Vertex AI's Reasoning Engine to conduct collaborative research using multiple AI agents. This notebook demonstrates the following key features:
 
 ## Functionality
 
