@@ -212,6 +212,7 @@ Kaggle
 Kalamang
 Kamradt
 Kanagawa
+Kanchana
 Katelyn
 Kaufmanns
 Kawagoe
@@ -318,6 +319,7 @@ PLOTLYENV
 PPO
 PYINK
 Pakeman
+Patlolla
 Paquete
 Parmar
 Pengyu
