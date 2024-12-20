@@ -4,15 +4,15 @@ This notebook provides a practical demonstration of utilizing the AG2 (formerly 
 
 ## Functionality
 
-* **Multi-Agent Collaboration:** Creates a research team of specialized AI agents, including a Researcher, Data Analyst, Literature Reviewer, and Fact Checker. These agents work together using AG2's group chat functionality to efficiently conduct research and generate reports.
+- **Multi-Agent Collaboration:** Creates a research team of specialized AI agents, including a Researcher, Data Analyst, Literature Reviewer, and Fact Checker. These agents work together using AG2's group chat functionality to efficiently conduct research and generate reports.
 
-* **Topic Customization:** Allows users to specify the research topic of interest, providing control over the scope and focus of the multi-agent investigation.
+- **Topic Customization:** Allows users to specify the research topic of interest, providing control over the scope and focus of the multi-agent investigation.
 
-* **Remote Deployment:** Leverages Vertex AI's Reasoning Engine for remote deployment and execution of the multi-agent application, ensuring scalability and resource management.
+- **Remote Deployment:** Leverages Vertex AI's Reasoning Engine for remote deployment and execution of the multi-agent application, ensuring scalability and resource management.
 
-* **Literature Review Generation:** Facilitates the generation of a comprehensive literature review based on the research conducted by the AI agents.
+- **Literature Review Generation:** Facilitates the generation of a comprehensive literature review based on the research conducted by the AI agents.
 
-* **Report Persistence:** Provides the option to save the generated literature review to a file for offline review, editing, and collaboration.
+- **Report Persistence:** Provides the option to save the generated literature review to a file for offline review, editing, and collaboration.
 
 ## What This Notebook Covers
 
@@ -26,7 +26,7 @@ This notebook provides a practical demonstration of utilizing the AG2 (formerly 
 
 5. **Monitoring:** Guides users on how to monitor the deployment progress and status within the Google Cloud Platform (GCP) console.
 
-6. **Report Persistence:** Demonstrates how to save the generated literature review to a file for offline access and further analysis.  
+6. **Report Persistence:** Demonstrates how to save the generated literature review to a file for offline access and further analysis.
 
 This notebook serves as a valuable resource for understanding and implementing multi-agent research workflows with AG2 and deployed on Google Cloud's Vertex AI via the Reasoning Engine.
 
