@@ -29,3 +29,7 @@ This notebook provides a practical demonstration of utilizing the AG2 framework 
 6. **Report Persistence:** Demonstrates how to save the generated literature review to a file for offline access and further analysis.  
 
 This notebook serves as a valuable resource for understanding and implementing multi-agent research workflows with AG2 and deployed on Google Cloud's Vertex AI via the Reasoning Engine.
+
+[Link to Notebook](genai-on-vertex-ai/agents/reasoning_engine/ag2/ag2_on_reasoning_engine_via_vertex.ipynb)
+
+Explore the notebook and contribute to the project!
