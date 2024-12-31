@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<!--
+ Copyright 2024 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<html>
+<head>
+  <title>Gemini Multimodal WebSocket Demo with Function Calls (Dev API)</title>
+  <link rel="stylesheet" href="http://localhost:8000/shared/style.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+</head>
+<body>
+  <div class="header-section">
+    <h1>Gemini Multimodal Chat with Function Calls (Dev API)</h1>
+    <p>This application demonstrates real-time multimodal interaction using the Gemini API and WebSockets. Speak into your microphone and optionally share your webcam or screen to engage in a rich multimedia conversation.</p>
+    <p>It offers additional function calls to get weather information, perform Google searches, and execute code.</p>
+  </div>
+  
+  <div class="input-container">
+    <button id="micButton" onclick="toggleMicrophone()" disabled class="action-button">
+      <span class="material-symbols-outlined">mic</span>
+    </button>
+    <button id="webcamButton" onclick="toggleWebcam()" class="action-button">
+      <span class="material-symbols-outlined">videocam</span>
+    </button>
+    <button id="screenButton" onclick="toggleScreen()" class="action-button">
+      <span class="material-symbols-outlined">present_to_all</span>
+    </button>
+  </div>
+  <div class="video-container">
+    <video id="videoPreview" autoplay playsinline class="hidden"></video>
+  </div>
+  <div id="output"></div>
+
+  <!-- Load EventEmitter3 first -->
+  <script src="https://cdn.jsdelivr.net/npm/eventemitter3@5.0.1/dist/eventemitter3.umd.min.js"></script>
+
+  <!-- Load our API class -->
+  <script src="http://localhost:8000/shared/gemini-live-api.js"></script>
+
+  <!-- Then load our module code -->
+  <script type="module">
+    import { AudioRecorder } from 'http://localhost:8000/shared/audio-recorder.js';
+    import { AudioStreamer } from 'http://localhost:8000/shared/audio-streamer.js';
+    import { MediaHandler } from 'http://localhost:8000/shared/media-handler.js';
+    import { getWeather } from 'http://localhost:8000/shared/tools/weather-api.js';
+    import { getStockPrice } from 'http://localhost:8000/shared/tools/stock-api.js';
+
+    const output = document.getElementById('output');
+    const apiKey = '<YOUR_API_KEY>'; // Replace with your actual API key
+    const host = 'generativelanguage.googleapis.com';
+    const endpoint = `wss://${host}/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?key=${apiKey}`;
+
+    let audioContext;
+    let audioStreamer;
+    let audioRecorder;
+    let isRecording = false;
+    let initialized = false;
+    let isInterrupted = false;
+    let mediaHandler;
+    let systemInstructions = '';  // Store system instructions for reconnection
+    let geminiAPI;  // Will be initialized after loading system instructions
+
+    document.addEventListener('DOMContentLoaded', () => {
+      mediaHandler = new MediaHandler();
+      mediaHandler.initialize(document.getElementById('videoPreview'));
+
+      // Load system instructions and send custom setup message
+      fetch('system-instructions.txt')
+        .then(response => response.text())
+        .then(instructions => {
+          systemInstructions = instructions;  // Store for later use
+          // Create initial API instance
+          geminiAPI = new GeminiLiveAPI(endpoint, false);
+          setupGeminiHandlers();
+          sendCustomSetup();
+        });
+    });
+
+    function sendCustomSetup() {
+      const setupMessage = {
+        setup: {
+          model: "models/gemini-2.0-flash-exp",
+          system_instruction: {
+            role: "user",
+            parts: [{
+              text: systemInstructions
+            }]
+          },
+          tools: [{
+            functionDeclarations: [{
+              name: "get_weather",
+              description: "Get current weather information for a city",
+              parameters: {
+                type: "OBJECT",
+                properties: {
+                  city: {
+                    type: "STRING",
+                    description: "The name of the city to get weather for"
+                  }
+                },
+                required: ["city"]
+              }
+            },
+            {
+              name: "get_stock_price",
+              description: "Get current stock price and related information for a given stock symbol",
+              parameters: {
+                type: "OBJECT",
+                properties: {
+                  symbol: {
+                    type: "STRING",
+                    description: "The stock symbol to get price information for (e.g., AAPL, GOOGL)"
+                  }
+                },
+                required: ["symbol"]
+              }
+            }]
+          },
+          {
+            codeExecution: {}
+          },
+          {
+            googleSearch: {}
+          }],
+          generation_config: {
+            response_modalities: ["audio"],
+            speech_config: {
+              voice_config: {
+                prebuilt_voice_config: {
+                  voice_name: "Puck"
+                }
+              }
+            }
+          }
+        }
+      };
+
+      console.log('Sending setup message:', setupMessage);
+      geminiAPI.sendSetupMessage(setupMessage);
+    }
+
+    // Initialize audio when sending the first message
+    async function ensureAudioInitialized() {
+      if (!initialized) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 24000 });
+        audioStreamer = new AudioStreamer(audioContext);
+        await audioContext.resume();
+        initialized = true;
+        console.log('Audio context initialized:', audioContext.state);
+      }
+    }
+
+    async function playAudioChunk(base64AudioChunk) {
+      try {
+        await ensureAudioInitialized();
+        const arrayBuffer = base64ToArrayBuffer(base64AudioChunk);
+        const uint8Array = new Uint8Array(arrayBuffer);
+        audioStreamer.addPCM16(uint8Array);
+        audioStreamer.resume();
+      } catch (error) {
+        console.error('Error queuing audio chunk:', error);
+      }
+    }
+
+    async function startRecording() {
+      try {
+        await ensureAudioInitialized();
+
+        // Reset state when starting new recording
+        isInterrupted = false;
+        audioStreamer.stop();  // Clean up any previous audio state
+
+        // Reinitialize Gemini API if WebSocket is closed
+        if (!geminiAPI || geminiAPI.ws.readyState !== WebSocket.OPEN) {
+          geminiAPI = new GeminiLiveAPI(endpoint, false);
+          // Reattach event handlers
+          setupGeminiHandlers();
+          // Send custom setup and wait for completion
+          await new Promise((resolve) => {
+            geminiAPI.onSetupComplete = () => {
+              resolve();
+              document.getElementById('micButton').disabled = false;
+            };
+            sendCustomSetup();
+          });
+        }
+
+        audioRecorder = new AudioRecorder();
+        await audioRecorder.start();
+
+        audioRecorder.on('data', (base64Data) => {
+          geminiAPI.sendAudioChunk(base64Data);
+        });
+
+        logMessage('Recording started...');
+        isRecording = true;
+        document.getElementById('micButton').innerHTML = '<span class="material-symbols-outlined">stop</span>';
+      } catch (error) {
+        console.error('Error starting recording:', error);
+        logMessage('Error starting recording: ' + error.message);
+      }
+    }
+
+    function stopRecording() {
+      if (audioRecorder) {
+        audioRecorder.stop();
+        audioRecorder.off('data');
+        logMessage('Recording stopped.');
+        isRecording = false;
+        document.getElementById('micButton').innerHTML = '<span class="material-symbols-outlined">mic</span>';
+        
+        // Stop video streams when stopping recording
+        mediaHandler.stopAll();
+        document.getElementById('webcamButton').innerHTML = 
+          '<span class="material-symbols-outlined">videocam</span>';
+        document.getElementById('screenButton').innerHTML = 
+          '<span class="material-symbols-outlined">present_to_all</span>';
+        
+        // Send end message before closing
+        geminiAPI.sendEndMessage();
+      }
+    }
+
+    // Function to set up Gemini API event handlers
+    function setupGeminiHandlers() {
+      geminiAPI.onSetupComplete = () => {
+        document.getElementById('micButton').disabled = false;
+      };
+
+      geminiAPI.onAudioData = async (audioData) => {
+        if (!audioStreamer.isPlaying) {
+          logMessage('Gemini: Speaking...');
+        }
+        await playAudioChunk(audioData);
+      };
+
+      geminiAPI.onInterrupted = () => {
+        logMessage('Gemini: Interrupted');
+        isInterrupted = true;
+        audioStreamer.stop();
+      };
+
+      geminiAPI.onTurnComplete = () => {
+        logMessage('Gemini: Finished speaking');
+        isInterrupted = false;  // Reset interruption state
+        audioStreamer.complete();
+      };
+
+      geminiAPI.onError = (message) => {
+        logMessage(message);
+      };
+
+      geminiAPI.onClose = (event) => {
+        logMessage(`Connection closed`);
+      };
+
+      // Add function call handler
+      geminiAPI.onToolCall = async (toolCall) => {
+        const functionCalls = toolCall.functionCalls;
+        const functionResponses = [];
+
+        // Handle function calls
+        for (const call of functionCalls) {
+          if (call.name === 'get_weather') {
+            // Show the function call details
+            logMessage(`Function: ${call.name}`);
+            logMessage(`Parameters: city = "${call.args.city}"`);
+            
+            const weather = await getWeather(call.args.city);
+            console.log('Weather response:', weather);
+
+            // Show the API response
+            if (weather.error) {
+              logMessage(`API Response: ${weather.error}`);
+            } else {
+              logMessage('API Response:');
+              logMessage(`Temperature: ${weather.temperature}°C`);
+              logMessage(`Conditions: ${weather.description}`);
+              logMessage(`Humidity: ${weather.humidity}%`);
+              logMessage(`Wind Speed: ${weather.windSpeed} m/s`);
+              logMessage(`Location: ${weather.city}, ${weather.country}`);
+            }
+
+            functionResponses.push({
+              id: call.id,
+              name: call.name,
+              response: {
+                result: {
+                  object_value: weather
+                }
+              }
+            });
+          } else if (call.name === 'get_stock_price') {
+            // Show the function call details
+            logMessage(`Function: ${call.name}`);
+            logMessage(`Parameters: symbol = "${call.args.symbol}"`);
+            
+            const stockData = await getStockPrice(call.args.symbol);
+            console.log('Stock response:', stockData);
+
+            // Show the API response
+            if (stockData.error) {
+              logMessage(`API Response: ${stockData.error}`);
+            } else {
+              logMessage('API Response:');
+              logMessage(`Symbol: ${stockData.symbol}`);
+              logMessage(`Current Price: $${stockData.currentPrice}`);
+              logMessage(`Change: ${stockData.change > 0 ? '+' : ''}${stockData.change} (${stockData.percentChange}%)`);
+              logMessage(`Day Range: $${stockData.lowPrice} - $${stockData.highPrice}`);
+              logMessage(`Open: $${stockData.openPrice}`);
+              logMessage(`Previous Close: $${stockData.previousClose}`);
+            }
+
+            functionResponses.push({
+              id: call.id,
+              name: call.name,
+              response: {
+                result: {
+                  object_value: stockData
+                }
+              }
+            });
+          }
+        }
+
+        // Send tool response back using the API
+        geminiAPI.sendToolResponse(functionResponses);
+      };
+    }
+
+    // Make toggleMicrophone available globally
+    window.toggleMicrophone = function() {
+      if (isRecording) {
+        stopRecording();
+      } else {
+        startRecording();
+      }
+    };
+
+    function base64ToArrayBuffer(base64) {
+      const binaryString = atob(base64);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      return bytes.buffer;
+    }
+
+    function logMessage(message) {
+      const messageElement = document.createElement('p');
+      
+      // Add specific styling based on message content
+      if (message.startsWith('Function:')) {
+        messageElement.className = 'function-name';
+      } else if (message.startsWith('Parameters:')) {
+        messageElement.className = 'function-params';
+      } else if (message.startsWith('API Response:')) {
+        messageElement.className = 'api-response';
+      } else if (message.match(/^(Temperature|Conditions|Humidity|Wind Speed|Location):/)) {
+        messageElement.className = 'weather-info';
+      }
+      
+      messageElement.textContent = message;
+      output.appendChild(messageElement);
+      
+      // Auto-scroll to bottom
+      output.scrollTop = output.scrollHeight;
+    }
+
+    window.toggleWebcam = async function() {
+      if (mediaHandler.isWebcamActive) {
+        mediaHandler.stopAll();
+        document.getElementById('webcamButton').innerHTML = 
+          '<span class="material-symbols-outlined">videocam</span>';
+      } else {
+        const success = await mediaHandler.startWebcam();
+        if (success) {
+          document.getElementById('webcamButton').innerHTML = 
+            '<span class="material-symbols-outlined">videocam_off</span>';
+          mediaHandler.startFrameCapture((base64Image) => {
+            if (geminiAPI.ws.readyState === WebSocket.OPEN) {
+              const message = {
+                realtimeInput: {
+                  mediaChunks: [{
+                    mime_type: "image/jpeg",
+                    data: base64Image
+                  }]
+                }
+              };
+              geminiAPI.ws.send(JSON.stringify(message));
+            }
+          });
+        }
+      }
+    };
+
+    window.toggleScreen = async function() {
+      if (mediaHandler.isScreenActive) {
+        mediaHandler.stopAll();
+        document.getElementById('screenButton').innerHTML = 
+          '<span class="material-symbols-outlined">present_to_all</span>';
+      } else {
+        const success = await mediaHandler.startScreenShare();
+        if (success) {
+          document.getElementById('screenButton').innerHTML = 
+            '<span class="material-symbols-outlined">cancel_presentation</span>';
+          mediaHandler.startFrameCapture((base64Image) => {
+            if (geminiAPI.ws.readyState === WebSocket.OPEN) {
+              const message = {
+                realtimeInput: {
+                  mediaChunks: [{
+                    mime_type: "image/jpeg",
+                    data: base64Image
+                  }]
+                }
+              };
+              geminiAPI.ws.send(JSON.stringify(message));
+            }
+          });
+        }
+      }
+    };
+  </script>
+</body>
+</html>

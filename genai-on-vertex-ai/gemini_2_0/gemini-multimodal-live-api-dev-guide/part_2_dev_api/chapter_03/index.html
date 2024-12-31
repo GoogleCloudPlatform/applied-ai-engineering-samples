@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<!--
+ Copyright 2024 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<html>
+<head>
+  <title>Gemini WebSocket Test</title>
+  <style>
+    .header-section {
+      padding: 20px;
+      margin-bottom: 30px;
+      background-color: #f5f5f5;
+      border-bottom: 1px solid #ddd;
+    }
+    .header-section h1 {
+      margin-top: 0;
+      color: #333;
+    }
+    .header-section p {
+      margin-bottom: 0;
+      color: #666;
+    }
+    #output {
+      padding: 20px;
+      border-top: 2px solid #ddd;
+    }
+  </style>
+</head>
+<body>
+  <div class="header-section">
+    <h1>Gemini WebSocket Test</h1>
+    <p>This is a simple demonstration of WebSocket communication with the Gemini API, showing a single exchange between user and model. It illustrates the fundamental principles of interacting with the API at a low level, without using an SDK.</p>
+  </div>
+
+  <div id="output"></div>
+
+  <script>
+    const output = document.getElementById('output');
+    const apiKey = '<YOUR_API_KEY>';
+
+    const host = 'generativelanguage.googleapis.com';
+    const endpoint = `wss://${host}/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?key=${apiKey}`;
+    
+    const ws = new WebSocket(endpoint);
+    
+    ws.onopen = () => {
+      console.log('WebSocket connection is opening...');
+      logMessage('Connected to Gemini');
+
+      const setupMessage = {
+        setup: {
+          model: "models/gemini-2.0-flash-exp",
+          generation_config: {
+            response_modalities: ["text"]
+          }
+        }
+      };
+
+      console.log('Sending setup message:', setupMessage);
+      ws.send(JSON.stringify(setupMessage));
+    };
+
+    ws.onmessage = async (event) => {
+      try {
+        console.log('Event:', event);
+        
+        // Handle Blob data
+        const responseText = await new Response(event.data).text();
+        const response = JSON.parse(responseText);
+        console.log('Response:', response);
+        
+        // Handle setup complete response
+        if (response.setupComplete) {
+          const userMessage = "Hello! Are you there?";
+          logMessage('You: ' + userMessage);
+
+          const contentMessage = {
+            client_content: {
+              turns: [{
+                role: "user",
+                parts: [{ text: userMessage }]
+              }],
+              turn_complete: true
+            }
+          };
+
+          console.log('Sending content message:', contentMessage);
+          ws.send(JSON.stringify(contentMessage));
+        } 
+        // Handle model response
+        else if (response.serverContent?.modelTurn?.parts?.[0]?.text) {
+          const modelResponse = response.serverContent.modelTurn.parts[0].text;
+          logMessage('Gemini: ' + modelResponse);
+        }
+      } catch (error) {
+        console.error('Error parsing response:', error);
+        logMessage('Error parsing response: ' + error.message);
+      }
+    };
+
+    ws.onerror = (error) => {
+      console.error('WebSocket Error:', error);
+      logMessage('WebSocket Error: ' + error.message);
+    };
+
+    ws.onclose = (event) => {
+      console.log('Connection closed:', event);
+      logMessage(`Connection closed - Code: ${event.code}, Reason: ${event.reason}`);
+    };
+
+    function logMessage(message) {
+      const messageElement = document.createElement('p');
+      messageElement.textContent = message;
+      output.appendChild(messageElement);
+    }
+  </script>
+</body>
+</html>

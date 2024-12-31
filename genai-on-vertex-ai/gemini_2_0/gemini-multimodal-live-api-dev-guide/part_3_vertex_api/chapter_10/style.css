@@ -1,0 +1,27 @@
+.input-container {
+    margin: 20px;
+    display: flex;
+    gap: 10px;
+  }
+  #micButton {
+    padding: 8px 16px;
+    cursor: pointer;
+  }
+  #output {
+    margin: 20px;
+  }
+  .video-container {
+    width: 100%;
+    max-width: 640px;
+    margin: 20px auto;
+  }
+  video {
+    width: 100%;
+    border-radius: 8px;
+  }
+  .hidden {
+    display: none;
+  }
+  .action-button .material-symbols-outlined {
+    font-variation-settings: 'FILL' 1;
+  }

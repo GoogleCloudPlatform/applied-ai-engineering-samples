@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<!--
+ Copyright 2024 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<html>
+<head>
+  <title>Gemini Text-to-Speech WebSocket Test</title>
+  <style>
+    .header-section {
+      padding: 20px;
+      margin-bottom: 30px;
+      background-color: #f5f5f5;
+      border-bottom: 1px solid #ddd;
+    }
+    .header-section h1 {
+      margin-top: 0;
+      color: #333;
+    }
+    .header-section p {
+      margin-bottom: 0;
+      color: #666;
+    }
+    .input-container {
+      margin: 20px;
+      display: flex;
+      gap: 10px;
+    }
+    #userInput {
+      padding: 8px;
+      width: 300px;
+    }
+    #sendButton {
+      padding: 8px 16px;
+      cursor: pointer;
+    }
+    #output {
+      margin: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header-section">
+    <h1>Gemini Text-to-Speech with WebSockets</h1>
+    <p>This application demonstrates real-time text-to-speech using the Gemini API. Type a message and receive an audio response that plays automatically in your browser. The app uses WebSockets for communication and AudioContext for handling audio playback.</p>
+  </div>
+
+  <div class="input-container">
+    <input type="text" id="userInput" placeholder="Type your message...">
+    <button id="sendButton" onclick="sendUserMessage()">Send</button>
+  </div>
+  <div id="output"></div>
+
+  <script>
+    const output = document.getElementById('output');
+    const apiKey = '<YOUR_API_KEY>';
+    let audioContext;
+    let initialized = false;
+    let audioQueue = [];
+    let isPlayingAudio = false;
+
+    // Initialize audio when sending the first message
+    async function ensureAudioInitialized() {
+      if (!initialized) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 24000 });
+        await audioContext.resume();
+        initialized = true;
+        console.log('Audio context initialized:', audioContext.state);
+      }
+    }
+
+    async function playAudioChunk(base64AudioChunk) {
+      try {
+        await ensureAudioInitialized();
+
+        // Add to queue and process if not already playing
+        audioQueue.push(base64AudioChunk);
+        if (!isPlayingAudio) {
+          await processAudioQueue();
+        }
+      } catch (error) {
+        console.error('Error queuing audio chunk:', error);
+      }
+    }
+
+    async function processAudioQueue() {
+      if (audioQueue.length === 0 || isPlayingAudio) {
+        return;
+      }
+
+      isPlayingAudio = true;
+
+      try {
+        while (audioQueue.length > 0) {
+          const chunk = audioQueue.shift();
+          
+          if (audioContext.state === 'suspended') {
+            await audioContext.resume();
+          }
+
+          const arrayBuffer = base64ToArrayBuffer(chunk);
+          const float32Data = convertPCM16LEToFloat32(arrayBuffer);
+          
+          const audioBuffer = audioContext.createBuffer(1, float32Data.length, 24000);
+          audioBuffer.getChannelData(0).set(float32Data);
+
+          const source = audioContext.createBufferSource();
+          source.buffer = audioBuffer;
+          source.connect(audioContext.destination);
+          
+          // Wait for the current chunk to finish before playing the next
+          await new Promise((resolve) => {
+            source.onended = resolve;
+            source.start(0);
+          });
+
+          console.log('Finished playing chunk, remaining chunks:', audioQueue.length);
+        }
+      } catch (error) {
+        console.error('Error processing audio queue:', error);
+      } finally {
+        isPlayingAudio = false;
+      }
+    }
+
+    const host = 'generativelanguage.googleapis.com';
+    const endpoint = `wss://${host}/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?key=${apiKey}`;
+    
+    const ws = new WebSocket(endpoint);
+    let audioChunks = []; // Array to collect audio chunks
+    let isReceivingResponse = false; // Flag to track if we're receiving a response
+
+    const userInput = document.getElementById('userInput');
+    const sendButton = document.getElementById('sendButton');
+
+    function sendUserMessage() {
+      if (!userInput.value.trim()) {
+        return;
+      }
+
+      const message = userInput.value;
+      logMessage('You: ' + message);
+
+      const contentMessage = {
+        client_content: {
+          turns: [{
+            role: "user",
+            parts: [{ text: message }]
+          }],
+          turn_complete: true
+        }
+      };
+
+      console.log('Sending content message:', contentMessage);
+      ws.send(JSON.stringify(contentMessage));
+      
+      // Clear input after sending
+      userInput.value = '';
+    }
+
+    // Add enter key support
+    userInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        sendUserMessage();
+      }
+    });
+
+    // Disable input until connection is ready
+    userInput.disabled = true;
+    sendButton.disabled = true;
+
+    ws.onopen = () => {
+      console.log('WebSocket connection is opening...');
+      logMessage('Connected to Gemini');
+
+      const setupMessage = {
+        setup: {
+          model: "models/gemini-2.0-flash-exp",
+          generation_config: {
+            response_modalities: ["audio"]
+          }
+        }
+      };
+
+      console.log('Sending setup message:', setupMessage);
+      ws.send(JSON.stringify(setupMessage));
+    };
+
+    ws.onmessage = async (event) => {
+      try {
+        console.log('Event:', event);
+        
+        let wsResponse;
+        if (event.data instanceof Blob) {
+          const responseText = await event.data.text();
+          wsResponse = JSON.parse(responseText);
+        } else {
+          wsResponse = JSON.parse(event.data);
+        }
+        
+        console.log('WebSocket Response:', wsResponse);
+        
+        if (wsResponse.setupComplete) {
+          // Enable input after setup is complete
+          userInput.disabled = false;
+          sendButton.disabled = false;
+        } 
+        else if (wsResponse.serverContent?.modelTurn?.parts?.[0]?.inlineData) {
+          try {
+            const audioData = wsResponse.serverContent.modelTurn.parts[0].inlineData.data;
+            
+            // Only show "Speaking..." message when starting a new response
+            if (!isPlayingAudio && audioQueue.length === 0) {
+              logMessage('Gemini: Speaking...');
+            }
+            
+            await playAudioChunk(audioData);
+
+            // Show "Finished speaking" when the response is complete
+            if (wsResponse.serverContent?.turnComplete) {
+              logMessage('Gemini: Finished speaking');
+            }
+          } catch (error) {
+            console.error('Error handling audio data:', error);
+            console.log('Full response:', wsResponse);
+          }
+        }
+      } catch (error) {
+        console.error('Error parsing response:', error);
+        console.log('Raw event data:', event.data);
+        logMessage('Error parsing response: ' + error.message);
+      }
+    };
+
+    function base64ToArrayBuffer(base64) {
+      const binaryString = window.atob(base64);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      return bytes.buffer;
+    }
+
+    function convertPCM16LEToFloat32(pcmData) {
+      const inputArray = new Int16Array(pcmData);
+      const float32Array = new Float32Array(inputArray.length);
+
+      for (let i = 0; i < inputArray.length; i++) {
+        float32Array[i] = inputArray[i] / 32768;
+      }
+
+      return float32Array;
+    }
+
+    ws.onerror = (error) => {
+      console.error('WebSocket Error:', error);
+      logMessage('WebSocket Error: ' + error.message);
+    };
+
+    ws.onclose = (event) => {
+      console.log('Connection closed:', event);
+      logMessage(`Connection closed - Code: ${event.code}, Reason: ${event.reason}`);
+    };
+
+    function logMessage(message) {
+      const messageElement = document.createElement('p');
+      messageElement.textContent = message;
+      output.appendChild(messageElement);
+    }
+
+    // Rename to CustomResponse to avoid confusion with the built-in Response class
+    class CustomResponse {
+      constructor(data) {
+        this.data = "";
+        this.endOfTurn = false;
+        
+        if (data?.serverContent?.turnComplete) {
+          this.endOfTurn = true;
+        }
+
+        if (data?.serverContent?.modelTurn?.parts?.[0]?.text) {
+          this.data = data.serverContent.modelTurn.parts[0].text;
+        }
+
+        if (data?.serverContent?.modelTurn?.parts?.[0]?.inlineData) {
+          this.data = data.serverContent.modelTurn.parts[0].inlineData.data;
+        }
+      }
+    }
+  </script>
+</body>
+</html> 
