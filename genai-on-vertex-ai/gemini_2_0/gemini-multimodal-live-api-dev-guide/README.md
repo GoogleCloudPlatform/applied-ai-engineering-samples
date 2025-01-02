@@ -68,14 +68,14 @@ Enterprise-grade implementation using Vertex AI, mirroring Part 2's journey with
 
 Below is a comprehensive overview of where each feature is implemented across the Development API and Vertex AI versions:
 
-| Feature | Part 2 - Dev API Chapter | Part 3 - Vertex AI Chapter |
-|---------|----------------|-------------------|
-| Basic WebSocket Setup | [Chapter 3](part_2_dev_api/chapter_03) | - |
-| Text-to-Speech | [Chapter 4](part_2_dev_api/chapter_04) | - |
-| Real-time Audio Chat | [Chapter 5](part_2_dev_api/chapter_05) | [Chapter 9](part_3_vertex_api/chapter_09) |
-| Multimodal (Audio + Video) | [Chapter 6](part_2_dev_api/chapter_06) | [Chapter 10](part_3_vertex_api/chapter_10) |
-| Function Calling & Instructions | [Chapter 7](part_2_dev_api/chapter_07) | [Chapter 11](part_3_vertex_api/chapter_11) |
-| Production Deployment (Project Pastra)| [Chapter 8](part_2_dev_api/chapter_08) | [Chapter 12](part_3_vertex_api/chapter_12) |
+| Feature | Part 1 - Intro Chapter | Part 2 - Dev API Chapter | Part 3 - Vertex AI Chapter |
+|---------|----------------|----------------|-------------------|
+| SDK setup and authentication | [Chapter 1](part_1_intro/chapter_01) | - | - |
+| Text and audio interactions | [Chapter 1](part_1_intro/chapter_01) | - | - |
+| Real-time Audio Chat | [Chapter 2](part_1_intro/chapter_02) | [Chapter 5](part_2_dev_api/chapter_05) | [Chapter 9](part_3_vertex_api/chapter_09) |
+| Multimodal (Audio + Video) | - | [Chapter 6](part_2_dev_api/chapter_06) | [Chapter 10](part_3_vertex_api/chapter_10) |
+| Function Calling & Instructions | - | [Chapter 7](part_2_dev_api/chapter_07) | [Chapter 11](part_3_vertex_api/chapter_11) |
+| Production Deployment | - | [Chapter 8](part_2_dev_api/chapter_08) | [Chapter 12](part_3_vertex_api/chapter_12) |
 
 Note: Vertex AI implementation starts directly with advanced features, skipping basic WebSocket and text-to-speech examples.
 
