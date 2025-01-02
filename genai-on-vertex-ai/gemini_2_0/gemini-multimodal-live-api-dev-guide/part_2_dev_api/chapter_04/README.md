@@ -128,4 +128,8 @@ This example demonstrates a basic text-to-speech application using the Gemini AP
 *   Using `AudioContext` to play the audio in the browser sequentially, one chunk after the other.
 *   Implementing basic error handling and connection closure.
 
-This example provides a starting point for building more sophisticated applications that can generate audio responses from the Gemini model and play them back in real time, all within the browser environment using low-level WebSockets and `AudioContext` for audio management.
+This example provides a starting point for building more sophisticated applications that can generate audio responses from the Gemini model and play them back in real time, all within the browser environment using low-level WebSockets and `AudioContext` for audio management. The sample rate is set to 24000 Hz to match the API's output sample rate, ensuring correct playback speed and pitch.
+
+**Security Best Practices:**
+
+For production applications, **never** expose your API key directly in client-side code.  Instead, use a secure backend server to handle authentication and proxy requests to the API. This protects your API key from unauthorized access.
