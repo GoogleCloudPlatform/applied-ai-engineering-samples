@@ -32,4 +32,4 @@ This section provides a foundational introduction to working with Google's Gemin
   - `pyaudio` (for audio examples)
 
 ## Getting Started
-Each chapter contains Jupyter notebooks and Python scripts that demonstrate different aspects of the Gemini AI capabilities. Start with Chapter 1's notebooks for basic SDK usage before moving on to the more advanced multimodal examples in Chapter 2. 
+Each chapter contains Jupyter notebooks and Python scripts that demonstrate different aspects of the Gemini AI capabilities. Start with Chapter 1's notebooks for basic SDK usage, and then move on to the more advanced multimodal examples in Chapter 2.
