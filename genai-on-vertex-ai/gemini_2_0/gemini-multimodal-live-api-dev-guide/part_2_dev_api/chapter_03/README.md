@@ -123,3 +123,14 @@ By examining this code, you can gain a deeper understanding of the underlying co
 *   Potentially integrating audio or video.
 
 This example provides a solid foundation for understanding the basic principles involved in interacting with the Gemini API at a low level using WebSockets, especially the crucial setup process.
+
+**Note:** This is a simplified example for educational purposes. A real-world chat application would involve more complex features like:
+
+*   Dynamic user input (see Chapter 4).
+*   Handling multiple conversation turns.
+*   Maintaining conversation history.
+*   Potentially integrating audio or video (see Chapter 5 & 6).
+
+**Security Best Practices:**
+
+For production applications, **never** expose your API key directly in client-side code.  Instead, use a secure backend server to handle authentication and proxy requests to the API. This protects your API key from unauthorized access.
