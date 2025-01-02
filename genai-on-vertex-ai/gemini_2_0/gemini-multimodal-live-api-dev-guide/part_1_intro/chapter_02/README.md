@@ -149,5 +149,5 @@ The `if __name__ == "__main__":` block ensures that the `audio_loop` function is
 
 ## Limitations
 
-The current implementation does not support user interruption of the model's speech.
+The current implementation does not support user interruption of the model's speech.  Future implementations could support interruption by sending a specific interrupt signal to the API or by modifying the current `end_of_turn` logic to be more responsive to shorter pauses in user speech.
 
