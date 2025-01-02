@@ -8,7 +8,7 @@ The core of the application lies in its ability to manage the continuous flow of
 
 ### System Architecture
 
-![Audio Client Diagram](/assets/audio-client.png)
+![Audio Client Diagram](../../assets/audio-client.png)
 
 The application's functionality can be broken down into several key components:
 
