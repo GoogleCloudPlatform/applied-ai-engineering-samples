@@ -34,7 +34,8 @@ CONFIG = {
 }
 
 async def audio_loop():
-    audio_queue = asyncio.Queue()
+    model_speaking = False
+    session = None
     model_speaking = False
     session = None
 
