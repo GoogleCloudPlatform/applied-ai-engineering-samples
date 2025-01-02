@@ -115,4 +115,10 @@ Each chapter builds upon its Part 2 counterpart while handling Vertex AI specifi
 - Authentication with Vertex AI
 - WebSocket connection management
 - Message routing
-- Token refresh and session management 
+Each chapter builds upon its Part 2 counterpart while handling Vertex AI specifics. The proxy server handles:
+- Authentication with Vertex AI
+- WebSocket connection management
+- Message routing
+- Token refresh and session management
+
+The proxy server enhances security by handling authentication and token management on the backend, preventing exposure of sensitive credentials on the client-side. It also maintains persistent connections and handles reconnection logic, improving the reliability of the application.
