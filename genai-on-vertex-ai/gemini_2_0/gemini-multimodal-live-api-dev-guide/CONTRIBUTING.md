@@ -1,6 +1,12 @@
 # How to Contribute
 
-At this time, we're not looking to take contributions to this project.
+At this time, we're not actively accepting external contributions to this project. However, we welcome and encourage community involvement. In the future, we plan to open up the project for contributions through a process that will likely involve:
+
+1. Forking the repository.
+2. Creating a new branch for your changes.
+3. Submitting a pull request for review.
+
+We appreciate your interest and look forward to your future contributions!
 
 ## Before you begin
 
