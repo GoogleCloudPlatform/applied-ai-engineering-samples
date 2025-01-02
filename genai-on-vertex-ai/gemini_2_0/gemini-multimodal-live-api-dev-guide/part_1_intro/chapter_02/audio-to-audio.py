@@ -34,6 +34,7 @@ CONFIG = {
 }
 
 async def audio_loop():
+    """Orchestrates the real-time audio chat loop."""
     model_speaking = False
     session = None
     model_speaking = False
