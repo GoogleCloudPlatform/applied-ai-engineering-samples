@@ -36,9 +36,6 @@ if __name__ == '__main__':
     
     port = 8000
     print(f"Starting server at http://localhost:{port}")
-    print(f"You can access:")
-    print(f"- Chapter 9: http://localhost:{port}/chapter_09/")
-    print(f"- Shared components: http://localhost:{port}/shared/")
     
     httpd = HTTPServer(('localhost', port), CORSRequestHandler)
     httpd.serve_forever() 

@@ -71,9 +71,17 @@
     let isInterrupted = false;
     let mediaHandler;
     let geminiAPI;  // Will be initialized with setup
+    let systemInstructions = '';  // Store system instructions for reconnection
+
 
     const setupConfig = {
       model: `projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/gemini-2.0-flash-exp`,
+      system_instruction: {
+            role: "user",
+            parts: [{
+              text: systemInstructions
+            }]
+          },
       tools: [{
         functionDeclarations: [{
           name: "get_weather",
