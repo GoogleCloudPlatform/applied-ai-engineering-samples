@@ -10,6 +10,7 @@ This chapter implements the exact same real-time multimodal chat application as 
 4. **Setup Configuration:** Includes additional Vertex AI-specific configuration parameters in the setup message
 
 The core functionality remains identical to Chapter 6, including:
+
 - Video capture (webcam and screen sharing)
 - Audio processing and streaming
 - Frame-by-frame video processing
@@ -22,6 +23,7 @@ Please refer to the comprehensive documentation in [Chapter 6's README](../../pa
 ## Code Comparison
 
 You can compare the implementations by looking at:
+
 - [Chapter 10 index.html](./index.html) (Vertex API version)
 - [Chapter 6 index.html](../../part_2_dev_api/chapter_06/index.html) (Development API version)
 

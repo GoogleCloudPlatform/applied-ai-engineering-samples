@@ -21,9 +21,6 @@
 export const registeredWorklets = new Map();
 
 export function createWorkletFromSrc(name, workletSrc) {
-  const blob = new Blob(
-    [`${workletSrc}`],
-    { type: 'application/javascript' }
-  );
+  const blob = new Blob([`${workletSrc}`], { type: "application/javascript" });
   return URL.createObjectURL(blob);
 }

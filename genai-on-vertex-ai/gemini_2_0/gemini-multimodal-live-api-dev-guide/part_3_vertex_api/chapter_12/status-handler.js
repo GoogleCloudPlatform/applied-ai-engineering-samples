@@ -21,28 +21,28 @@ export class StatusHandler {
   }
 
   initialize() {
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => {
-        this.functionInfo = document.getElementById('functionInfo');
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", () => {
+        this.functionInfo = document.getElementById("functionInfo");
       });
     } else {
-      this.functionInfo = document.getElementById('functionInfo');
+      this.functionInfo = document.getElementById("functionInfo");
     }
   }
 
   update(functionName, params = {}) {
     // Get the element again if we don't have it yet
     if (!this.functionInfo) {
-      this.functionInfo = document.getElementById('functionInfo');
+      this.functionInfo = document.getElementById("functionInfo");
     }
-    
+
     if (this.functionInfo) {
       const timestamp = new Date().toLocaleTimeString();
       let content = `[${timestamp}] Function: ${functionName}\n`;
 
-      if (params.status === 'requesting') {
+      if (params.status === "requesting") {
         content += `Requesting weather for: ${params.city}...`;
-      } else if (params.status === 'received' && params.weather) {
+      } else if (params.status === "received" && params.weather) {
         const weather = params.weather;
         if (weather.error) {
           content += `Error: ${weather.error}`;
@@ -61,4 +61,4 @@ export class StatusHandler {
 }
 
 // Create and export a singleton instance
-export const statusHandler = new StatusHandler(); 
+export const statusHandler = new StatusHandler();

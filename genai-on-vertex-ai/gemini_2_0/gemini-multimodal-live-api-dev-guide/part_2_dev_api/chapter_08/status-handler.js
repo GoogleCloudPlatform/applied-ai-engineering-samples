@@ -21,29 +21,29 @@ export class StatusHandler {
   }
 
   initialize() {
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => {
-        this.functionInfo = document.getElementById('functionInfo');
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", () => {
+        this.functionInfo = document.getElementById("functionInfo");
       });
     } else {
-      this.functionInfo = document.getElementById('functionInfo');
+      this.functionInfo = document.getElementById("functionInfo");
     }
   }
 
   update(functionName, params = {}) {
     // Get the element again if we don't have it yet
     if (!this.functionInfo) {
-      this.functionInfo = document.getElementById('functionInfo');
+      this.functionInfo = document.getElementById("functionInfo");
     }
-    
+
     if (this.functionInfo) {
       const timestamp = new Date().toLocaleTimeString();
       let content = `[${timestamp}] Function: ${functionName}\n`;
 
-      if (functionName === 'get_weather') {
-        if (params.status === 'requesting') {
+      if (functionName === "get_weather") {
+        if (params.status === "requesting") {
           content += `Requesting weather for: ${params.city}...`;
-        } else if (params.status === 'received' && params.weather) {
+        } else if (params.status === "received" && params.weather) {
           const weather = params.weather;
           if (weather.error) {
             content += `Error: ${weather.error}`;
@@ -55,17 +55,17 @@ export class StatusHandler {
             content += `Wind Speed: ${weather.windSpeed} m/s`;
           }
         }
-      } else if (functionName === 'get_stock_price') {
-        if (params.status === 'requesting') {
+      } else if (functionName === "get_stock_price") {
+        if (params.status === "requesting") {
           content += `Requesting stock price for: ${params.symbol}...`;
-        } else if (params.status === 'received' && params.stock) {
+        } else if (params.status === "received" && params.stock) {
           const stock = params.stock;
           if (stock.error) {
             content += `Error: ${stock.error}`;
           } else {
             content += `Stock Information for ${stock.symbol}:\n`;
             content += `Current Price: $${stock.currentPrice}\n`;
-            content += `Change: ${stock.change > 0 ? '+' : ''}${stock.change} (${stock.percentChange}%)\n`;
+            content += `Change: ${stock.change > 0 ? "+" : ""}${stock.change} (${stock.percentChange}%)\n`;
             content += `Day Range: $${stock.lowPrice} - $${stock.highPrice}\n`;
             content += `Open: $${stock.openPrice}\n`;
             content += `Previous Close: $${stock.previousClose}`;
@@ -79,4 +79,4 @@ export class StatusHandler {
 }
 
 // Create and export a singleton instance
-export const statusHandler = new StatusHandler(); 
+export const statusHandler = new StatusHandler();

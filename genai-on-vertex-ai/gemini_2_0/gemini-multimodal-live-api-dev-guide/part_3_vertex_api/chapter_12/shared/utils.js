@@ -15,7 +15,9 @@
  */
 
 export async function audioContext({ sampleRate }) {
-  const context = new (window.AudioContext || window.webkitAudioContext)({ sampleRate });
+  const context = new (window.AudioContext || window.webkitAudioContext)({
+    sampleRate,
+  });
   await context.resume();
   return context;
 }

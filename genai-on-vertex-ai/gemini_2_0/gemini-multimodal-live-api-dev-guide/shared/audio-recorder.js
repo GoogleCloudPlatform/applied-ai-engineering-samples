@@ -15,7 +15,10 @@
  */
 
 import { audioContext } from "./utils.js";
-import { createWorkletFromSrc, registeredWorklets } from "./audioworklet-registry.js";
+import {
+  createWorkletFromSrc,
+  registeredWorklets,
+} from "./audioworklet-registry.js";
 import AudioRecordingWorklet from "./audio-recording-worklet.js";
 
 function arrayBufferToBase64(buffer) {
@@ -64,7 +67,7 @@ export class AudioRecorder extends EventEmitter3 {
         await this.audioContext.audioWorklet.addModule(src);
         registry[workletName] = {
           node: new AudioWorkletNode(this.audioContext, workletName),
-          handlers: []
+          handlers: [],
         };
       }
 

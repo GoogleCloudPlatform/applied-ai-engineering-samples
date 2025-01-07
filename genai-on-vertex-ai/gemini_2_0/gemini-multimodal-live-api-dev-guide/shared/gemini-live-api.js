@@ -17,11 +17,11 @@ class GeminiLiveAPI {
 
   setupWebSocket() {
     this.ws.onopen = () => {
-      console.log('WebSocket connection is opening...');
+      console.log("WebSocket connection is opening...");
       if (this.autoSetup) {
         this.sendDefaultSetup();
       } else if (this.pendingSetupMessage) {
-        console.log('Sending pending setup message:', this.pendingSetupMessage);
+        console.log("Sending pending setup message:", this.pendingSetupMessage);
         this.ws.send(JSON.stringify(this.pendingSetupMessage));
         this.pendingSetupMessage = null;
       }
@@ -37,7 +37,7 @@ class GeminiLiveAPI {
           wsResponse = JSON.parse(event.data);
         }
 
-        console.log('WebSocket Response:', wsResponse);
+        console.log("WebSocket Response:", wsResponse);
 
         if (wsResponse.setupComplete) {
           this.onSetupComplete();
@@ -50,7 +50,8 @@ class GeminiLiveAPI {
           }
 
           if (wsResponse.serverContent.modelTurn?.parts?.[0]?.inlineData) {
-            const audioData = wsResponse.serverContent.modelTurn.parts[0].inlineData.data;
+            const audioData =
+              wsResponse.serverContent.modelTurn.parts[0].inlineData.data;
             this.onAudioData(audioData);
 
             if (!wsResponse.serverContent.turnComplete) {
@@ -63,18 +64,18 @@ class GeminiLiveAPI {
           }
         }
       } catch (error) {
-        console.error('Error parsing response:', error);
-        this.onError('Error parsing response: ' + error.message);
+        console.error("Error parsing response:", error);
+        this.onError("Error parsing response: " + error.message);
       }
     };
 
     this.ws.onerror = (error) => {
-      console.error('WebSocket Error:', error);
-      this.onError('WebSocket Error: ' + error.message);
+      console.error("WebSocket Error:", error);
+      this.onError("WebSocket Error: " + error.message);
     };
 
     this.ws.onclose = (event) => {
-      console.log('Connection closed:', event);
+      console.log("Connection closed:", event);
       this.onClose(event);
     };
   }
@@ -83,17 +84,20 @@ class GeminiLiveAPI {
     if (this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(message));
     } else {
-      console.error('WebSocket is not open. Current state:', this.ws.readyState);
-      this.onError('WebSocket is not ready. Please try again.');
+      console.error(
+        "WebSocket is not open. Current state:",
+        this.ws.readyState,
+      );
+      this.onError("WebSocket is not ready. Please try again.");
     }
   }
 
   sendSetupMessage(setupMessage) {
     if (this.ws.readyState === WebSocket.OPEN) {
-      console.log('Sending setup message:', setupMessage);
+      console.log("Sending setup message:", setupMessage);
       this.ws.send(JSON.stringify(setupMessage));
     } else {
-      console.log('Connection not ready, queuing setup message');
+      console.log("Connection not ready, queuing setup message");
       this.pendingSetupMessage = setupMessage;
     }
   }
@@ -106,15 +110,15 @@ class GeminiLiveAPI {
         speech_config: {
           voice_config: {
             prebuilt_voice_config: {
-              voice_name: "Puck"
-            }
-          }
-        }
-      }
+              voice_name: "Puck",
+            },
+          },
+        },
+      },
     };
 
     const setupMessage = {
-      setup: this.setupConfig || defaultConfig
+      setup: this.setupConfig || defaultConfig,
     };
 
     this.sendSetupMessage(setupMessage);
@@ -123,11 +127,13 @@ class GeminiLiveAPI {
   sendAudioChunk(base64Audio) {
     const message = {
       realtime_input: {
-        media_chunks: [{
-          mime_type: "audio/pcm",
-          data: base64Audio
-        }]
-      }
+        media_chunks: [
+          {
+            mime_type: "audio/pcm",
+            data: base64Audio,
+          },
+        ],
+      },
     };
     console.log("Sending audio message: ", message);
     this.sendMessage(message);
@@ -136,12 +142,14 @@ class GeminiLiveAPI {
   sendEndMessage() {
     const message = {
       client_content: {
-        turns: [{
-          role: "user",
-          parts: []
-        }],
-        turn_complete: true
-      }
+        turns: [
+          {
+            role: "user",
+            parts: [],
+          },
+        ],
+        turn_complete: true,
+      },
     };
     this.sendMessage(message);
   }
@@ -149,12 +157,14 @@ class GeminiLiveAPI {
   sendContinueSignal() {
     const message = {
       client_content: {
-        turns: [{
-          role: "user",
-          parts: []
-        }],
-        turn_complete: false
-      }
+        turns: [
+          {
+            role: "user",
+            parts: [],
+          },
+        ],
+        turn_complete: false,
+      },
     };
     this.sendMessage(message);
   }
@@ -162,10 +172,10 @@ class GeminiLiveAPI {
   sendToolResponse(functionResponses) {
     const toolResponse = {
       tool_response: {
-        function_responses: functionResponses
-      }
+        function_responses: functionResponses,
+      },
     };
-    console.log('Sending tool response:', toolResponse);
+    console.log("Sending tool response:", toolResponse);
     this.sendMessage(toolResponse);
   }
 
@@ -176,25 +186,25 @@ class GeminiLiveAPI {
 
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
-        reject(new Error('Connection timeout'));
+        reject(new Error("Connection timeout"));
       }, 5000);
 
       const onOpen = () => {
         clearTimeout(timeout);
-        this.ws.removeEventListener('open', onOpen);
-        this.ws.removeEventListener('error', onError);
+        this.ws.removeEventListener("open", onOpen);
+        this.ws.removeEventListener("error", onError);
         resolve();
       };
 
       const onError = (error) => {
         clearTimeout(timeout);
-        this.ws.removeEventListener('open', onOpen);
-        this.ws.removeEventListener('error', onError);
+        this.ws.removeEventListener("open", onOpen);
+        this.ws.removeEventListener("error", onError);
         reject(error);
       };
 
-      this.ws.addEventListener('open', onOpen);
-      this.ws.addEventListener('error', onError);
+      this.ws.addEventListener("open", onOpen);
+      this.ws.addEventListener("error", onError);
     });
   }
-} 
+}

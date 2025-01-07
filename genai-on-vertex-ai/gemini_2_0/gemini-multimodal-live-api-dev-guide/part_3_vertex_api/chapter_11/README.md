@@ -11,6 +11,7 @@ This chapter implements the function calling and system instructions capabilitie
 5. **⚠️ Important Tool Limitation:** Unlike the Development API which supports multiple tools, the Vertex AI API currently supports only one tool declaration. This means you must choose a single function to expose to the model (weather, search, or code execution) rather than providing all three simultaneously.
 
 The core functionality remains similar to Chapter 7, but adapted for the single-tool limitation:
+
 - System instructions support
 - Function calling (limited to one function)
 - WebSocket communication patterns
@@ -22,6 +23,7 @@ Please refer to the comprehensive documentation in [Chapter 7's README](../../pa
 ## Code Comparison
 
 You can compare the implementations by looking at:
+
 - [Chapter 11 index.html](./index.html) (Vertex API version)
 - [Chapter 7 index.html](../../part_2_dev_api/chapter_07/index.html) (Development API version)
 

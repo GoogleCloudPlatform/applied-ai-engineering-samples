@@ -10,6 +10,7 @@ This chapter implements the exact same real-time audio-to-audio chat application
 4. **Setup Configuration:** Includes additional Vertex AI-specific configuration parameters in the setup message
 
 The core functionality, audio processing, WebSocket communication patterns, and user interface remain identical to Chapter 5. For detailed technical information about the implementation, including:
+
 - Audio processing pipeline
 - WebSocket communication
 - Interruption handling
@@ -23,6 +24,7 @@ Please refer to the comprehensive documentation in [Chapter 5's README](../../pa
 ## Code Comparison
 
 You can compare the implementations by looking at:
+
 - [Chapter 9 index.html](./index.html) (Vertex API version)
 - [Chapter 5 index.html](../../part_2_dev_api/chapter_05/index.html) (Development API version)
 

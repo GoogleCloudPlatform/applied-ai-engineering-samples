@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-const FINNHUB_API_KEY = '<YOUR_FINNHUB_API_KEY>';
+const FINNHUB_API_KEY = "<YOUR_FINNHUB_API_KEY>";
 
 export async function getStockPrice(symbol) {
   try {
     const url = `https://finnhub.io/api/v1/quote?symbol=${encodeURIComponent(symbol)}&token=${FINNHUB_API_KEY}`;
-    console.log('Fetching stock data from:', url);
-    
+    console.log("Fetching stock data from:", url);
+
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`Finnhub API failed with status: ${response.status}`);
     }
-    
+
     const data = await response.json();
-    
+
     // Check if we got valid data
     if (data.c === 0 && data.h === 0 && data.l === 0) {
       return {
-        error: `Could not find stock data for symbol: ${symbol}`
+        error: `Could not find stock data for symbol: ${symbol}`,
       };
     }
 
@@ -43,16 +43,16 @@ export async function getStockPrice(symbol) {
       lowPrice: data.l,
       openPrice: data.o,
       previousClose: data.pc,
-      symbol: symbol.toUpperCase()
+      symbol: symbol.toUpperCase(),
     };
   } catch (error) {
-    console.error('Detailed error:', {
+    console.error("Detailed error:", {
       message: error.message,
       stack: error.stack,
-      type: error.name
+      type: error.name,
     });
     return {
-      error: `Error fetching stock price for ${symbol}: ${error.message}`
+      error: `Error fetching stock price for ${symbol}: ${error.message}`,
     };
   }
-} 
+}

@@ -105,11 +105,11 @@ video:not(.hidden) {
 
 .main-title {
   text-align: center;
-  font-size: 2.0rem;
+  font-size: 2rem;
   margin: 0.5rem 0;
   padding: 0 20px;
   color: white;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-weight: 300;
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
   z-index: 1001;

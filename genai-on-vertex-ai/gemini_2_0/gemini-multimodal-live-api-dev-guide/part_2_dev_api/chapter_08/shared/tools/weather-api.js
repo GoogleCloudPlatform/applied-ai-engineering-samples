@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-const OPENWEATHER_API_KEY = '<YOUR_OPENWEATHER_API_KEY>';
+const OPENWEATHER_API_KEY = "<YOUR_OPENWEATHER_API_KEY>";
 
 export async function getWeather(city) {
   try {
     // First get coordinates for the city
     const geoUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(city)}&limit=1&appid=${OPENWEATHER_API_KEY}`;
-    console.log('Fetching geo data from:', geoUrl);
+    console.log("Fetching geo data from:", geoUrl);
     const geoResponse = await fetch(geoUrl);
     if (!geoResponse.ok) {
       throw new Error(`Geo API failed with status: ${geoResponse.status}`);
@@ -29,7 +29,7 @@ export async function getWeather(city) {
 
     if (!geoData.length) {
       return {
-        error: `Could not find location: ${city}`
+        error: `Could not find location: ${city}`,
       };
     }
 
@@ -37,10 +37,12 @@ export async function getWeather(city) {
 
     // Then get weather data
     const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${OPENWEATHER_API_KEY}`;
-    console.log('Fetching weather data from:', weatherUrl);
+    console.log("Fetching weather data from:", weatherUrl);
     const weatherResponse = await fetch(weatherUrl);
     if (!weatherResponse.ok) {
-      throw new Error(`Weather API failed with status: ${weatherResponse.status}`);
+      throw new Error(
+        `Weather API failed with status: ${weatherResponse.status}`,
+      );
     }
     const weatherData = await weatherResponse.json();
 
@@ -50,16 +52,16 @@ export async function getWeather(city) {
       humidity: weatherData.main.humidity,
       windSpeed: weatherData.wind.speed,
       city: weatherData.name,
-      country: weatherData.sys.country
+      country: weatherData.sys.country,
     };
   } catch (error) {
-    console.error('Detailed error:', {
+    console.error("Detailed error:", {
       message: error.message,
       stack: error.stack,
-      type: error.name
+      type: error.name,
     });
     return {
-      error: `Error fetching weather for ${city}: ${error.message}`
+      error: `Error fetching weather for ${city}: ${error.message}`,
     };
   }
-} 
+}
