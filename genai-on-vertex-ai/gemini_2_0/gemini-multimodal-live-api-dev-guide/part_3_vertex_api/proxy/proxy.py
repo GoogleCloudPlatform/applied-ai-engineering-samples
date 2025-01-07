@@ -94,7 +94,7 @@ async def proxy_task(
                 print(f"\n{name} connection closed during message processing:")
                 print("=" * 80)
                 print(f"Close code: {e.code}")
-                print(f"Close reason (full):")
+                print("Close reason (full):")
                 print("-" * 40)
                 print(e.reason)
                 print("=" * 80)
@@ -110,7 +110,7 @@ async def proxy_task(
         print(f"\n{name} connection closed:")
         print("=" * 80)
         print(f"Close code: {e.code}")
-        print(f"Close reason (full):")
+        print("Close reason (full):")
         print("-" * 40)
         print(e.reason)
         print("=" * 80)
@@ -231,7 +231,7 @@ async def main() -> None:
     """
     Starts the WebSocket server.
     """
-    print(f"DEBUG: proxy.py - main() function started")
+    print("DEBUG: proxy.py - main() function started")
     # Get the port from the environment variable, defaulting to 8081
     # port = int(os.environ.get("PORT", 8081))
     port = 8081
