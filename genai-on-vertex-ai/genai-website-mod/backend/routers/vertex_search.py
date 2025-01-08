@@ -28,12 +28,14 @@ from models.vertex_search_models import (
     VertexSearchFollowupResponse,
 )
 from proto import Message
-from utils.const import USER_AGENT
+from utils.consts import USER_AGENT
 from utils.vertex_search_utils import (
     get_document_from_ids,
     recommend_items,
     search_followup,
 )
+from google.cloud.aiplatform import telemetry
+from utils.consts import USER_AGENT
 
 with open("config.toml", "rb") as f:
     config = tomllib.load(f)
@@ -55,15 +57,16 @@ with telemetry.tool_context_manager(USER_AGENT):
 
 
 def create_new_conversation():
-    converse_request = discoveryengine.CreateConversationRequest(
-        parent=(f"projects/{project_id}/locations/{datastore_location}/"
-                f"collections/default_collection/dataStores/{datastore_id}"
-        ),  # noqa: E501
-        conversation=discoveryengine.Conversation(),
-    )
-    conversation = converse_client.create_conversation(request=converse_request)
+    with telemetry.tool_context_manager(USER_AGENT):
+        converse_request = discoveryengine.CreateConversationRequest(
+            parent=(f"projects/{project_id}/locations/{datastore_location}/"
+                    f"collections/default_collection/dataStores/{datastore_id}"
+            ),  # noqa: E501
+            conversation=discoveryengine.Conversation(),
+        )
+        conversation = converse_client.create_conversation(request=converse_request)
 
-    return conversation
+        return conversation
 
 
 router = APIRouter()

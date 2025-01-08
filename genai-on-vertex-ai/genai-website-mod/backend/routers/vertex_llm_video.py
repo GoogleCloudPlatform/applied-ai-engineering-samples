@@ -22,6 +22,8 @@ from models.vertex_llm_video_models import (
     VertexLLMVideoChatRequest,
     VertexLLMVideoResponse,
 )
+from google.cloud.aiplatform import telemetry
+from utils.consts import USER_AGENT
 
 with open("./config.toml", "rb") as f:
     config = tomllib.load(f)
@@ -37,7 +39,6 @@ def video_chat(req: VertexLLMVideoChatRequest) -> VertexLLMVideoResponse:
         "top_p": req.top_p,
         "top_k": req.top_k
     }
-
     model = GenerativeModel(
         req.model_name,
         generation_config=generation_config,
@@ -56,19 +57,20 @@ def video_chat(req: VertexLLMVideoChatRequest) -> VertexLLMVideoResponse:
             history = None
     else:
         history = None
-        
-    chat = model.start_chat(history=history)
-    video1 = Part.from_uri(
-        mime_type="video/mp4",
-        uri=req.video_url,
-    )
-    print (f"video1: {video1}")
-    print (f"prompt: {req.prompt}")
-    try:
-        resp = chat.send_message(
-            [video1, req.prompt]
+
+    with telemetry.tool_context_manager(USER_AGENT):
+        chat = model.start_chat(history=history)
+        video1 = Part.from_uri(
+            mime_type="video/mp4",
+            uri=req.video_url,
         )
-    except Exception as error:
-        print(f"[Error]{error}")
-        return VertexLLMVideoResponse(response="Something went wrong, please try again later.")
-    return VertexLLMVideoResponse(response=resp.text)
+        print (f"video1: {video1}")
+        print (f"prompt: {req.prompt}")
+        try:
+            resp = chat.send_message(
+                [video1, req.prompt]
+            )
+        except Exception as error:
+            print(f"[Error]{error}")
+            return VertexLLMVideoResponse(response="Something went wrong, please try again later.")
+        return VertexLLMVideoResponse(response=resp.text)

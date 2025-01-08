@@ -1,27 +1,48 @@
+# [global]
+# project_id = ""
+# location = "us-central1"
+
+# datastore_location = "global"
+# datastore_id = ""
+# serving_config = "default_config"
+
+# recs_datastore_id = ""
+# recs_serving_config_id = ""
 [global]
-project_id = ""
+project_id = "customermod-genai-sa"
 location = "us-central1"
 
 datastore_location = "global"
-datastore_id = ""
+datastore_id = "cymbal-investments-datasto_1701335160137"
 serving_config = "default_config"
 
-recs_datastore_id = ""
-recs_serving_config_id = ""
+recs_datastore_id = "cxm-ccadmin-recsys-store_1701063661621"
+recs_serving_config_id = "cxm-ccadmin-recsys_1701063621105"
 
 [video]
 video_url = "https://www.youtube.com/watch?v=St1up9PwnUY"
 
+# [imagen]
+# generation_model_name = "imagegeneration@005"
+# caption_model_name = "imagetext@002"
+# bucket_name = ""
+# generation_negative_prompt = "nsfw, porn"
+# refine_prompt_template = """{}"""
+
 [imagen]
-generation_model_name = "imagegeneration@005"
+generation_model_name = "imagegeneration@002"
 caption_model_name = "imagetext@002"
-bucket_name = ""
+bucket_name = "website-mod-imagen-outputs"
 generation_negative_prompt = "nsfw, porn"
 refine_prompt_template = """{}"""
 
+# [blog]
+# blog_bucket = ""
+# image_bucket = ""
+
 [blog]
-blog_bucket = ""
-image_bucket = ""
+blog_bucket = "website-mod-imagen-outputs"
+image_bucket = "website-mod-blog-images"
 
 [vertex-llm]
 

@@ -16,20 +16,21 @@ import os
 import sys
 
 from google.cloud.aiplatform import telemetry
+from google.cloud.aiplatform import telemetry
 from fastapi import APIRouter
-from utils.const import USER_AGENT
+from utils.consts import USER_AGENT
 from vertexai.preview.vision_models import (
     Image,
     ImageCaptioningModel,
     ImageGenerationModel,
     ImageGenerationResponse,
 )
+from utils.consts import USER_AGENT
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 
 router = APIRouter()
-
 
 def caption_image(image_bytes: bytes, model_name="imagetext@001") -> list[str]:
     with telemetry.tool_context_manager(USER_AGENT):
