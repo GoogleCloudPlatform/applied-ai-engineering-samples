@@ -6,7 +6,7 @@ This chapter presents a real-time audio-to-audio chat application that interacts
 
 **How This Chapter Differs from Previous Chapters:**
 
-- **Chapter 2 (Live Audio Chat with Gemini):** Utilized the Python SDK for simplifying the audio streaming, but didn't run in the browser. It handled audio-to-audio but with the assistance of the SDK's higher-level abstractions. **Importantly, Chapter 2 used a `model_speaking` flag on the client-side to prevent the model's output from being treated as input.** This chapter achieves a similar outcome through a different mechanism, relying on the API's turn management.
+- **Chapter 2 (Live Audio Chat with Gemini):** Utilized the Python SDK for simplifying the audio streaming, but didn't run in the browser. It handled audio-to-audio but with the assistance of the SDK's higher-level abstractions. **Importantly, Chapter 2 used a `model_speaking` flag on the client-side to prevent the model's output from being treated as input.** This chapter achieves a similar outcome through a different mechanism, relying on the APIs turn management.
 - **Chapter 3 (Low-Level WebSocket Interaction - Single Exchange Example):** Introduced low level WebSocket interaction but only for sending a single text query to the model.
 - **Chapter 4 (Text-to-Speech with WebSockets):** Focused on text-to-speech, sending text to the API and playing back the received audio. It introduced basic audio handling but did not involve live microphone input or complex audio stream management.
 
@@ -128,7 +128,7 @@ The audio processing pipeline in this application is crucial for real-time perfo
 **3. Audio Playback and `AudioStreamer`:**
 
 - **`AudioStreamer` Class:** This class manages the playback of audio chunks received from the Gemini API.
-- **`AudioContext`:** It utilizes the Web Audio API's `AudioContext` for handling audio playback. The `AudioContext` is initialized only when the first audio chunk is received to comply with browser autoplay policies. It sets a sample rate of 24000 Hz.
+- **`AudioContext`:** It utilizes the Web Audio APIs `AudioContext` for handling audio playback. The `AudioContext` is initialized only when the first audio chunk is received to comply with browser autoplay policies. It sets a sample rate of 24000 Hz.
   - **Lazy Initialization:** The `AudioContext` is only created when the first audio chunk is received. This is because some browsers restrict audio playback unless it's initiated by a user action.
   - **Sample Rate:** The sample rate is set to 24000 Hz, which is a common sample rate for speech audio.
 - **`addPCM16()`:** This method receives PCM16 audio chunks, converts them back to Float32, creates `AudioBuffer` objects, and adds them to an internal queue (`audioQueue`).
@@ -166,7 +166,7 @@ The audio processing pipeline in this application is crucial for real-time perfo
 
 **4. Interruption Handling:**
 
-- **Detection:** The API signals an interruption by sending a `serverContent` message with the `interrupted` flag set to `true`. This typically happens when the API's VAD detects speech from the user while the model is still speaking.
+- **Detection:** The API signals an interruption by sending a `serverContent` message with the `interrupted` flag set to `true`. This typically happens when the APIs VAD detects speech from the user while the model is still speaking.
   ```javascript
   if (wsResponse.serverContent.interrupted) {
     logMessage("Gemini: Interrupted");
@@ -178,14 +178,14 @@ The audio processing pipeline in this application is crucial for real-time perfo
 - **Client-Side Handling:** When the `interrupted` flag is received:
   1. The `isInterrupted` flag is set to `true`.
   2. The `AudioStreamer`'s `stop()` method is called to immediately halt any ongoing audio playback. This ensures that the interrupted audio is not played.
-- **Latency:** The latency for interruption detection is primarily determined by the API's VAD and the network latency. The client-side processing adds minimal delay. On a fast connection, the interruption should feel near-instantaneous.
-- **No Specific Parameter:** There is no specific parameter in this code to tune the interruption sensitivity, as that is primarily controlled by the API's VAD.
+- **Latency:** The latency for interruption detection is primarily determined by the APIs VAD and the network latency. The client-side processing adds minimal delay. On a fast connection, the interruption should feel near-instantaneous.
+- **No Specific Parameter:** There is no specific parameter in this code to tune the interruption sensitivity, as that is primarily controlled by the APIs VAD.
 - **Effects of Changing VAD (if possible):** If the API provided a way to adjust VAD sensitivity (which it currently doesn't for the Multimodal Live API), the effects would be:
   - **More Sensitive VAD:** Interruptions would be triggered more easily, potentially leading to a more responsive but also more "jumpy" conversation.
   - **Less Sensitive VAD:** The model would be more likely to finish its turn, but it might feel less responsive to user interruptions.
 
 **5. Preventing Feedback Loop (No Echo):**
-In Chapter 2 with the Python SDK we introduced a `model_speaking` flag to prevent to model from listening to itself. In this chapter, we achieve this without an explicit flag on the client-side, **relying on the API's built-in turn management capabilities.** Here's how it works:
+In Chapter 2 with the Python SDK we introduced a `model_speaking` flag to prevent to model from listening to itself. In this chapter, we achieve this without an explicit flag on the client-side, **relying on the APIs built-in turn management capabilities.** Here's how it works:
 
 - **Turn Detection:** The Gemini API uses its Voice Activity Detection (VAD) to determine when a user's turn begins and ends. When the user starts speaking, the VAD detects this as the start of a turn. When the user stops speaking for a certain duration (a pause), the VAD determines that the user's turn has ended.
 
@@ -206,7 +206,7 @@ Essentially, the API is designed to handle the "listen while speaking" scenario 
   - Therefore, each chunk is 2048 samples \* 2 bytes/sample = 4096 bytes.
   - Chunks are sent roughly every 128 milliseconds.
   - This translates to a data rate of approximately 4096 bytes / 0.128 seconds = 32 KB/s (kilobytes per second).
-  - **VAD and Turn Boundaries:** The API's VAD plays a crucial role in determining the boundaries of a turn. When VAD detects a significant enough pause in the user's speech, it considers the turn to be over, and the model generates a response based on that segment of audio.
+  - **VAD and Turn Boundaries:** The APIs VAD plays a crucial role in determining the boundaries of a turn. When VAD detects a significant enough pause in the user's speech, it considers the turn to be over, and the model generates a response based on that segment of audio.
   - **Practical Implications:** For a natural conversational flow, it's generally a good practice to keep your utterances relatively concise and allow for turn-taking. This helps the API process the audio effectively and generate relevant responses.
 
 **7. User Interface (`index.html`)**
@@ -229,7 +229,7 @@ Essentially, the API is designed to handle the "listen while speaking" scenario 
 - **Error Handling:** The code includes basic error handling, but it could be made more robust by handling specific error codes or messages from the API and providing more informative feedback to the user.
 - **Security:** The API key is currently hardcoded in the HTML file. For production, you should **never** expose your API key directly in client-side code. Instead, use a secure backend server to handle authentication and proxy requests to the API.
 - **Scalability:** This example is designed for a single user. For a multi-user scenario, you would need to manage multiple WebSocket connections and potentially use a server-side component to handle user sessions and routing.
-- **Audio Quality:** The audio quality depends on the microphone, network conditions, and the API's processing. You can experiment with different sample rates and chunk sizes, but these values are often constrained by the API's requirements and the need to balance latency and bandwidth.
+- **Audio Quality:** The audio quality depends on the microphone, network conditions, and the APIs processing. You can experiment with different sample rates and chunk sizes, but these values are often constrained by the APIs requirements and the need to balance latency and bandwidth.
 - **Network Latency:** Network latency can significantly impact the real-time performance of the application. There's no single solution to mitigate network latency, but using a server closer to the user's location and optimizing the audio processing pipeline can help.
 - **Audio Level:** There is a `gainNode` to allow for controlling the volume of the output audio in the `AudioStreamer`. This is not used yet but could be exposed to the user through the UI if needed.
 
@@ -251,7 +251,7 @@ The Web Audio API is a high-level JavaScript API for processing and synthesizing
 
 **How This Application Uses the Web Audio API:**
 
-- **`AudioContext`:** An `AudioContext` is created to manage the entire audio graph. It's initialized with a sample rate of 24000 Hz, matching the API's output sample rate.
+- **`AudioContext`:** An `AudioContext` is created to manage the entire audio graph. It's initialized with a sample rate of 24000 Hz, matching the APIs output sample rate.
 - **`AudioWorkletNode`:** An `AudioWorkletNode` is used to run the `AudioProcessingWorklet` defined in `audio-recording-worklet.js`. This handles the real-time processing of microphone input, converting it to Int16 format and dividing it into chunks.
 - **`AudioBufferSourceNode`:** An `AudioBufferSourceNode` is created for each audio chunk received from the API. The audio data is decoded, converted to Float32, and then used to create an `AudioBuffer` that is assigned to the source node.
 - **`MediaStreamAudioSourceNode`:** A `MediaStreamAudioSourceNode` is created to capture the audio stream from the user's microphone.
@@ -280,7 +280,7 @@ The following parameters and values are used in this application and can be cust
       - **`voice_name`**: `Aoede` (specifies which voice to use).
         Possible values: `Aoede`, `Charon`, `Fenrir`, `Kore`, `Puck`
 - **`sampleRate`:**
-  The sample rate is set to 16000 Hz for the input and 24000 Hz for the output. This is dictated by the API's requirements.
+  The sample rate is set to 16000 Hz for the input and 24000 Hz for the output. This is dictated by the APIs requirements.
   - **Input (Microphone):** 16000 Hz (set in `audio-recorder.js`). This is a common sample rate for speech recognition.
     - **Why 16000 Hz for input?** 16000 Hz is a standard sample rate for speech processing and is often used in speech recognition systems because it captures most of the relevant frequency information in human speech while keeping computational costs manageable. Using a higher sample rate for input might not provide significant improvements in speech recognition accuracy for this application.
   - **Output (API):** 24000 Hz (specified in the API documentation and when creating the `AudioContext`). This is a higher sample rate, providing better audio quality for playback.

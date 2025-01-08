@@ -80,7 +80,7 @@ To understand how chunking enables a smooth, real-time conversation, let's trace
 3. **Chunking (Fast):** Every time 512 frames (32 milliseconds of audio) are captured, a chunk is created.
 4. **Send to API (Frequent):** This small chunk is immediately sent to the Gemini API, along with `end_of_turn=True`.
 5. **API Processing (Starts Early):** The API receives the chunk and its Voice Activity Detection (VAD) starts analyzing it. Because the chunks are small and frequent, the API can begin processing the audio very quickly, even while the user is still speaking.
-6. **Model Response (Begins Quickly):** Once the API's VAD detects a pause that it interprets as the end of a user's turn (even if it's a short pause between phrases), the Gemini model starts generating a response based on the audio it has received so far.
+6. **Model Response (Begins Quickly):** Once the APIs VAD detects a pause that it interprets as the end of a user's turn (even if it's a short pause between phrases), the Gemini model starts generating a response based on the audio it has received so far.
 7. **Audio Output (Low Latency):** The response audio is sent back to the client in chunks. The `receive_and_play` task starts playing the response audio as soon as it arrives, minimizing the delay.
 
 **Impact of `CHUNK_SIZE`:**
@@ -93,7 +93,7 @@ Each chunk is sent to the API with the `end_of_turn=True` flag. While this might
 
 ### Input/Output and Turn-Taking
 
-The application distinguishes between user input and model output through a combination of the `model_speaking` flag, the `end_of_turn=True` signal sent with each audio chunk, and the Gemini API's Voice Activity Detection (VAD).
+The application distinguishes between user input and model output through a combination of the `model_speaking` flag, the `end_of_turn=True` signal sent with each audio chunk, and the Gemini APIs Voice Activity Detection (VAD).
 
 **Distinguishing Input from Output:**
 
@@ -104,7 +104,7 @@ The application distinguishes between user input and model output through a comb
 **How Audio Chunks are Sent:**
 
 - **`end_of_turn=True` with Each Chunk:** The `listen_and_send` task sends each chunk of audio data (determined by `CHUNK_SIZE`) with `end_of_turn=True` in the message payload: `await session.send({"data": data, "mime_type": "audio/pcm"}, end_of_turn=True)`. This might seem like it would constantly interrupt the conversation flow. However, the API handles this gracefully.
-- **API-Side Buffering and VAD:** The Gemini API likely buffers the incoming audio chunks on its end. Even though each chunk is marked as the end of a turn with `end_of_turn=True`, the API's Voice Activity Detection (VAD) analyzes the buffered audio to identify longer pauses or periods of silence that more accurately represent the actual end of the user's speech. The API can group several chunks into what it considers a single user turn based on its VAD analysis, rather than strictly treating each chunk as a separate turn.
+- **API-Side Buffering and VAD:** The Gemini API likely buffers the incoming audio chunks on its end. Even though each chunk is marked as the end of a turn with `end_of_turn=True`, the APIs Voice Activity Detection (VAD) analyzes the buffered audio to identify longer pauses or periods of silence that more accurately represent the actual end of the user's speech. The API can group several chunks into what it considers a single user turn based on its VAD analysis, rather than strictly treating each chunk as a separate turn.
 - **Low-Latency Processing:** The API is designed for low-latency interaction. It starts processing the received audio chunks as soon as possible. Even if `end_of_turn=True` is sent with each chunk, the API can begin generating a response while still receiving more audio from the user, as long as it hasn't detected a significant enough pause to finalize the user's turn based on its VAD.
 
 **Determining End of Model Turn:**
@@ -123,7 +123,7 @@ The application distinguishes between user input and model output through a comb
 6. When the model finishes, it sends `turn_complete: True`.
 7. The `receive_and_play` task sets `model_speaking` to `False`, switching back to the user's turn.
 
-In essence, although `end_of_turn=True` is sent with each audio chunk, the API's VAD plays a more significant role in determining the actual turn boundaries. The `end_of_turn=True` in this implementation might act more as a hint or a nudge to the API to process the audio, rather than a definitive end-of-turn marker. This approach allows for a relatively smooth conversation flow despite the frequent `end_of_turn` signals, thanks to the API's buffering, VAD, and low-latency processing.
+In essence, although `end_of_turn=True` is sent with each audio chunk, the APIs VAD plays a more significant role in determining the actual turn boundaries. The `end_of_turn=True` in this implementation might act more as a hint or a nudge to the API to process the audio, rather than a definitive end-of-turn marker. This approach allows for a relatively smooth conversation flow despite the frequent `end_of_turn` signals, thanks to the APIs buffering, VAD, and low-latency processing.
 
 ### Why Always Set `end_of_turn=True`?
 
@@ -131,7 +131,7 @@ Setting `end_of_turn=True` with each audio chunk, even when the user hasn't fini
 
 1. **Simplicity and Reduced Client-Side Complexity:** Implementing robust Voice Activity Detection (VAD) on the client-side can be complex. By always setting `end_of_turn=True`, the developers might have opted for a simpler client-side implementation that offloads the more complex VAD task to the Gemini API.
 2. **Lower Latency:** Sending smaller chunks with `end_of_turn=True` might allow the API to start processing the audio sooner. However, this potential latency benefit depends heavily on how the API is designed.
-3. **Emphasis on API-Side Control:** By sending `end_of_turn=True` frequently, the client cedes more control over turn-taking to the API. The API's VAD becomes the primary mechanism for determining turn boundaries.
+3. **Emphasis on API-Side Control:** By sending `end_of_turn=True` frequently, the client cedes more control over turn-taking to the API. The APIs VAD becomes the primary mechanism for determining turn boundaries.
 
 **It's important to note:** While this approach can work, it's not necessarily the most optimal or efficient way to handle turn-taking in a voice conversation system. Ideally, you would want to send `end_of_turn=True` only when the user has actually finished speaking, which would typically involve implementing client-side VAD.
 

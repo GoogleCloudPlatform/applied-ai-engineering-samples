@@ -12,7 +12,7 @@ Starting with fundamental WebSocket concepts, each chapter adds new capabilities
 
 - Single exchange example with the Gemini API
 - Core WebSocket setup and communication
-- Understanding the API's message formats
+- Understanding the APIs message formats
 - Handling the mandatory setup phase
 
 ### Chapter 4: Text-to-Speech Implementation

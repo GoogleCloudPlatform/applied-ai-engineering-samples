@@ -3,10 +3,12 @@
   display: flex;
   gap: 10px;
 }
-#micButton {
+
+#mic-button {
   padding: 8px 16px;
   cursor: pointer;
 }
+
 #output {
   margin: 20px;
 }

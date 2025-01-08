@@ -27,7 +27,7 @@ body {
   height: 60px;
   border-radius: 50%;
   border: none;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgb(0 0 0 / 60%);
   backdrop-filter: blur(10px);
   cursor: pointer;
   display: flex;
@@ -60,7 +60,7 @@ body {
   align-items: center;
   justify-content: center;
   z-index: 100;
-  background: rgba(128, 128, 128, 0.2);
+  background: rgb(128 128 128 / 20%);
 }
 
 video {
@@ -72,7 +72,7 @@ video {
   min-height: 240px;
   object-fit: contain;
   background: #000;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgb(255 255 255 / 20%);
 }
 
 video:not(.hidden) {
@@ -85,7 +85,7 @@ video:not(.hidden) {
 }
 
 .function-info {
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgb(0 0 0 / 70%);
   color: white;
   padding: 10px;
   margin: 10px auto;

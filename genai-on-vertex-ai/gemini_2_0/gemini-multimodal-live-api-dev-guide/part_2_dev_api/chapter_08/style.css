@@ -23,7 +23,7 @@ body {
   gap: 20px;
   z-index: 1000;
   padding: 15px;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgb(0 0 0 / 50%);
   border-radius: 30px;
   backdrop-filter: blur(10px);
 }
@@ -33,7 +33,7 @@ body {
   height: 60px;
   border-radius: 50%;
   border: none;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgb(0 0 0 / 60%);
   backdrop-filter: blur(10px);
   cursor: pointer;
   display: flex;
@@ -66,7 +66,7 @@ body {
   align-items: center;
   justify-content: center;
   z-index: 100;
-  background: rgba(0, 0, 0, 0.9);
+  background: rgb(0 0 0 / 90%);
 }
 
 video {
@@ -93,7 +93,7 @@ video:not(.hidden) {
   z-index: 1000;
   width: 90%;
   max-width: 800px;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgb(0 0 0 / 70%);
   color: white;
   padding: 15px;
   border-radius: 10px;
@@ -109,9 +109,9 @@ video:not(.hidden) {
   margin: 0.5rem 0;
   padding: 0 20px;
   color: white;
-  font-family: "Inter", sans-serif;
+  font-family: Inter, sans-serif;
   font-weight: 300;
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  text-shadow: 0 0 10px rgb(255 255 255 / 30%);
   z-index: 1001;
   position: relative;
   line-height: 1.2;
