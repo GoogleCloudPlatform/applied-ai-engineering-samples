@@ -24,3 +24,4 @@ We will try to use REST APIs which will hopefully make the codes easier to under
 4. [Query-Level Boosting, Filtering, and Facets for Vertex AI Search Website Datastores](./query_level_boosting_filtering_and_facets.ipynb)
 5. [Inline Ingestion of Documents into Vertex AI Search](./inline_ingestion_of_documents.ipynb)
 6. [Event-based Triggering of Manual Recrawl for Vertex AI Search Advanced Website Datastores](./manual_recrawl_urls_with_trigger.ipynb)
+7. [Recording Real-Time User Events in Vertex AI Search Datastores](./record_user_events.ipynb)
