@@ -15,7 +15,9 @@
 import os
 import sys
 
+from google.cloud.aiplatform import telemetry
 from fastapi import APIRouter
+from utils.const import USER_AGENT
 from vertexai.preview.vision_models import (
     Image,
     ImageCaptioningModel,
@@ -30,7 +32,9 @@ router = APIRouter()
 
 
 def caption_image(image_bytes: bytes, model_name="imagetext@001") -> list[str]:
-    model = ImageCaptioningModel.from_pretrained(model_name)
+    with telemetry.tool_context_manager(USER_AGENT):
+        model = ImageCaptioningModel.from_pretrained(model_name)
+
     source_image = Image(image_bytes=image_bytes)
 
     captions = model.get_captions(
@@ -45,7 +49,9 @@ def caption_image(image_bytes: bytes, model_name="imagetext@001") -> list[str]:
 def generate_image(
     prompt: str, negative_prompt: str = "", model_name="imagegeneration@006"
 ) -> ImageGenerationResponse:
-    model = ImageGenerationModel.from_pretrained(model_name)
+    with telemetry.tool_context_manager(USER_AGENT):
+        model = ImageGenerationModel.from_pretrained(model_name)
+
     images = model.generate_images(
         prompt=prompt,
         number_of_images=1,
@@ -56,7 +62,9 @@ def generate_image(
 
 
 def edit_image(image_bytes: bytes, prompt: str, model_name="imagegeneration@002"):
-    model = ImageGenerationModel.from_pretrained(model_name)
+    with telemetry.tool_context_manager(USER_AGENT):
+        model = ImageGenerationModel.from_pretrained(model_name)
+
     base_img = Image(image_bytes=image_bytes)
 
     images = model.edit_image(

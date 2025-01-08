@@ -45,24 +45,21 @@ class WebpageContent:
 
         try:
             if url.startswith("https://storage.googleapis.com/"):
-                # https://storage.googleapis.com/website-mod-imagen-outputs/production/test_content.json
                 gcs_url = url.replace("https://storage.googleapis.com/", "")
                 print(f"***gcs_url={gcs_url}")
                 gcs_urls = gcs_url.split("/")
-                # self.project_id = gcs_url.split("/")[0]
                 self.bucket = gcs_urls[0]
                 print(f"**self.bucket={self.bucket}")
                 self.content_id = gcs_urls[-1][0 : gcs_urls[-1].index(".")]
                 print(f"**self.content_id={self.content_id}")
                 self.blob = "/".join(
                     gcs_urls[1:]
-                )  # gcs_url.replace(self.bucket + "/", "")
+                )
                 print(f"**self.blob={self.blob}")
                 state_str = self.blob.split("/")[0]
                 print(f"**self.state_str={state_str}")
                 self.state = ContentState[state_str.upper()]
             elif url.startswith("gs://"):
-                # gs://website-mod-imagen-outputs/draft/1.html  # noqa: E231
                 self.bucket = url.replace("gs://", "").split("/")[0]
                 self.blob = url.replace(f"gs://{self.bucket}/", "")  # noqa: E231
                 self.content_id = self.blob.split("/")[-1][

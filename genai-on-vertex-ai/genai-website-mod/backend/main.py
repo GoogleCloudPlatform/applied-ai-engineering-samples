@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import tomllib
-from typing import Annotated
+from typing import Annotated, Optional
 
 import google.cloud.logging
 import vertexai
@@ -35,6 +35,7 @@ from routers.vertex_llm import router as vertex_llm_router
 from routers.vertex_search import router as vertex_search_router
 from routers.vertex_search import trigger_first_search, trigger_followup_search
 from routers.vertex_llm_video import router as vertex_llm_video_router
+from urllib import parse
 from utils.content_cache import ContentCache
 from utils.content_utils import ContentState
 from views.magi import magi_follow_up_controls
@@ -88,7 +89,7 @@ def execute_search_ask_video(thequery: str):
         prompt=thequery,
         video_url=config["video"]["video_url"],
     )
-    
+
     # Directly call the video_chat function
     response = video_chat(req=request_data)
 
@@ -128,6 +129,16 @@ def execute_follow_up_search(thequery: str, conversation_name: str):
 
     return message_pairs, search_results, conversation_name
 
+def extract_form_data(form:str) -> dict:
+    kvs = {}
+    for kv in form.split("&"):
+        key = kv.split("=")[0]
+        k = parse.unquote(key, encoding="utf-8", errors="replace")
+        value = kv.split("=")[1]
+        v = parse.unquote(value, encoding="utf-8", errors="replace")
+        if value != "":
+            kvs[k] = v
+    return kvs
 
 # UI APIs
 @app.get("/", response_class=HTMLResponse)
@@ -275,9 +286,16 @@ async def get_blog_content_action(
         },
     )
 
-
 @app.post("/web/magi", response_class=HTMLResponse)
-async def search(request: Request, thequery: Annotated[str, Form()]):
+# async def search(request: Request, thequery: Annotated[str, Form()]):
+async def search(request: Request):
+    query = await request.body()
+    form_data = extract_form_data(
+        form=query.decode(encoding="utf-8")
+    )
+
+    print("Entering /web/magi: %s", form_data)
+    thequery = form_data["thequery"]
     messages, search_results, conversation_name = execute_first_search(thequery)
 
     return templates.TemplateResponse(
@@ -291,9 +309,34 @@ async def search(request: Request, thequery: Annotated[str, Form()]):
         },
     )
 
+@app.post("/web/magi-follow", response_class=HTMLResponse)
+async def search_follow_up(
+    request: Request, thequery: Annotated[str, Form()], conversation_name: str
+):
+    print(f"CONV {conversation_name}")
+    messages, search_results, conversation_name = execute_follow_up_search(
+        thequery, conversation_name
+    )
+    return templates.TemplateResponse(
+        "magi.html",
+        {
+            "request": request,
+            "magi_follow_up_controls": magi_follow_up_controls,
+            "messages": messages,
+            "search_results": search_results,
+            "conversation_name": conversation_name,
+        },
+    )
+
+
 @app.post("/web/magi-video", response_class=HTMLResponse)
-async def search(request: Request, thequery: Annotated[str, Form()]):
-    print(f"REACHED magi-video: {thequery}\n {request}")
+async def search(request: Request):
+    # print(f"REACHED magi-video: {thequery}\n {request}")
+    query = await request.body()
+    form = extract_form_data(
+        form=query.decode(encoding="utf-8")
+    )
+    thequery = form["video_query"]
     messages, search_results, conversation_name = execute_search_ask_video(thequery)
 
     return templates.TemplateResponse(
