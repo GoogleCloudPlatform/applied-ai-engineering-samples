@@ -41,7 +41,6 @@ magi_follow_up_controls = """
                     hx-post="/web/magi-follow?conversation_name={{conversation_name}}"
                     hx-indicator="#loading-initial"
                     hx-include="#prompt-follow-up"
-                    hx-trigger="keydown[keyCode==13] from:input"
                     hx-target="#magi-container-target"
                     style="width: 100%;" />
             </div>

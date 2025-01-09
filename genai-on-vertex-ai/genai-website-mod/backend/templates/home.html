@@ -11,14 +11,14 @@
                 margin-left: auto; margin-right: auto;">
         <div>
             <input style="border: 1px solid rgb(228, 204, 204); height: 40px; width: 510px;" type="text"
-                id="search-bar-query" name="video_query" title="Search" type="search" placeholder="Ask Video ..."
-                hx-post="/web/magi-video" hx-indicator="#loading-initial-video" hx-include="#search-bar-query"
+                id="search-bar-query-video" name="video_query" title="Search" type="search" placeholder="Ask Video ..."
+                hx-post="/web/magi-video" hx-indicator="#loading-initial-video" hx-include="#search-bar-query-video"
                 hx-target="#magi-container-target2" aria-label="Search" />
         </div>
         <div class="search-controls">
             <div class="search-controls-magnifier">
                 <button type="submit" hx-post="/web/magi-video" hx-indicator="#loading-initial-video"
-                    hx-include="#search-bar-query" hx-target="#magi-container-target2"
+                    hx-include="#search-bar-query-video" hx-target="#magi-container-target2"
                     style="border: 1px solid rgb(228, 204, 204); height: 40px; border-radius: 5px;">
                     <span class="google-symbols"> search_spark </span>
                 </button>

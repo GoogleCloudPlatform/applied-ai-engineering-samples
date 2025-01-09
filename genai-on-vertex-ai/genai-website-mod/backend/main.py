@@ -181,7 +181,6 @@ async def home_publish(request: Request, action: str):
 async def clear(request: Request):
     return """<input type="text" id="search-bar-query" name="thequery" title="Search" type="search"
                 placeholder="Ask ..."
-          hx-trigger="keydown[keyCode==13] from:input"
           hx-post="/web/magi"
           hx-indicator="#loading-initial"
           hx-include="#search-bar-query"
@@ -331,7 +330,6 @@ async def search_follow_up(
 
 @app.post("/web/magi-video", response_class=HTMLResponse)
 async def search(request: Request):
-    # print(f"REACHED magi-video: {thequery}\n {request}")
     query = await request.body()
     form = extract_form_data(
         form=query.decode(encoding="utf-8")
