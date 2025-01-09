@@ -1,3 +1,5 @@
+aaie
+Abhishek
 AALR
 ADMA
 AFX
@@ -34,6 +36,7 @@ Bao
 Beckham
 Benno
 Bettes
+Bhagwat
 Biden
 Bigtable
 Bitcoin
@@ -177,6 +180,7 @@ Hisaki
 Hmmm
 Hogwarts
 Hossain
+Hossein
 Hubmann
 Hyperdisk
 ICICI
@@ -247,6 +251,7 @@ Loghub
 Logrus
 Lopyrev
 Lottry
+Mansour
 MFU
 MICOA
 MLB
