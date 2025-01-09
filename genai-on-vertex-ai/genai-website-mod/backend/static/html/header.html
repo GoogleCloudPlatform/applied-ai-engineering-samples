@@ -3,9 +3,9 @@
         font-family: 'Google Symbols';
         font-style: normal;
         font-weight: 400;
-        src: url(https://fonts.gstatic.com/s/googlesymbols/v233/HhzZU5Ak9u-oMExPeInvcuEmPosC9zyteYEFU68cPrjdKM1XLPTxlGmzczpgWvF1SbxVhQidBnv_C_ar1J9g0sLBUv3G8taXnhpB-Bw_tg.woff)
-            format('woff');
+        src: url(https://fonts.gstatic.com/s/googlesymbols/v233/HhzZU5Ak9u-oMExPeInvcuEmPosC9zyteYEFU68cPrjdKM1XLPTxlGmzczpgWvF1SbxVhQidBnv_C_ar1J9g0sLBUv3G8taXnhpB-Bw_tg.woff) format('woff');
     }
+
     .google-symbols {
         font-family: 'Google Symbols';
         font-weight: normal;
@@ -25,30 +25,14 @@
 <script type="module" src="/static/js/header-GA.js"></script>
 
 <div>
-    <div
-        class="container-fluid d-flex header-cnt"
-        style="justify-content: space-between">
-        <a class="navbar-brand" href="/"
-            ><img
-                src="/static/img/cymbal-investment-h.png"
-                width="150"
-                alt="Cymbal Agent Workstation Logo"
-        /></a>
+    <div class="container-fluid d-flex header-cnt" style="justify-content: space-between">
+        <a class="navbar-brand" href="/"><img src="/static/img/cymbal-investment-h.png" width="150"
+                alt="Cymbal Agent Workstation Logo" /></a>
         <div class="search-bar">
             <div>
-                <input
-                    type="text"
-                    id="search-bar-query"
-                    name="thequery"
-                    title="Search"
-                    type="search"
-                    placeholder="Ask ..."
-                    hx-trigger="keydown[keyCode==13] from:input"
-                    hx-post="/web/magi"
-                    hx-indicator="#loading-initial"
-                    hx-include="#search-bar-query"
-                    hx-target="#magi-container-target"
-                    aria-label="Search" />
+                <input type="text" id="search-bar-query" name="thequery" title="Search" type="search"
+                    placeholder="Ask ..." hx-post="/web/magi" hx-indicator="#loading-initial"
+                    hx-include="#search-bar-query" hx-target="#magi-container-target" aria-label="Search" />
             </div>
             <div class="search-controls">
                 <div>
@@ -58,12 +42,8 @@
                 </div>
                 <div class="search-separator"></div>
                 <div class="search-controls-magnifier">
-                    <button
-                        type="submit"
-                        hx-post="/web/magi"
-                        hx-indicator="#loading-initial"
-                        hx-include="#search-bar-query"
-                        hx-target="#magi-container-target">
+                    <button type="submit" hx-post="/web/magi" hx-indicator="#loading-initial"
+                        hx-include="#search-bar-query" hx-target="#magi-container-target">
                         <span class="google-symbols"> search_spark </span>
                     </button>
                 </div>

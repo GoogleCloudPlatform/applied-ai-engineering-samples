@@ -18,6 +18,7 @@ import tomllib
 
 from fastapi import APIRouter, HTTPException
 from google.cloud import discoveryengine_v1beta as discoveryengine
+from google.cloud.aiplatform import telemetry
 from models.vertex_search_models import (
     VertexRecommendRequest,
     VertexRecommendResponse,
@@ -27,11 +28,14 @@ from models.vertex_search_models import (
     VertexSearchFollowupResponse,
 )
 from proto import Message
+from utils.consts import USER_AGENT
 from utils.vertex_search_utils import (
     get_document_from_ids,
     recommend_items,
     search_followup,
 )
+from google.cloud.aiplatform import telemetry
+from utils.consts import USER_AGENT
 
 with open("config.toml", "rb") as f:
     config = tomllib.load(f)
@@ -42,25 +46,27 @@ datastore_id = config["global"]["datastore_id"]
 datastore_location = config["global"]["datastore_location"]
 serving_config = config["global"]["serving_config"]
 
-converse_client = discoveryengine.ConversationalSearchServiceClient()
+with telemetry.tool_context_manager(USER_AGENT):
+    converse_client = discoveryengine.ConversationalSearchServiceClient()
 
-recommendation_client = discoveryengine.RecommendationServiceClient()
-recs_datastore_id = config["global"]["recs_datastore_id"]
-recs_serving_config_id = config["global"]["recs_serving_config_id"]
+    recommendation_client = discoveryengine.RecommendationServiceClient()
+    recs_datastore_id = config["global"]["recs_datastore_id"]
+    recs_serving_config_id = config["global"]["recs_serving_config_id"]
 
-document_client = discoveryengine.DocumentServiceClient()
+    document_client = discoveryengine.DocumentServiceClient()
 
 
 def create_new_conversation():
-    converse_request = discoveryengine.CreateConversationRequest(
-        parent=(f"projects/{project_id}/locations/{datastore_location}/"
-                f"collections/default_collection/dataStores/{datastore_id}"
-        ),  # noqa: E501
-        conversation=discoveryengine.Conversation(),
-    )
-    conversation = converse_client.create_conversation(request=converse_request)
+    with telemetry.tool_context_manager(USER_AGENT):
+        converse_request = discoveryengine.CreateConversationRequest(
+            parent=(f"projects/{project_id}/locations/{datastore_location}/"
+                    f"collections/default_collection/dataStores/{datastore_id}"
+            ),  # noqa: E501
+            conversation=discoveryengine.Conversation(),
+        )
+        conversation = converse_client.create_conversation(request=converse_request)
 
-    return conversation
+        return conversation
 
 
 router = APIRouter()

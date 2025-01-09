@@ -26,16 +26,15 @@
     <div class="magi-actions-container">
         <div class="search-bar" style="background-color: white">
             <div style="width: 100%">
-                <input type="text" id="prompt-follow-up" name="thequery" title="Search" type="search" value=""
-                    placeholder="Ask ..." aria-label="Search"
-                    hx-post="/web/magi-video" hx-indicator="#loading-initial-video"
-                    hx-include="#prompt-follow-up" hx-trigger="keydown[keyCode==13] from:input"
+                <input type="text" id="prompt-follow-up" name="video_query" title="Search" type="search" value=""
+                    placeholder="Ask ..." aria-label="Search" hx-post="/web/magi-video"
+                    hx-indicator="#loading-initial-video" hx-include="#prompt-follow-up"
                     hx-target="#magi-container-target2" style="width: 100%" />
             </div>
         </div>
         <div class="magi-buttons">
-            <button type="submit" hx-post="/web/magi-video"
-                hx-indicator="#loading-initial-video" hx-include="#prompt-follow-up" hx-target="#magi-container-target2">
+            <button type="submit" hx-post="/web/magi-video" hx-indicator="#loading-initial-video"
+                hx-include="#prompt-follow-up" hx-target="#magi-container-target2">
                 <span class="google-symbols"> astrophotography_mode </span>
                 Ask a follow up
             </button>
