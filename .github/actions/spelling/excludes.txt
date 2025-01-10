@@ -80,6 +80,7 @@
 \.xz$
 \.zip$
 ^\.github/actions/spelling/
+^\docs/
 ^\Q.github/workflows/spelling.yaml\E$
 ^\Q.github/workflows/notebook_linter/run_linter.sh\E$
 ^\Q.github/workflows/linter.yaml\E$
@@ -114,5 +115,3 @@ ignore$
 ^\Qowlbot.py\E$
 ^\Q.github/workflows/issue_assigner/assign_issue.py\E$
 ^\Qnoxfile.py\E$
-^\Qmkdocs.yml\E$
-^\Qmkdocs.sh\E$

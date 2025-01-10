@@ -3,7 +3,9 @@
       "terminology": {
         "defaultTerms": true, 
         "exclude": [
-          "README", "website(s)"
+          "README", 
+          "(?i)website(s)",
+          "code[- ]base(es)?"
         ]
       }
     }
