@@ -1,0 +1,4 @@
+websockets
+google-auth
+certifi
+requests

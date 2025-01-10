@@ -189,6 +189,8 @@ nav:
           - Overview: genai-on-vertex-ai/gemini_2_0/ui_ux_tooling/README.md
           - Spatial Reasoning (SDK): genai-on-vertex-ai/gemini_2_0/ui_ux_tooling/spatial_reasoning_SDK_for_gemini2.ipynb
           - Interactive Spatial Reasoning: genai-on-vertex-ai/gemini_2_0/ui_ux_tooling/spatial_reasoning_app_for_gemini2.ipynb
+        - Gemini Multimodal Live API Developer Guide: 
+          - Overview: genai-on-vertex-ai/gemini_2_0/gemini-multimodal-live-api-dev-guide/README.md
       - Gemini Prompting Recipes: 
         - Overview: genai-on-vertex-ai/gemini/prompting_recipes/README.md
         - Long Context Windows: 
