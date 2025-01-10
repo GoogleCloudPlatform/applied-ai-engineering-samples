@@ -3,7 +3,7 @@
       "terminology": {
         "defaultTerms": true, 
         "exclude": [
-          "README" 
+          "README", "website(s)"
         ]
       }
     }
