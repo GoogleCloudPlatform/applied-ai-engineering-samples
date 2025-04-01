@@ -70,8 +70,6 @@ This section contains code samples and hands-on labs demonstrating the use of [G
     <td style="vertical-align: baseline;">
       <ul>
         <li><a href="./genai-on-vertex-ai/gemini/prompting_recipes/">Gemini Prompting Recipes</a></li>
-        <li><a href="./genai-on-vertex-ai/advanced_prompting_training/">Advanced Prompting</a></li>
-        <li><a href="./genai-on-vertex-ai/vertex_foundation_tuning/">Foundation model tuning</a></li>
     </ul>
     </td>
     <td style="vertical-align: baseline;">
@@ -84,17 +82,6 @@ This section contains code samples and hands-on labs demonstrating the use of [G
       <ul>
         <li><a href="./genai-on-vertex-ai/vertex_ai_search/">Vertex AI Search</a></li>
         <li><a href="./genai-on-vertex-ai/retrieval_augmented_generation/">Retrieval Augmented Generation</a></li>
-      </ul>
-    </td>
-    <td style="vertical-align: baseline;">
-      <ul>
-        <li><a href="./genai-on-vertex-ai/agents/">Agents</a></li>
-        <li><a href="./genai-on-vertex-ai/vertex_ai_extensions/">Vertex AI Extensions</a></li>
-      </ul>
-    </td>
-    <td style="vertical-align: baseline;">
-      <ul>
-        <li><a href="./genai-on-vertex-ai/developer_productivity_with_genai/">Developer Productivity with GenAI</a></li>
       </ul>
     </td>
   </tr>
