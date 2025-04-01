@@ -183,18 +183,8 @@ nav:
   - GenAI on Vertex AI:
     - Overview: genai-on-vertex-ai/README.md
     - Foundation Models:
-      - Gemini 2.0:
-        - Overview: genai-on-vertex-ai/gemini_2_0/README.md
-        - Multimodal Analysis & Reasoning: 
-          - Overview: genai-on-vertex-ai/gemini_2_0/ui_ux_tooling/README.md
-          - Spatial Reasoning (SDK): genai-on-vertex-ai/gemini_2_0/ui_ux_tooling/spatial_reasoning_SDK_for_gemini2.ipynb
-          - Interactive Spatial Reasoning: genai-on-vertex-ai/gemini_2_0/ui_ux_tooling/spatial_reasoning_app_for_gemini2.ipynb
-      - Gemini Prompting Recipes: 
+      - Gemini 2.0: 
         - Overview: genai-on-vertex-ai/gemini/prompting_recipes/README.md
-        - Long Context Windows: 
-          - Overview: genai-on-vertex-ai/gemini/prompting_recipes/long_context_window/README.md
-          - Long Context Text: genai-on-vertex-ai/gemini/prompting_recipes/long_context_window/gemini_long_context_text.ipynb
-          - Long Context Video: genai-on-vertex-ai/gemini/prompting_recipes/long_context_window/gemini_long_context_video.ipynb
         - PDF Processing: 
           - Overview: genai-on-vertex-ai/gemini/prompting_recipes/pdf_processing_with_gemini/README.md
           - Extract PDF Pages: genai-on-vertex-ai/gemini/prompting_recipes/pdf_processing_with_gemini/1_extract_pdf_pages_with_gemini.ipynb
@@ -204,6 +194,11 @@ nav:
           - Audio Prompting: genai-on-vertex-ai/gemini/prompting_recipes/multimodal/multimodal_prompting_audio.ipynb
           - Image Prompting: genai-on-vertex-ai/gemini/prompting_recipes/multimodal/multimodal_prompting_image.ipynb
           - Video Prompting: genai-on-vertex-ai/gemini/prompting_recipes/multimodal/multimodal_prompting_video.ipynb
+        - Spatial Reasoning:
+          - Overview: genai-on-vertex-ai/gemini/prompting_recipes/spatial_reasoning/README.md
+          - Spatial Reasoning (SDK): genai-on-vertex-ai/gemini/prompting_recipes/spatial_reasoning/spatial_reasoning_SDK_for_gemini2.ipynb
+          - Interactive Spatial Reasoning: genai-on-vertex-ai/gemini/prompting_recipes/spatial_reasoning/spatial_reasoning_app_for_gemini2.ipynb   
+ 
     - Evaluation: 
       - Overview: genai-on-vertex-ai/gemini/README.md
       - Gemini Evals Playbook: 
@@ -239,6 +234,7 @@ nav:
         - Overview: genai-on-vertex-ai/retrieval_augmented_generation/README.md
         - Building Grounded RAG App: genai-on-vertex-ai/retrieval_augmented_generation/diy_rag_with_vertexai_apis/build_grounded_rag_app_with_vertex.ipynb
     - Agents: 
+      - Deploying Agents on Reasoning Engine: genai-on-vertex-ai/agents/reasoning_engine/crewai/CrewAI_on_VertexAI_Reasoning_Engine.ipynb
   - Research Operationalization: 
     - Overview: research-operationalization/README.md
     - TimesFM: 

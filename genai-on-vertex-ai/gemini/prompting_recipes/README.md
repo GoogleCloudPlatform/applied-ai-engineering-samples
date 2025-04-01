@@ -30,10 +30,10 @@ This folder contains code samples and guidance for how to leverage Gemini's uniq
 
   <tr>
     <td>
-      <a href="./long_context_window/"><code>long_context_window/</code></a>
+      <a href="./spatial_reasoning"><code>spatial_reasoning/</code></a>
     </td>
     <td>
-      Leveraging Gemini's 2M token context window to analyze long documents
+    Multimodal analysis and reasoning use cases for spatial reasoning
     </td>
   </tr>
 
