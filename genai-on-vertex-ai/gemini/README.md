@@ -24,7 +24,7 @@ To run the notebooks you'll need access to a Google Cloud project with the Verte
     <td>
       Code samples demonstrating prompting techniques for Gemini specific use cases
     </td>
-    <td><a href="./prompting_recipes">multimodal prompting, long context window, pdf processing</a></td>
+    <td><a href="./prompting_recipes">multimodal prompting, pdf processing and spatial reasoning</a></td>
   </tr>
 
   </tr>
