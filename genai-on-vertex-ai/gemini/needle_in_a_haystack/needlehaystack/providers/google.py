@@ -28,7 +28,7 @@ class Google(ModelProvider):
 
     def __init__(self,
                  project_id: str,
-                 model_name: str = "gemini-1.5-pro",
+                 model_name: str = "gemini-2.0-flash-001",
                  model_kwargs: dict = DEFAULT_MODEL_KWARGS,
                  vocab_file_url: str = VOCAB_FILE_URL):
         """
@@ -36,7 +36,7 @@ class Google(ModelProvider):
 
         Args:
             project_id (str): ID of the google cloud platform project to use
-            model_name (str): The name of the Google model to use. Defaults to 'gemini-1.5-pro'.
+            model_name (str): The name of the Google model to use. Defaults to 'gemini-2.0-flash-001'.
             model_kwargs (dict): Model configuration. Defaults to {max_tokens: 300, temperature: 0}.
             vocab_file_url (str): Sentencepiece model file that defines tokenization vocabulary. Deafults to gemma
                 tokenizer https://github.com/google/gemma_pytorch/blob/main/tokenizer/tokenizer.model

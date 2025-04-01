@@ -1,5 +1,0 @@
-Type,Prompt Template
-Basic Debugging,"You are great at debugging python code, please tell me how to fix the code based on the error message below: {error_message}"
-Debugging with Context,Here is the original code: {context}. Please fix the original code based on the error message below: {error_message} and and explain what you fixed
-Debugging with Context Function,Here is the original code: {new_context}. Please fix the original code based on the error message below: {new_error_message} and explain what you fixed.
-Error Prevention,"Based on the errors above, please tell me how to prevent similar errors in the future in this codebase."

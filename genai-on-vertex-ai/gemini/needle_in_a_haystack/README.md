@@ -99,8 +99,8 @@ You may generate a visualization of these results using the notebook [niah_visua
 You may modify your test configuration with the following options:
 
 - `gcp_project_id` - The GCP project ID used to run the test. 
-- `model_name` - Model name of the language model accessible by the provider. Defaults to `gemini-1.5-pro`
-- `evaluator_model_name` - Model name of the language model accessible by the evaluator. Defaults to `gemini-1.5-pro`
+- `model_name` - Model name of the language model accessible by the provider. Defaults to `gemini-2.0-flash-001`
+- `evaluator_model_name` - Model name of the language model accessible by the evaluator. Defaults to `gemini-2.0-flash-001`
 - `dynamic_needle` - Whether to use the dynamic needle or not. Defaults to `True`
 - `needle` - The statement or fact which will be placed in your context. Only used if `dynamic_needle=False`
 - `haystack_dir` - The directory which contains the text files to load as background context. Only text files are supported
