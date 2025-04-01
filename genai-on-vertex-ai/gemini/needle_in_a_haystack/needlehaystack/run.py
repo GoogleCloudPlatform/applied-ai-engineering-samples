@@ -12,8 +12,8 @@ class CommandArgs():
     gcp_project_id: str
     provider: str = "google"
     evaluator: str = "google"
-    model_name: str = "gemini-1.5-pro"
-    evaluator_model_name: Optional[str] = "gemini-1.5-pro"
+    model_name: str = "gemini-2.0-flash-001"
+    evaluator_model_name: Optional[str] = "gemini-2.0-flash-001"
     dynamic_needle: Optional[bool] = True
     needle: Optional[str] = "\nThe best thing to do in San Francisco is eat a sandwich and sit in Dolores Park on a sunny day.\n"
     haystack_dir: Optional[str] = "PaulGrahamEssays"

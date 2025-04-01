@@ -17,7 +17,7 @@ class GoogleEvaluator(Evaluator):
 
     def __init__(self,
                  project_id: str,
-                 model_name: str = "gemini-1.5-pro",
+                 model_name: str = "gemini-2.0-flash-001",
                  model_kwargs: dict = DEFAULT_MODEL_KWARGS):
         """
         :param project_id: ID of the google cloud platform project to use
