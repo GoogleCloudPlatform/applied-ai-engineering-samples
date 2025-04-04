@@ -9,7 +9,7 @@ This Eval Recipe demonstrates how to compare performance of a text classificatio
 
 - Metric: this eval uses a single deterministic metric "Accuracy" calculated by comparing model responses with ground truth labels. 
 
-- Labeled evaluation dataset (dataset.jsonl) includes 6 records that represent products from different categories. Each record provides two attributes which are wrapped in the `vars` object. This dataset structure allows Promptfoo to recognize variables that are needed to populate prompt templates, and ground truth labels used for scoring:
+- Labeled evaluation dataset (dataset.jsonl) is based [MAVE](https://github.com/google-research-datasets/MAVE/tree/main) dataset from Google Research. It includes 6 records that represent products from different categories. Each record provides two attributes which are wrapped in the `vars` object. This dataset structure allows Promptfoo to recognize variables that are needed to populate prompt templates, and ground truth labels used for scoring:
     - `product`: product name and description
     - `reference`: the name of correct product category which serves as the ground truth label
 
@@ -21,19 +21,22 @@ This Eval Recipe demonstrates how to compare performance of a text classificatio
 
 - Shell script `run.sh` installs the required Python libraries and runs `eval.py` 
 
-- How to customize this Eval Recipe:
-    1. Copy all files from the recipe directory to your source control system.
-    1. Edit the Python script `eval.py`:
-        - set the `project` parameter of vertexai.init to your Google Cloud Project ID.
-        - set the parameter `baseline_model` to the model that is currently used by your application
-        - set the parameter `candidate_model` to the model that you want to compare with your current model
-        - configure a unique `experiment_name` for each template for tracking purposes
-    1. Replace the contents of `dataset.jsonl` with your custom data in the same format.
-    1. Replace the contents of `prompt_template.txt` with your custom prompt template. Make sure that prompt template variables have the same names as dataset attributes.
-    1. Execute the shell script `run.sh` in a terminal window.
-    1. The resulting scores will be displayed in the script output. 
-    1. You can use [Vertex AI Experiments](https://console.cloud.google.com/vertex-ai/experiments) to view the history of evaluations for each experiment, including the final metrics scores.
-    1. Please refer to our [documentation](https://cloud.google.com/vertex-ai/generative-ai/docs/models/determine-eval) if you want to further customize your evaluation. Vertex AI Evaluation Service has a lot of features that are not included in this recipe, including LLM-based autoraters that can provide valuable metrics even without ground truth labels.
+## How to run this Eval Recipe
+
+1. Configure your [Google Cloud Environment](https://cloud.google.com/vertex-ai/docs/start/cloud-environment) and clone this Github repo to your environment. We recommend [Cloud Shell](https://shell.cloud.google.com/) or [Vertex AI Workbench](https://cloud.google.com/vertex-ai/docs/workbench/instances/introduction).
+1. Navigate to the Eval Recipe directory in terminal and run the shell script `run.sh`.
+1. The resulting scores will be displayed in the script output. 
+1. You can use [Vertex AI Experiments](https://console.cloud.google.com/vertex-ai/experiments) to view the history of evaluations for each experiment, including the final metrics scores.
+
+## How to customize this Eval Recipe:
+1. Edit the Python script `eval.py`:
+    - set the `project` parameter of vertexai.init to your Google Cloud Project ID.
+    - set the parameter `baseline_model` to the model that is currently used by your application
+    - set the parameter `candidate_model` to the model that you want to compare with your current model
+    - configure a unique `experiment_name` for each template for tracking purposes
+1. Replace the contents of `dataset.jsonl` with your custom data in the same format.
+1. Replace the contents of `prompt_template.txt` with your custom prompt template. Make sure that prompt template variables have the same names as dataset attributes.
+1. Please refer to our [documentation](https://cloud.google.com/vertex-ai/generative-ai/docs/models/determine-eval) if you want to further customize your evaluation. Vertex AI Evaluation Service has a lot of features that are not included in this recipe, including LLM-based autoraters that can provide valuable metrics even without ground truth labels.
     
 
 
