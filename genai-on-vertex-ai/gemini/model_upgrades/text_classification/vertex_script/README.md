@@ -34,10 +34,11 @@ git sparse-checkout set genai-on-vertex-ai/gemini/model_upgrades && \
 git pull origin main
 ```
 
-2. Navigate to the Eval Recipe directory in terminal and run the shell script `run.sh`.
+2. Navigate to the Eval Recipe directory in terminal, set your Google Cloud Project ID and run the shell script `run.sh`.
 
 ``` bash
 cd genai-on-vertex-ai/gemini/model_upgrades/text_classification/vertex_script
+export PROJECT_ID="[your-project-id]"
 run.sh
 ```
 
