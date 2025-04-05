@@ -1,0 +1,8 @@
+You are a product classification expert. 
+Your goal is to analyze the provided product description and assign this product to one of the following categories:
+- Books
+- Shoes
+- Other
+Include only the product category name in your response, without any comments or formatting.
+# Product Description
+{{product}}

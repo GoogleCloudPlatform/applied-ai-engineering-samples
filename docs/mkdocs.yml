@@ -198,6 +198,9 @@ nav:
           - Overview: genai-on-vertex-ai/gemini/prompting_recipes/spatial_reasoning/README.md
           - Spatial Reasoning (SDK): genai-on-vertex-ai/gemini/prompting_recipes/spatial_reasoning/spatial_reasoning_SDK_for_gemini2.ipynb
           - Interactive Spatial Reasoning: genai-on-vertex-ai/gemini/prompting_recipes/spatial_reasoning/spatial_reasoning_app_for_gemini2.ipynb   
+        - Model Upgrades:
+          - Overview: genai-on-vertex-ai/gemini/model_upgrades/README.md
+          - Text Classification: genai-on-vertex-ai/gemini/model_upgrades/text_classification/README.md
  
     - Evaluation: 
       - Overview: genai-on-vertex-ai/gemini/README.md
