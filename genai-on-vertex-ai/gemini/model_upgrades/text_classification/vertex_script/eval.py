@@ -8,6 +8,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 import vertexai
 from datetime import datetime
 from vertexai.evaluation import EvalTask, CustomMetric
@@ -40,7 +41,9 @@ def run_eval(experiment_name: str, baseline_model: str, candidate_model: str, pr
     print("Candidate model accuracy:", candidate_results.summary_metrics["accuracy/mean"])
 
 if __name__ == '__main__':
-    vertexai.init(project='kashkin', location='us-central1')
+    if os.getenv("PROJECT_ID", "your-project-id") == "your-project-id":
+        raise ValueError("Please configure your Google Cloud Project ID.")
+    vertexai.init(project=os.environ.get('PROJECT_ID', '[set-your-project-id-here]'), location='us-central1')
     baseline=run_eval(
         experiment_name = 'evals-classifier-demo',
         baseline_model = 'gemini-1.0-pro-002',
