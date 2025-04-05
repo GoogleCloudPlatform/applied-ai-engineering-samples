@@ -43,7 +43,7 @@ def run_eval(experiment_name: str, baseline_model: str, candidate_model: str, pr
 if __name__ == '__main__':
     if os.getenv("PROJECT_ID", "your-project-id") == "your-project-id":
         raise ValueError("Please configure your Google Cloud Project ID.")
-    vertexai.init(project=os.environ.get("PROJECT_ID"), location='us-central1')
+    vertexai.init(project=os.getenv("PROJECT_ID"), location='us-central1')
     baseline=run_eval(
         experiment_name = 'evals-classifier-demo',
         baseline_model = 'gemini-1.0-pro-002',
