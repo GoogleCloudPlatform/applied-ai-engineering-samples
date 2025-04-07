@@ -1,0 +1,6 @@
+{"document_path": "documents/document_01.txt", "question": "How many households used BSkyB service in 1994?", "reference": "3.5 million"}
+{"document_path": "documents/document_02.txt", "question": "When did Dodge end production of their full size sedans?", "reference": "ANSWER_NOT_FOUND"}
+{"document_path": "documents/document_03.txt", "question": "How many square miles was the region impacted by the 2010 drought?", "reference": "1160000"}
+{"document_path": "documents/document_04.txt", "question": "What is the largest Mansion in the west coast?", "reference": "ANSWER_NOT_FOUND"}
+{"document_path": "documents/document_05.txt", "question": "Who founded Telnet?", "reference": "Larry Roberts"}
+{"document_path": "documents/document_06.txt", "question": "When did the Chinese famine begin?", "reference": "1331"}
