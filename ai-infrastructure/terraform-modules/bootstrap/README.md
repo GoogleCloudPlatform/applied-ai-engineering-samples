@@ -1,6 +1,6 @@
 # Automation bootstrap
 
-This Terraform module establishes the initial configuration of a GCP project that requires elevated administrative permissions. Its primary objective is to set up Terraform and Cloud Build automation for subsequent provisioning tasks. The module enables the specified set of services and sets up an automation service account along with an automation GCS bucket. Optionally, the module can create a GCP project.
+This Terraform module establishes the initial configuration of a Google Cloud project that requires elevated administrative permissions. Its primary objective is to set up Terraform and Cloud Build automation for subsequent provisioning tasks. The module enables the specified set of services and sets up an automation service account along with an automation GCS bucket. Optionally, the module can create a Google Cloud project.
 
 ## Examples 
 
