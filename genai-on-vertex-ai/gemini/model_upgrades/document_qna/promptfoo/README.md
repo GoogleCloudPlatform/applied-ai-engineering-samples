@@ -1,4 +1,4 @@
-# Document QnA
+# Document Question Answering
 ### _Eval Recipe for model migration_
 
 This Eval Recipe demonstrates how to compare performance of a Document Question Answering prompt with Gemini 1.0 and Gemini 2.0 using a labeled dataset and open source evaluation tool [Promptfoo](https://www.promptfoo.dev/).
