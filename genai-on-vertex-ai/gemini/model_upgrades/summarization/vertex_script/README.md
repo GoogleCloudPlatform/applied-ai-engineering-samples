@@ -1,17 +1,19 @@
 # Text Classification 
 ### _Eval Recipe for model migration_
 
-This Eval Recipe demonstrates how to compare performance of a document question answering prompt with Gemini 1.0 and Gemini 2.0 using  [Vertex AI Evaluation Service](https://cloud.google.com/vertex-ai/generative-ai/docs/models/evaluation-overview).
+This Eval Recipe demonstrates how to compare performance of a summarization prompt with Gemini 1.0 and Gemini 2.0 using  [Vertex AI Evaluation Service](https://cloud.google.com/vertex-ai/generative-ai/docs/models/evaluation-overview).
 
 ![](diagram.png "Model Comparison Eval")
 
-- Use case: answer questions based on information from the given document.
-- Evaluation Dataset is based on [SQuAD2.0](https://rajpurkar.github.io/SQuAD-explorer/). It includes 6 documents stored as plain text files, and a JSONL file that provides ground truth labels: [`dataset.jsonl`](./dataset.jsonl).  Each record in this file includes 3 attributes:
-    - `document_path`: relative path to the plain text document file
-    - `question`: the question that we want to ask about this particular document
-    - `reference`: expected correct answer or special code `ANSWER_NOT_FOUND` used to verify that the model does not hallucinate answers when the document does not provide enough information to answer the given question.
+- Use case: summarize a news article.
 
-- Prompt Template is a zero-shot prompt located in [`prompt_template.txt`](./prompt_template.txt) with two prompt variables (`document` and `question`) that are automatically populated from our dataset.
+- Use case: summarize a news article.
+
+- Evaluation Dataset is based on [XSum](https://github.com/EdinburghNLP/XSum). It includes 5 news articles stored as plain text files, and a JSONL file with ground truth labels: [`dataset.jsonl`](./dataset.jsonl). Each record in this file includes 2 attributes:
+    - `document`: relative path to the plain text file containing the news article
+    - `reference`: ground truth label (short summary of the article)
+
+- Prompt Template is a zero-shot prompt located in [`prompt_template.txt`](./prompt_template.txt) with variable `document` that gets populated from the corresponding dataset attribute.
 
 - Python script [`eval.py`](./eval.py) configures the evaluation:
     - `run_eval`: configures the evaluation task, runs it on the 2 models and prints the results.
@@ -34,12 +36,12 @@ git pull origin main
 2. Navigate to the Eval Recipe directory in terminal, set your Google Cloud Project ID and run the shell script `run.sh`.
 
 ``` bash
-cd genai-on-vertex-ai/gemini/model_upgrades/document_qna/vertex_script
+cd genai-on-vertex-ai/gemini/model_upgrades/summarization/vertex_script
 export PROJECT_ID="[your-project-id]"
 ./run.sh
 ```
 
-3. The resulting metrics will be displayed in the script output. 
+3. The resulting metrics will be displayed in the script output. You can find the prompts and model responses stored in `candidate_results.metrics_table`.
 4. You can use [Vertex AI Experiments](https://console.cloud.google.com/vertex-ai/experiments) to view the history of evaluations for each experiment, including the final metrics scores.
 
 ## How to customize this Eval Recipe:

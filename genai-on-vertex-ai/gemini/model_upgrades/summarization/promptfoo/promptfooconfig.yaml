@@ -1,0 +1,17 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+
+providers:  # one or more models, with optional temperature and system instructions
+  - id: "vertex:gemini-1.0-pro-002"
+  - id: "vertex:gemini-2.0-flash-lite-001"
+
+prompts:
+  - file://prompt_template.txt
+
+tests:  # Promptfoo will generate a separate prompt for each record in this dataset based on the prompt template above
+  - file://dataset.jsonl
+
+defaultTest:  # The rules for scoring each model response
+  assert:
+    - type: rouge-n   # LLM based autorater
+      value: "{{summary}}"  # use the variable "summary" from dataset.jsonl as the ground truth label
+      threshold: 0.3
