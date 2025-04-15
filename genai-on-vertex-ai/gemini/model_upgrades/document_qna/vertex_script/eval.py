@@ -34,6 +34,9 @@ def run_eval(experiment_name: str, baseline_model: str, candidate_model: str, pr
     print(f"Baseline model score: {baseline_results.summary_metrics['question_answering_quality/mean']*20:.1f}%")
     print(f"Candidate model score: {candidate_results.summary_metrics['question_answering_quality/mean']*20:.1f}%")
 
+def export_eval_run():
+          detail_df = eval_result.metrics_table.to_dict(orient="records")
+
 if __name__ == '__main__':
     if os.getenv("PROJECT_ID", "your-project-id") == "your-project-id":
         raise ValueError("Please configure your Google Cloud Project ID.")

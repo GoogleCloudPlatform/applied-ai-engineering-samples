@@ -10,3 +10,11 @@ The goal is to accelerate the process of upgrading to the latest version of Gemi
     - Command line script based on Vertex GenAI Evaluation Service
     - Command line script based on Promptfoo
 - Eval Recipes can be customized by replacing the prompt template and the evaluation dataset.
+
+
+| Eval Recipe | Vertex AI Colab | Vertex AI Script | Promptfoo |
+| -------- | ------- | -------- | ------- |
+| Document QnA | [view](./document_qna/vertex_colab/document_qna_eval.ipynb) | [view](./document_qna/vertex_script/README.md) | [view](./document_qna/promptfoo/README.md) |
+| Summarization | [view](./summarization/vertex_colab/summarization_eval.ipynb) | [view](./summarization/vertex_script/README.md) | [view](./summarization/promptfoo/README.md) |
+| Text Classification | [view](./text_classification/vertex_colab/text_classification_eval.ipynb) | [view](./text_classification/vertex_script/README.md) | [view](./text_classification/promptfoo/README.md) |
+

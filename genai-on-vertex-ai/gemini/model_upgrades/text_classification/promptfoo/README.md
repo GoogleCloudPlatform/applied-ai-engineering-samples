@@ -37,16 +37,16 @@ git sparse-checkout set genai-on-vertex-ai/gemini/model_upgrades && \
 git pull origin main
 ```
 
-2. Install Promptfoo using [these instructions](https://www.promptfoo.dev/docs/installation/).
+1. Install Promptfoo using [these instructions](https://www.promptfoo.dev/docs/installation/).
 
-3. Navigate to the Eval Recipe directory in terminal and run the command `promptfoo eval`.
+1. Navigate to the Eval Recipe directory in terminal and run the command `promptfoo eval`.
 
 ``` bash
 cd genai-on-vertex-ai/gemini/model_upgrades/text_classification/promptfoo
 promptfoo eval
 ```
 
-4. Run `promptfoo view` to analyze the eval results. You can switch the Display option to `Show failures only` in order to investigate any underperforming prompts.
+1. Run `promptfoo view` to analyze the eval results. You can switch the Display option to `Show failures only` in order to investigate any underperforming prompts.
 
 ## How to customize this Eval Recipe:
 

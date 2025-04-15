@@ -1,4 +1,4 @@
-# Text Classification 
+# Document Question Answering
 ### _Eval Recipe for model migration_
 
 This Eval Recipe demonstrates how to compare performance of a document question answering prompt with Gemini 1.0 and Gemini 2.0 using  [Vertex AI Evaluation Service](https://cloud.google.com/vertex-ai/generative-ai/docs/models/evaluation-overview).

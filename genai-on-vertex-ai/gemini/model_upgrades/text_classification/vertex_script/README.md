@@ -39,7 +39,7 @@ git pull origin main
 ``` bash
 cd genai-on-vertex-ai/gemini/model_upgrades/text_classification/vertex_script
 export PROJECT_ID="[your-project-id]"
-run.sh
+./run.sh
 ```
 
 3. The resulting scores will be displayed in the script output. 
