@@ -7,7 +7,7 @@ This Eval Recipe demonstrates how to compare performance of a Summarization prom
 
 - Use case: summarize a news article.
 
-- Evaluation Dataset is based on [XSum](https://github.com/EdinburghNLP/XSum). It includes 5 news articles stored as plain text files, and a JSONL file with ground truth labels: [`dataset.jsonl`](./dataset.jsonl). Each record in this file includes 2 attributes wrapped in the `vars` object. This structure allows Promptfoo to inject the article text into the prompt template, and find ground truth label required to score the quality of model-generated summaries:
+- The Evaluation Dataset[^1] includes 5 news articles stored as plain text files, and a JSONL file with ground truth labels: [`dataset.jsonl`](./dataset.jsonl). Each record in this file includes 2 attributes wrapped in the `vars` object. This structure allows Promptfoo to inject the article text into the prompt template, and find ground truth label required to score the quality of model-generated summaries:
     - `document`: relative path to the plain text file containing the news article
     - `summary`: ground truth label (short summary of the article)
 
@@ -35,6 +35,11 @@ git pull origin main
 
 1. Install Promptfoo using [these instructions](https://www.promptfoo.dev/docs/installation/).
 1. Navigate to the Eval Recipe directory in terminal and run the command `promptfoo eval`.
+
+``` bash
+cd genai-on-vertex-ai/gemini/model_upgrades/summarization/promptfoo
+promptfoo eval
+```
 1. Run `promptfoo view` to analyze the eval results. You can switch the Display option to `Show failures only` in order to investigate any underperforming prompts.
 
 ## How to customize this Eval Recipe:
@@ -42,3 +47,12 @@ git pull origin main
 1. Add your labeled dataset file with JSONL schema similar to `dataset.jsonl`. 
 1. Save your prompt template to `prompt_template.txt` and make sure that the template variables map to the variables defined in your dataset.
 1. That's it! You are ready to run `promptfoo eval`. If needed, add alternative prompt templates or additional metrics to promptfooconfig.yaml as explained [here](https://www.promptfoo.dev/docs/configuration/parameters/).
+
+[^1]: Dataset ([XSum](https://github.com/EdinburghNLP/XSum)) citation:
+ @InProceedings{xsum-emnlp,
+  author    = {Shashi Narayan and Shay B. Cohen and Mirella Lapata},
+  title     = {Don't Give Me the Details, Just the Summary! {T}opic-Aware Convolutional Neural Networks for Extreme Summarization},
+  booktitle = {Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing},
+  year      = {2018},
+  address   = {Brussels, Belgium},
+}

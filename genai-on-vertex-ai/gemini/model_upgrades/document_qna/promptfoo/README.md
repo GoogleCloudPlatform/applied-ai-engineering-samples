@@ -7,7 +7,7 @@ This Eval Recipe demonstrates how to compare performance of a Document Question 
 
 - Use case: answer questions based on information from the given document.
 
-- Evaluation Dataset is based on [SQuAD2.0](https://rajpurkar.github.io/SQuAD-explorer/). It includes 6 documents stored as plain text files, and a JSONL file that provides ground truth labels: [`dataset.jsonl`](./dataset.jsonl). Each record in this file includes 3 attributes wrapped in the `vars` object. This structure allows Promptfoo to specify the variables needed to populate prompt templates (document and question), as well as the ground truth label required to score the accuracy of model responses:
+- The Evaluation Dataset is based on [SQuAD2.0](https://rajpurkar.github.io/SQuAD-explorer/). It includes 6 documents stored as plain text files, and a JSONL file that provides ground truth labels: [`dataset.jsonl`](./dataset.jsonl). Each record in this file includes 3 attributes wrapped in the `vars` object. This structure allows Promptfoo to specify the variables needed to populate prompt templates (document and question), as well as the ground truth label required to score the accuracy of model responses:
     - `document`: relative path to the plain text document file
     - `question`: the question that we want to ask about this particular document
     - `answer`: expected correct answer or special code `ANSWER_NOT_FOUND` used to verify that the model does not hallucinate answers when the document does not provide enough information to answer the given question.
@@ -36,6 +36,11 @@ git pull origin main
 
 1. Install Promptfoo using [these instructions](https://www.promptfoo.dev/docs/installation/).
 1. Navigate to the Eval Recipe directory in terminal and run the command `promptfoo eval`.
+
+``` bash
+cd genai-on-vertex-ai/gemini/model_upgrades/document_qna/promptfoo
+promptfoo eval
+```
 1. Run `promptfoo view` to analyze the eval results. You can switch the Display option to `Show failures only` in order to investigate any underperforming prompts.
 
 ## How to customize this Eval Recipe:

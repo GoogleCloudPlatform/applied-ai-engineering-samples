@@ -6,7 +6,7 @@ This Eval Recipe demonstrates how to compare performance of a document question 
 ![](diagram.png "Model Comparison Eval")
 
 - Use case: answer questions based on information from the given document.
-- Evaluation Dataset is based on [SQuAD2.0](https://rajpurkar.github.io/SQuAD-explorer/). It includes 6 documents stored as plain text files, and a JSONL file that provides ground truth labels: [`dataset.jsonl`](./dataset.jsonl).  Each record in this file includes 3 attributes:
+- The Evaluation Dataset is based on [SQuAD2.0](https://rajpurkar.github.io/SQuAD-explorer/). It includes 6 documents stored as plain text files, and a JSONL file that provides ground truth labels: [`dataset.jsonl`](./dataset.jsonl).  Each record in this file includes 3 attributes:
     - `document_path`: relative path to the plain text document file
     - `question`: the question that we want to ask about this particular document
     - `reference`: expected correct answer or special code `ANSWER_NOT_FOUND` used to verify that the model does not hallucinate answers when the document does not provide enough information to answer the given question.

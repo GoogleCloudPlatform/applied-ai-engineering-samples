@@ -9,7 +9,7 @@ This Eval Recipe demonstrates how to compare performance of a summarization prom
 
 - Use case: summarize a news article.
 
-- Evaluation Dataset is based on [XSum](https://github.com/EdinburghNLP/XSum). It includes 5 news articles stored as plain text files, and a JSONL file with ground truth labels: [`dataset.jsonl`](./dataset.jsonl). Each record in this file includes 2 attributes:
+- The Evaluation Dataset[^1] includes 5 news articles stored as plain text files, and a JSONL file with ground truth labels: [`dataset.jsonl`](./dataset.jsonl). Each record in this file includes 2 attributes:
     - `document`: relative path to the plain text file containing the news article
     - `reference`: ground truth label (short summary of the article)
 
@@ -54,3 +54,12 @@ export PROJECT_ID="[your-project-id]"
 1. Replace the contents of `dataset.jsonl` with your custom data in the same format.
 1. Replace the contents of `prompt_template.txt` with your custom prompt template. Make sure that prompt template variables map to the dataset attributes.
 1. Please refer to our [documentation](https://cloud.google.com/vertex-ai/generative-ai/docs/models/determine-eval) if you want to further customize your evaluation. Vertex AI Evaluation Service has a lot of features that are not included in this recipe.
+
+[^1]: Dataset ([XSum](https://github.com/EdinburghNLP/XSum)) citation:
+ @InProceedings{xsum-emnlp,
+  author    = {Shashi Narayan and Shay B. Cohen and Mirella Lapata},
+  title     = {Don't Give Me the Details, Just the Summary! {T}opic-Aware Convolutional Neural Networks for Extreme Summarization},
+  booktitle = {Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing},
+  year      = {2018},
+  address   = {Brussels, Belgium},
+}
