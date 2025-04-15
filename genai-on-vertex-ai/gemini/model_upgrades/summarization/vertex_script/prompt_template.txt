@@ -1,0 +1,3 @@
+Write a one sentence summary of the following news article: 
+{document_text}
+# Summary

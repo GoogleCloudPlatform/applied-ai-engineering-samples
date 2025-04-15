@@ -1,0 +1,11 @@
+<DOCUMENT>
+{document_text}
+</DOCUMENT>
+
+# Instructions
+- Answer the question below using strictly information from the document above.
+- Provide a brief answer, without any unnecessary comments.
+- If the document does not provide enough information to answer this question, respond with "ANSWER_NOT_FOUND".
+
+Question: {question}
+Answer:

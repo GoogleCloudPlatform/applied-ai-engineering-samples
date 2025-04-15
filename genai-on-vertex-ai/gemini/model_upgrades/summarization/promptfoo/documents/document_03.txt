@@ -1,0 +1,11 @@
+HP acquired the WebOS operating system when it bought veteran gadget maker Palm in 2011 for $1.2bn (Â£789m).
+Financial details of the deal have not been disclosed but HP is not thought to have recouped much of the money it paid for Palm.
+LG said the WebOS code would be used to power its next-generation smart TV technology.
+The WebOS was created to run smartphones, tablets and other devices developed by Palm that, in its early days, pioneered the handheld gadget industry. However, Palm's influence has diminished as Apple, Google's Android and RIM's Blackberry have come to dominate the smartphone and tablet markets.
+In the deal, LG gets WebOS source code, engineers working on it, documentation and the websites that promote it. HP is holding on to patents underlying WebOS as well as technology that helps it connect to web-based services.
+HP did launch products running WebOS, such as the TouchPad tablet, but poor sales led it to seek other ways to boost interest in the software. One way it chose was to open up the code to any developer to work on. LG was one of the first firms to take up this chance and the acquisition grew out of this relationship.
+Using WebOS in TV sets made "sense" for LG, said Ovum analyst Tony Cripps, adding that it could herald a return to the software's smartphone roots.
+WebOS's use of core web technology left it well placed for the next generation of mobile apps that were likely to be based around the same code, he said.
+The acquisition was probably driven by LG's recognition that it needed to make gadgets of all types easier to use, added Mr Cripps.
+"Device manufacturers are recognising the need to differentiate through software-based innovation in user experience," he said.
+The deal with LG was announced as HP took the wraps off its first Android-powered tablet, called the HP Slate 7, at the 2013 Mobile World Congress currently under way in Barcelona.
