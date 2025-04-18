@@ -1,0 +1,20 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+
+providers:  # one or more models, with optional temperature and system instructions
+  - id: "vertex:gemini-1.0-pro-001"
+  - id: "vertex:gemini-2.0-flash"
+
+prompts:
+  - file://prompt_template.txt
+
+tests:  # Promptfoo will generate a separate prompt for each record in this dataset based on the prompt template above
+  - file://dataset.jsonl
+
+defaultTest:  # The rules for scoring each model response
+  assert:
+    - type: g-eval 
+      value: 
+        - "Check if the response is similar to {{reference}}"  # use the variable "reference" from dataset.jsonl as the ground truth label
+      transform: output.trim()  # trim whitespace before comparing model response with the label
+      threshold: 0.5
+
