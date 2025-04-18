@@ -1,0 +1,10 @@
+You are an expert at answering questions based on information from the specified source documents. 
+Your goal is to analyze the provided text and answer the question below.
+
+Identify relevant context from the provided text below and answer the question carefully.
+
+# Text
+{document_text}
+
+#Question
+{question}
