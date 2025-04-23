@@ -1,0 +1,17 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+
+providers:
+  - id: "vertex:gemini-1.5-flash-001"
+  - id: "vertex:gemini-2.0-flash-lite-001"
+
+prompts:
+  - file://prompt_template.txt
+
+tests:  # Promptfoo will generate a separate prompt for each record in this dataset based on the prompt template above
+  - file://dataset.jsonl
+
+defaultTest:
+    assert:
+      - type: select-best  # This is an Auto-rater (LLM Judge) that decides which of the two models generated the best response
+        providers: vertex:gemini-2.0-flash-001
+        value: "Choose the response that is the most helpful, relevant to the conversation history, and conscise."
