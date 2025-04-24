@@ -24,23 +24,31 @@ This Eval Recipe demonstrates how to compare performance of a Document Question 
 
 ## How to run this Eval Recipe
 
-1. Configure your [Google Cloud Environment](https://cloud.google.com/vertex-ai/docs/start/cloud-environment) and clone this Github repo to your environment. We recommend [Cloud Shell](https://shell.cloud.google.com/) or [Vertex AI Workbench](https://cloud.google.com/vertex-ai/docs/workbench/instances/introduction).
+- Google Cloud Shell is the easiest option as it automatically clones our Github repo:
 
-``` bash
-git clone --filter=blob:none --sparse https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples.git && \
-cd applied-ai-engineering-samples && \
-git sparse-checkout init && \
-git sparse-checkout set genai-on-vertex-ai/gemini/model_upgrades && \
-git pull origin main
-```
+    <a href="https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples&cloudshell_git_branch=main&cloudshell_workspace=genai-on-vertex-ai/gemini/model_upgrades">
+        <img alt="Open in Cloud Shell" src="http://gstatic.com/cloudssh/images/open-btn.png">
+    </a>
+
+- Alternatively, you can use the following command to clone this repo to any Linux environment with configured [Google Cloud Environment](https://cloud.google.com/vertex-ai/docs/start/cloud-environment):
+
+    ``` bash
+    git clone --filter=blob:none --sparse https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples.git && \
+    cd applied-ai-engineering-samples && \
+    git sparse-checkout init && \
+    git sparse-checkout set genai-on-vertex-ai/gemini/model_upgrades && \
+    git pull origin main
+    cd genai-on-vertex-ai/gemini/model_upgrades
+    ```
 
 1. Install Promptfoo using [these instructions](https://www.promptfoo.dev/docs/installation/).
 1. Navigate to the Eval Recipe directory in terminal and run the command `promptfoo eval`.
 
-``` bash
-cd genai-on-vertex-ai/gemini/model_upgrades/document_qna/promptfoo
-promptfoo eval
-```
+    ``` bash
+    cd document_qna/promptfoo
+    promptfoo eval
+    ```
+
 1. Run `promptfoo view` to analyze the eval results. You can switch the Display option to `Show failures only` in order to investigate any underperforming prompts.
 
 ## How to customize this Eval Recipe:

@@ -43,9 +43,10 @@ This Eval Recipe demonstrates how to evaluate a multi-turn conversation (chat) o
 1. Navigate to the Eval Recipe directory in terminal and run the command `promptfoo eval`.
 
     ``` bash
-    cd genai-on-vertex-ai/gemini/model_upgrades/multiturn_chat/promptfoo
+    cd multiturn_chat/promptfoo
     promptfoo eval
     ```
+    
 1. Run `promptfoo view` to analyze the eval results. You can switch the Display option to `Show failures only` in order to investigate any underperforming prompts.
 
 ## How to customize this Eval Recipe:
