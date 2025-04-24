@@ -38,7 +38,7 @@ This Eval Recipe demonstrates how to compare performance of an Instruction Follo
 1. Navigate to the Eval Recipe directory in terminal, set your Google Cloud Project ID and run the shell script `run.sh`.
 
     ``` bash
-    cd instruction-following/vertex_script
+    cd instruction_following/vertex_script
     export PROJECT_ID="[your-project-id]"
     ./run.sh
     ```
