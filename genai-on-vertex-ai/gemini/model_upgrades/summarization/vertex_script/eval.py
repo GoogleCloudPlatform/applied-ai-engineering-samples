@@ -38,9 +38,9 @@ if __name__ == '__main__':
     if os.getenv("PROJECT_ID", "your-project-id") == "your-project-id":
         raise ValueError("Please configure your Google Cloud Project ID.")
     vertexai.init(project=os.getenv("PROJECT_ID"), location='us-central1')
-    baseline=run_eval(
+    run_eval(
         experiment_name = 'eval-summarization-demo',
-        baseline_model = 'gemini-1.0-pro-002',
+        baseline_model = 'gemini-1.5-flash-001',
         candidate_model = 'gemini-2.0-flash-001',
         prompt_template_local_path = 'prompt_template.txt',
         dataset_local_path = 'dataset.jsonl'    

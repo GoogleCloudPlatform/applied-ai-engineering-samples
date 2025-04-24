@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
 
 providers:
-  - id: "vertex:gemini-1.5-flash-001"
+  - id: "vertex:gemini-1.5-flash"
   - id: "vertex:gemini-2.0-flash-lite-001"
 
 prompts:

@@ -7,8 +7,6 @@ This Eval Recipe demonstrates how to compare performance of a summarization prom
 
 - Use case: summarize a news article.
 
-- Use case: summarize a news article.
-
 - The Evaluation Dataset[^1] includes 5 news articles stored as plain text files, and a JSONL file with ground truth labels: [`dataset.jsonl`](./dataset.jsonl). Each record in this file includes 2 attributes:
     - `document`: relative path to the plain text file containing the news article
     - `reference`: ground truth label (short summary of the article)
@@ -23,26 +21,33 @@ This Eval Recipe demonstrates how to compare performance of a summarization prom
 
 ## How to run this Eval Recipe
 
-1. Configure your [Google Cloud Environment](https://cloud.google.com/vertex-ai/docs/start/cloud-environment) and clone this Github repo to your environment. We recommend [Cloud Shell](https://shell.cloud.google.com/) or [Vertex AI Workbench](https://cloud.google.com/vertex-ai/docs/workbench/instances/introduction).
+- Google Cloud Shell is the easiest option as it automatically clones our Github repo:
 
-``` bash
-git clone --filter=blob:none --sparse https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples.git && \
-cd applied-ai-engineering-samples && \
-git sparse-checkout init && \
-git sparse-checkout set genai-on-vertex-ai/gemini/model_upgrades && \
-git pull origin main
-```
+    <a href="https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples&cloudshell_git_branch=main&cloudshell_workspace=genai-on-vertex-ai/gemini/model_upgrades">
+        <img alt="Open in Cloud Shell" src="http://gstatic.com/cloudssh/images/open-btn.png">
+    </a>
 
-2. Navigate to the Eval Recipe directory in terminal, set your Google Cloud Project ID and run the shell script `run.sh`.
+- Alternatively, you can use the following command to clone this repo to any Linux environment with configured [Google Cloud Environment](https://cloud.google.com/vertex-ai/docs/start/cloud-environment):
 
-``` bash
-cd genai-on-vertex-ai/gemini/model_upgrades/summarization/vertex_script
-export PROJECT_ID="[your-project-id]"
-./run.sh
-```
+    ``` bash
+    git clone --filter=blob:none --sparse https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples.git && \
+    cd applied-ai-engineering-samples && \
+    git sparse-checkout init && \
+    git sparse-checkout set genai-on-vertex-ai/gemini/model_upgrades && \
+    git pull origin main
+    cd genai-on-vertex-ai/gemini/model_upgrades
+    ```
 
-3. The resulting metrics will be displayed in the script output. You can find the prompts and model responses stored in `candidate_results.metrics_table`.
-4. You can use [Vertex AI Experiments](https://console.cloud.google.com/vertex-ai/experiments) to view the history of evaluations for each experiment, including the final metrics scores.
+1. Navigate to the Eval Recipe directory in terminal, set your Google Cloud Project ID and run the shell script `run.sh`.
+
+    ``` bash
+    cd summarization/vertex_script
+    export PROJECT_ID="[your-project-id]"
+    ./run.sh
+    ```
+
+1. The resulting metrics will be displayed in the script output. You can find the prompts and model responses stored in `candidate_results.metrics_table`.
+1. You can use [Vertex AI Experiments](https://console.cloud.google.com/vertex-ai/experiments) to view the history of evaluations for each experiment, including the final metrics scores.
 
 ## How to customize this Eval Recipe:
 
