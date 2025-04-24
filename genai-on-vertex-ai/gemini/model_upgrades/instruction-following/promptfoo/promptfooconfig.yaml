@@ -13,5 +13,5 @@ tests:  # Promptfoo will generate a separate prompt for each record in this data
 defaultTest:  # The rules for scoring each model response
   assert:
     - type: answer-relevance
-      value: "Check if the response adheres to the instructions in the prompt"
+      value: "Evaluate the generated response to ensure it fully adheres to all instructions and constraints specified in the original prompt."
       threshold: 0.5

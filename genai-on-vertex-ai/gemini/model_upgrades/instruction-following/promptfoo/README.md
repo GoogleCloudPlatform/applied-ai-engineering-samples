@@ -7,7 +7,7 @@ This Eval Recipe demonstrates how to compare performance of an Instruction Follo
 
 - Use case: Instruction Following 
 
-- Evaluation Dataset is based on [Instruction Following Evaluation Dataset](https://github.com/google-research/google-research/blob/master/instruction_following_eval/data/input_data.jsonl). It includes 15 randomly sampled prompts in a JSONL file `dataset.jsonl`. Each record in this file includes 1 attribute wrapped in the `vars` object. This structure allows Promptfoo to specify the variables needed to populate prompt templates (document and question), as well as the ground truth label required to score the accuracy of model responses:
+- Evaluation Dataset is based on [Instruction Following Evaluation Dataset](https://github.com/google-research/google-research/blob/master/instruction_following_eval/data/input_data.jsonl). It includes 10 randomly sampled prompts in a JSONL file `dataset.jsonl`. Each record in this file includes 1 attribute wrapped in the `vars` object. This structure allows Promptfoo to specify the variables needed to populate prompt templates (document and question), as well as the ground truth label required to score the accuracy of model responses:
     - `prompt`: The task with specific instructions provided
 
 - Prompt Template is a zero-shot prompt located in [`prompt_template.txt`](./prompt_template.txt) with one prompt variable (`prompt`) that is automatically populated from our dataset.
