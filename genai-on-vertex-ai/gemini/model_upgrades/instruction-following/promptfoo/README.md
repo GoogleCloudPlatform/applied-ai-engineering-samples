@@ -1,8 +1,9 @@
-# RAG
+# Instruction Following 
 ### _Eval Recipe for model migration_
 
 This Eval Recipe demonstrates how to compare performance of an Instruction Following prompt with Gemini 1.5 Flash and Gemini 2.0 Flash using an unlabeled dataset and open source evaluation tool [Promptfoo](https://www.promptfoo.dev/).
 
+[Instruction-Following Eval (IFEval)](https://arxiv.org/abs/2311.07911) is a straightforward and easy-to-reproduce evaluation benchmark. It focuses on a set of "verifiable instructions" such as "write in more than 400 words", "write in bullet points", etc. 
 
 - Use case: Instruction Following 
 
@@ -24,15 +25,22 @@ This Eval Recipe demonstrates how to compare performance of an Instruction Follo
 
 ## How to run this Eval Recipe
 
-1. Configure your [Google Cloud Environment](https://cloud.google.com/vertex-ai/docs/start/cloud-environment) and clone this Github repo to your environment. We recommend [Cloud Shell](https://shell.cloud.google.com/) or [Vertex AI Workbench](https://cloud.google.com/vertex-ai/docs/workbench/instances/introduction).
+- Google Cloud Shell is the easiest option as it automatically clones our Github repo:
 
-``` bash
-git clone --filter=blob:none --sparse https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples.git && \
-cd applied-ai-engineering-samples && \
-git sparse-checkout init && \
-git sparse-checkout set genai-on-vertex-ai/gemini/model_upgrades && \
-git pull origin main
-```
+    <a href="https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples&cloudshell_git_branch=main&cloudshell_workspace=genai-on-vertex-ai/gemini/model_upgrades">
+        <img alt="Open in Cloud Shell" src="http://gstatic.com/cloudssh/images/open-btn.png">
+    </a>
+
+- Alternatively, you can use the following command to clone this repo to any Linux environment with configured [Google Cloud Environment](https://cloud.google.com/vertex-ai/docs/start/cloud-environment):
+
+    ``` bash
+    git clone --filter=blob:none --sparse https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples.git && \
+    cd applied-ai-engineering-samples && \
+    git sparse-checkout init && \
+    git sparse-checkout set genai-on-vertex-ai/gemini/model_upgrades && \
+    git pull origin main
+    cd genai-on-vertex-ai/gemini/model_upgrades
+    ```
 
 1. Install Promptfoo using [these instructions](https://www.promptfoo.dev/docs/installation/).
 1. Navigate to the Eval Recipe directory in terminal and run the command `promptfoo eval`.
