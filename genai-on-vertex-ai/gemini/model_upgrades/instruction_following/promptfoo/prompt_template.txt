@@ -1,0 +1,7 @@
+You are an expert at following instructions precisely and accurately.
+Your goal is to carefully read the instruction provided below and execute it exactly as specified.
+
+Pay close attention to all constraints and requirements mentioned in the instruction.
+
+# Instruction
+{{prompt}}
