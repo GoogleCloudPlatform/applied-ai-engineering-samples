@@ -1,0 +1,5 @@
+module.exports = (file_path) => {
+  fs = require('fs');
+  const dataBuffer = fs.readFileSync(file_path);
+  return dataBuffer.toString('base64');
+};

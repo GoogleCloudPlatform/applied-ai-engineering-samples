@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+
+providers:
+  - id: "vertex:gemini-2.0-flash"
+
+nunjucksFilters:
+  readFile: ./read_file.tsxx
+
+prompts:  # These prompts load images from different dataset columns
+  - file://prompt_imagen2.yaml
+  - file://prompt_imagen3.yaml
+
+tests:  
+  - file://dataset.jsonl
+
+defaultTest:  
+  vars:  # This shared variable is used to inject the autorater instructions in both prompt templates
+    autorater_instructions: file://autorater_instructions.txt
+  assert:
+    - type: python
+      value: file://metrics.py:assert_prompt_alignment

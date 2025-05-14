@@ -19,4 +19,5 @@ The goal is to accelerate the process of upgrading to the latest version of Gemi
 | Text Classification | [view](./text_classification/vertex_colab/text_classification_eval.ipynb) | [view](./text_classification/vertex_script/README.md) | [view](./text_classification/promptfoo/README.md) |
 | Multi-turn Chat | [view](./multiturn_chat/vertex_colab/multiturn_chat_eval.ipynb) | [view](./multiturn_chat/vertex_script/README.md) | [view](./multiturn_chat/promptfoo/README.md) |
 | Instruction Following | [view](./instruction_following/vertex_colab/instruction_following_eval.ipynb) | [view](./instruction_following/vertex_script/README.md) | [view](./instruction_following/promptfoo/README.md) |
+| Image-Prompt Alignment | [view](./image_prompt_alignment/vertex_colab/image_prompt_alignment_eval.ipynb) | [view](./image_prompt_alignment/vertex_script/README.md) | [view](./image_prompt_alignment/promptfoo/README.md) |
 
