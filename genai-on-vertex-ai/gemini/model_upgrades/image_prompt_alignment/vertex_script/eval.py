@@ -79,7 +79,7 @@ def print_scores_and_explanations(title: str, eval_result: EvalResult) -> None:
     print(f'\n{"-"*80}\nRESULTS FOR {title}:')
     for i, row in eval_result.metrics_table.iterrows():
         gaps = row["image_prompt_alignment/explanation"]
-        gaps = f', GAPS={gaps}' if gaps else ''
+        gaps = f', GAPS: {gaps}' if gaps else ''
         print(f'{row["image_path"]}: SCORE={row["image_prompt_alignment/score"]}%{gaps}')
 
 
