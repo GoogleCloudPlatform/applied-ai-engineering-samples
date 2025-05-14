@@ -1,6 +1,6 @@
-role: user
-parts:
+- role: user
+  parts:
     - inlineData:
-        data: '{{imagen3 | readFile}}'
+        data: "{{imagen3 | readFile}}"
         mimeType: image/jpeg
-    - text: '{{autorater_instructions}}'
+    - text: "{{autorater_instructions}}"

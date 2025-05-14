@@ -22,6 +22,3 @@ You must use the following 6-step process and provide brief written notes for ea
 <IMAGE_DESCRIPTION>
 {{prompt}}
 </IMAGE_DESCRIPTION>
-
-# Image Description accuracy analysis notes
-## Step 1. IMAGE_DESCRIPTION contains the following Visually Groundable Requirements:

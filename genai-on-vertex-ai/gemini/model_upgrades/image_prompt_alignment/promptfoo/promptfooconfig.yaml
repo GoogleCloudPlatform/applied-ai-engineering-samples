@@ -14,8 +14,8 @@ tests:
   - file://dataset.jsonl
 
 defaultTest:  
-  vars:  # This shared variable is used to inject the same autorater instructions in both prompt templates
-    autorater_instructions: file://prompt_autorater.txt
+  vars:  # This shared variable is used to inject the autorater instructions in both prompt templates
+    autorater_instructions: file://autorater_instructions.txt
   assert:
     - type: python
       value: file://metrics.py:assert_prompt_alignment
