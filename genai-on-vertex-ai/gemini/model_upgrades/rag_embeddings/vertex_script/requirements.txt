@@ -1,0 +1,2 @@
+google-cloud-aiplatform[evaluation] >= 1.69.0
+pandas >= 2.2.3
