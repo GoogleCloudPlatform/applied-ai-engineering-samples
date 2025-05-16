@@ -5,5 +5,5 @@ This folder has code samples demonstrating processing Gemini 2.0 responses for a
 
 ### Spatial reasoning and bounding box rendering
 
-- [Spatial reasoning with Gemini 2.0 using Vertex AI SDK](./spatial_reasoning_SDK_for_gemini2.ipynb)
+- [Spatial reasoning with Gemini 2.0 using Vertex AI](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/gemini/use-cases/spatial-understanding/spatial_understanding.ipynb)
 - [Interactive spatial reasoning with Gemini 2.0](./spatial_reasoning_app_for_gemini2.ipynb)
