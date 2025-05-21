@@ -17,9 +17,11 @@ We will be looking at `text-embedding-004` as our baseline model and `text-embed
 
 - Prompt Template is a zero-shot prompt located in [`prompt_template.txt`](./prompt_template.txt) with two prompt variables ( `reference` and `retrieved_context`) that are automatically populated from our dataset.
 
+- This eval recipe uses an LLM judge model(gemini-2.0-flash) to evaluate the retrieval quality of the embedding models. 
+
 ### _Prerequisite_
 
-This recipe assumes that the user has already created datasets for the baseline embedding model and the candidate embedding model. The user needs to generate the datasets for the baseline and candidate embedding models. Please refer to [RAG Engine generation notebook](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/gemini/rag-engine/rag_engine_eval_service_sdk.ipynb) to create a RAG engine and set up datasets. The `retrieved_context` column in the dataset is the context retrieved from the RAG engine for each one of the questions.
+This recipe assumes that the user has already created datasets for the baseline embedding model and the candidate embedding model. The user needs to generate the datasets for the baseline(text-embedding-004) and candidate(text-embedding-005) embedding models. Please refer to [RAG Engine generation notebook](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/gemini/rag-engine/rag_engine_eval_service_sdk.ipynb) to create two separate RAG engines and set up corresponding datasets. The `retrieved_context` column in the dataset is the context retrieved from the respective RAG engine for each one of the questions.
 
 - Python script [`eval.py`](./eval.py) configures the evaluation:
     - `run_eval`: configures the evaluation task, runs it on the 2 models and prints the results.
@@ -62,7 +64,7 @@ We will have two runs, one for the baseline model and the candidate model
 
 1. Edit the Python script `eval.py`:
     - set the `project` parameter of vertexai.init to your Google Cloud Project ID.
-    - set the parameter `model` to the model that is currently used by your application
+    - set the parameter `model`  in the run_eval calls (e.g., 'gemini-2.0-flash') to the LLM you want to use for performing the evaluation task.
     - set the parameter `embedding_model` to the model that you want to run the evaluation for
     - configure a unique `experiment_name` for tracking purposes
     - set the parameter `dataset_local_path` to the file you are running the evaluations for 

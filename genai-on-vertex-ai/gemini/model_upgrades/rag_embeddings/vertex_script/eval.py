@@ -24,7 +24,10 @@ def load_dataset(dataset_local_path: str):
 
 def run_eval(experiment_name: str, model: str, embedding_model: str, prompt_template_local_path: str, dataset_local_path: str, metric_name: str):
   timestamp = f"{datetime.now().strftime('%b-%d-%H-%M-%S')}".lower()
-  prompt_template = open(prompt_template_local_path).read()
+
+  with open(prompt_template_local_path, 'r') as f:
+    prompt_template = f.read()
+ 
   metrics = EvalTask(
       dataset=load_dataset(dataset_local_path),
       metrics=[PointwiseMetric(
@@ -35,7 +38,7 @@ def run_eval(experiment_name: str, model: str, embedding_model: str, prompt_temp
       experiment=experiment_name
   ).evaluate(
       response_column_name= 'retrieved_context',
-      experiment_run_name=f"{timestamp}-{model.replace('.', '-')}"
+      experiment_run_name=f"{timestamp}-{embedding_model}-{model.replace('.', '-')}"
   )
 
   return f"Average score for {embedding_model} model retrieval quality:", round(metrics.summary_metrics[f'{metric_name}/mean'],3)
