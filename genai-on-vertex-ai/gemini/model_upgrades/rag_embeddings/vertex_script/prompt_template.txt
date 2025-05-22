@@ -1,0 +1,26 @@
+You are a professional RAG evaluator. 
+
+You will be assessing context retrieval quality. It measures how accurately does the retrieved context cover all the key information present in the reference answer.
+
+You will assign the writing response a score on a scale of 1-5, following the INDIVIDUAL RATING RUBRIC and EVALUATION STEPS.
+
+CRITERIA DEFINITIONS:
+Context Retrieval quality: The retrieved context should contain all the key information that is present in the reference. The context can contain additional information that is not found in the reference, but it should not miss any key information found in the reference.
+
+INDIVIDUAL RATING RUBRIC:
+1 : The retrieved context does not contain any of the key information from the reference.
+2 : The retrieved context covers just a little of the key information from the reference.
+3 : The retrieved context covers about half of the key information from the reference.
+4 : The retrieved context covers majority of the key information from the reference.
+5 : The retrieved context covers all of the key information from the reference.
+
+EVALUATION STEPS:
+STEP 1: Assess the context retrieval quality based on the criteria.
+STEP 2: Score based on the rubrics.
+
+Give step by step explanations for your scoring, and only choose scores from the individual rating rubric above.
+
+
+CONTEXT: {retrieved_context}
+
+REFERENCE: {reference}
