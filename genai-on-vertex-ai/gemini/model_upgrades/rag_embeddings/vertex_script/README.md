@@ -8,9 +8,9 @@ We will be looking at `text-embedding-004` as our baseline model and `text-embed
 
 - Use case: RAG retrieval
 
-- Metric: This eval uses a Pointwise Retrieval quality template to evaluate the responses and pick a model as the winner. We will define `retreival quality` as the metric here. It checks whether the `retrieved_context` contains all the key information present in `reference`.
+- Metric: This eval uses a Pointwise Retrieval quality template to evaluate the responses and pick a model as the winner. We will define `retrieval quality` as the metric here. It checks whether the `retrieved_context` contains all the key information present in `reference`.
 
-- Evaluation Datasets are based on [RAG Dateset](https://www.kaggle.com/datasets/samuelmatsuoharris/single-topic-rag-evaluation-dataset) in compliance with the following [license](https://www.mit.edu/~amini/LICENSE.md). They include 8 randomly sampled prompts in JSONL files `baseline_dataset.jsonl` and `candidate_dataset.jsonl` with the following structure:
+- Evaluation Datasets are based on [RAG Dataset](https://www.kaggle.com/datasets/samuelmatsuoharris/single-topic-rag-evaluation-dataset) in compliance with the following [license](https://www.mit.edu/~amini/LICENSE.md). They include 8 randomly sampled prompts in JSONL files `baseline_dataset.jsonl` and `candidate_dataset.jsonl` with the following structure:
     - `question`: User inputted question 
     - `reference`: The golden truth answer for the question
     - `retrieved_context`: The context retrieved from the model.

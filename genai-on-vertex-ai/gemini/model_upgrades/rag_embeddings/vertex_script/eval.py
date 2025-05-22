@@ -13,7 +13,7 @@ import json
 import pandas as pd
 import vertexai
 from datetime import datetime
-from vertexai.evaluation import EvalTask,PointwiseMetric
+from vertexai.evaluation import EvalTask, PointwiseMetric
 
 
 def load_dataset(dataset_local_path: str):
