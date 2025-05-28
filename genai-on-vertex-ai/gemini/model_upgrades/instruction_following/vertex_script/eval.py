@@ -27,26 +27,23 @@ def load_dataset(dataset_local_path: str):
 def run_eval(experiment_name: str, baseline_model: str, candidate_model: str, prompt_template_local_path: str, dataset_local_path: str, metric_name: str):
     timestamp = f"{datetime.now().strftime('%b-%d-%H-%M-%S')}".lower()
     prompt_template = open(prompt_template_local_path).read()
-    
-    metrics = EvalTask(
-      dataset=load_dataset(dataset_local_path),
-      metrics= [
-        PairwiseMetric(
-            metric=metric_name,
-            metric_prompt_template=MetricPromptTemplateExamples.Pairwise.INSTRUCTION_FOLLOWING.metric_prompt_template,
-            # Baseline model for pairwise comparison
-            baseline_model=GenerativeModel(baseline_model),
-        ),
-    ],
-      experiment=experiment_name
-  ).evaluate(
-      model=GenerativeModel(candidate_model),
-      prompt_template=prompt_template,
-      experiment_run_name=f"{timestamp}-{candidate_model.replace('.', '-')}"
-  )
-    
-    print("Baseline model win rate:", round(metrics.summary_metrics[f'{metric_name}/baseline_model_win_rate'],3))
-    print("Candidate model win rate:", round(metrics.summary_metrics[f'{metric_name}/candidate_model_win_rate'],3))
+    metric = PairwiseMetric(
+        metric=metric_name,
+        metric_prompt_template=MetricPromptTemplateExamples.Pairwise.INSTRUCTION_FOLLOWING.metric_prompt_template,
+        baseline_model=GenerativeModel(baseline_model),
+    )
+    task = EvalTask(
+        dataset=load_dataset(dataset_local_path),
+        metrics=[metric],
+        experiment=experiment_name
+    )
+    results = task.evaluate(
+        model=GenerativeModel(candidate_model),
+        prompt_template=prompt_template,
+        experiment_run_name=f"{timestamp}-{candidate_model.replace('.', '-')}"
+    )    
+    print("Baseline model win rate:", round(results.summary_metrics[f'{metric_name}/baseline_model_win_rate'],3))
+    print("Candidate model win rate:", round(results.summary_metrics[f'{metric_name}/candidate_model_win_rate'],3))
 
 if __name__ == '__main__':
     if os.getenv("PROJECT_ID", "your-project-id") == "your-project-id":

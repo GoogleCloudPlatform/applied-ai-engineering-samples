@@ -2,7 +2,20 @@
 
 providers:  # one or more models, with optional temperature and system instructions
   - id: "vertex:gemini-1.5-flash"
-  - id: "vertex:gemini-2.0-flash-lite-001"
+  - id: "vertex:gemini-2.5-flash-preview-05-20"
+    label: 2.5-flash-thinking-disabled
+    config:
+      generationConfig:
+        temperature: 0.0
+      thinking_config:
+        thinking_budget: 0
+  - id: "vertex:gemini-2.5-flash-preview-05-20"
+    label: 2.5-flash-thinking-enabled
+    config:
+      generationConfig:
+        temperature: 0.0
+      thinking_config:
+        thinking_budget: 10000
 
 prompts:
   - file://prompt_template.txt

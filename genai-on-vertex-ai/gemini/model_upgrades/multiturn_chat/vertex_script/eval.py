@@ -64,7 +64,7 @@ if __name__ == '__main__':
         project_id=os.getenv('PROJECT_ID'),
         location=os.getenv('LOCATION') or 'us-central1',
         experiment_name = 'eval-multiturn-chat',
-        baseline_model = 'gemini-1.5-flash-001',
+        baseline_model = 'gemini-1.5-flash-002',
         candidate_model = 'gemini-2.0-flash-001',
         dataset_local_path = 'dataset.jsonl'    
     )

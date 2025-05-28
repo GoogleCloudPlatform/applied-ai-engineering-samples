@@ -46,7 +46,7 @@ if __name__ == '__main__':
     vertexai.init(project=os.getenv("PROJECT_ID"), location='us-central1')
     run_eval(
         experiment_name = 'evals-classifier-demo',
-        baseline_model = 'gemini-1.5-flash-001',
+        baseline_model = 'gemini-1.5-flash-002',
         candidate_model = 'gemini-2.0-flash-001',
         prompt_template_local_path = 'prompt_template.txt',
         dataset_local_path = 'dataset.jsonl'    
