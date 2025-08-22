@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>English → Hindi Dictionary (Offline-ready)</title>
+  <style>
+    :root{--bg:#0f172a;--card:#0b1220;--muted:#cbd5e1;--fg:#e5e7eb;--accent:#22d3ee;--danger:#ef4444;--ok:#10b981}
+    *{box-sizing:border-box}html,body{height:100%}body{margin:0;font-family:Inter,system-ui,Arial;background:linear-gradient(180deg,#071226,#0f172a);color:var(--fg);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+    header{padding:18px;text-align:center}header h1{margin:0;font-size:22px}header p{margin:6px 0 0;color:var(--muted)}
+    .container{display:grid;grid-template-columns:1.25fr .85fr;gap:16px;max-width:1100px;margin:18px auto;padding:10px}
+    @media (max-width:960px){ .container{grid-template-columns:1fr} }
+    .panel{background:linear-gradient(180deg,#071726,#07111a);padding:14px;border-radius:12px;border:1px solid #13202b}
+    textarea{width:100%;min-height:140px;padding:10px;border-radius:10px;border:1px solid #13202b;background:#06121a;color:var(--fg);resize:vertical}
+    .controls{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+    button,input[type=file]{background:#07121a;border:1px solid #13303d;color:var(--fg);padding:8px 10px;border-radius:8px;cursor:pointer}
+    input[type=text]{padding:8px;border-radius:8px;border:1px solid #13202b;background:#06121a;color:var(--fg);width:100%}
+    .row{display:flex;gap:8px;align-items:center;margin:8px 0}
+    .output{background:#07121a;border:1px dashed #123041;padding:10px;border-radius:8px;min-height:56px;color:var(--fg);overflow:auto}
+    .token{padding:0 2px;border-radius:4px}
+    .wrong{color:var(--danger);text-decoration:underline;text-decoration-thickness:2px;text-decoration-style:wavy;cursor:pointer}
+    .correct{color:var(--fg)}
+    .popover{position:absolute;background:#07121a;border:1px solid #123041;border-radius:8px;padding:8px;z-index:1000}
+    .muted{color:var(--muted)}
+    footer{text-align:center;padding:12px;color:var(--muted)}
+    label.small{font-size:13px;color:var(--muted)}
+    .pill{padding:6px 10px;border-radius:999px;border:1px solid #243047;background:#06121a;color:var(--muted);font-size:13px}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>English → Hindi Dictionary</h1>
+    <p>शब्द खोजें, वाक्य चेक करें, और सुनें — ऑनलाइन या ऑफ़लाइन।</p>
+  </header>
+
+  <main class="container">
+    <section class="panel">
+      <textarea id="textInput" placeholder="Type a single word for quick lookup or paste longer text for spell-check & meanings..."></textarea>
+
+      <div class="controls">
+        <button id="analyzeBtn">Check Spelling & Meanings</button>
+        <button id="speakEnBtn">🔊 Read (Indian English)</button>
+        <button id="speakHiBtn">🔊 Read (Hindi)</button>
+
+        <label class="pill">Speed
+          <input id="rate" type="range" min="0.10" max="2" step="0.10" value="1" style="vertical-align:middle;margin-left:8px" />
+          <span id="rateVal" class="muted" style="margin-left:6px">1.00×</span>
+        </label>
+
+        <input id="fileInput" type="file" accept="application/json" title="Load/merge dictionary.json" />
+        <button id="clearBtn">Clear</button>
+      </div>
+
+      <div style="margin-top:12px">
+        <div class="row">
+          <input id="singleWord" type="text" placeholder="Quick lookup: type a single English word…" />
+          <button id="lookupBtn">Lookup</button>
+          <button id="wordSpeakEn">🔊 EN</button>
+          <button id="wordSpeakHi">🔊 HI</button>
+        </div>
+        <div style="margin-top:8px">
+          <div id="wordResult" class="output">—</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h3 style="margin-top:0">Spell-checked text</h3>
+      <div id="spellOut" class="output"></div>
+
+      <h3 style="margin-bottom:6px;margin-top:12px">Per-word Hindi meanings</h3>
+      <div id="meaningsOut" class="output"></div>
+      <div style="margin-top:10px" class="muted">लाल तरंगित शब्द गलत दिखते हैं — क्लिक करने पर सुझाव आते हैं।</div>
+    </section>
+  </main>
+
+  <footer>
+    <small>Offline-capable: पहली बार लोड के बाद ब्राउज़र में cached रहेगा. बड़ी dictionary के लिए dictionary.json अपलोड करें।</small>
+  </footer>
+
+  <div id="popover" class="popover" style="display:none"></div>
+
+  <script>
+    /*******************************
+     * Self-contained Eng→Hi site
+     *******************************/
+
+    // DEMO dictionary (extendable). Replace or merge by uploading a dictionary.json file.
+    const DICT = {
+      "hello":["नमस्ते"],
+      "world":["दुनिया"],
+      "tree":["पेड़","वृक्ष"],
+      "book":["किताब","पुस्तक"],
+      "student":["छात्र","विद्यार्थी"],
+      "teacher":["शिक्षक","अध्यापक"],
+      "water":["पानी","जल"],
+      "fire":["आग"],
+      "earth":["पृथ्वी","धरणी"],
+      "air":["हवा","वायु"],
+      "learn":["सीखना"],
+      "read":["पढ़ना","अध्ययन करना"],
+      "write":["लिखना"],
+      "speak":["बोलना"],
+      "listen":["सुनना"],
+      "language":["भाषा"],
+      "school":["विद्यालय","स्कूल"],
+      "college":["कॉलेज"],
+      "computer":["कम्प्यूटर","संगणक"],
+      "science":["विज्ञान"],
+      "mathematics":["गणित"],
+      "physics":["भौतिकी"],
+      "chemistry":["रसायन विज्ञान"],
+      "biology":["जीव विज्ञान"],
+      "friend":["दोस्त","मित्र"],
+      "family":["परिवार"],
+      "home":["घर","आवास"],
+      "city":["शहर"],
+      "village":["गांव"],
+      "market":["बाज़ार"],
+      "food":["भोजन","खाना"],
+      "rice":["चावल"],
+      "bread":["रोटी","ब्रेड"],
+      "milk":["दूध"],
+      "tea":["चाय"],
+      "coffee":["कॉफ़ी"],
+      "flower":["फूल"],
+      "river":["नदी"],
+      "mountain":["पहाड़","पर्वत"],
+      "sun":["सूर्य"],
+      "moon":["चंद्रमा"],
+      "star":["सितारा"],
+      "time":["समय"],
+      "day":["दिन"],
+      "night":["रात"],
+      "morning":["सुबह"],
+      "evening":["शाम"],
+      "good":["अच्छा"],
+      "bad":["बुरा"],
+      "happy":["खुश","प्रसन्न"],
+      "sad":["उदास"],
+      "love":["प्रेम","प्यार"],
+      "light":["प्रकाश","रोशनी"],
+      "sound":["ध्वनि","आवाज़"],
+      "play":["खेलना","नाटक करना"],
+      "work":["काम","कार्य"],
+      "help":["मदद","सहायता"],
+      "walk":["चलना"],
+      "run":["दौड़ना","भागना"],
+      "big":["बड़ा"],
+      "small":["छोटा"],
+      "fast":["तेज़","फास्ट"],
+      "slow":["धीमा"],
+      "correct":["सही"],
+      "wrong":["गलत"],
+      "translate":["अनुवाद करना"],
+      "meaning":["अर्थ"]
+      // आप चाहें तो यहाँ और जोड़ सकते हैं, या नीचे अपलोड से मर्ज करें
+    };
+
+    // Build english word set for fast lookup / suggestions
+    const englishWords = new Set(Object.keys(DICT).map(w=>w.toLowerCase()));
+
+    // Allow merging new dictionary objects into DICT and englishWords
+    function mergeDictionary(obj){
+      if(!obj || typeof obj !== 'object') return;
+      for(const k of Object.keys(obj)){
+        const key = k.toLowerCase();
+        DICT[key] = obj[k];
+        englishWords.add(key);
+      }
+      toast('Dictionary merged: ' + Object.keys(obj).length + ' words');
+    }
+
+    // If a dictionary.json exists next to this file on server, try to fetch & merge it
+    fetch('dictionary.json', {cache: 'reload'}).then(r=>r.ok? r.json() : null).then(j=>{
+      if(j && typeof j === 'object') mergeDictionary(j);
+    }).catch(()=>{/* silent */});
+
+    // File upload (user can load/merge a large dictionary)
+    document.getElementById('fileInput').addEventListener('change', async (e)=>{
+      const f = e.target.files?.[0]; if(!f) return;
+      try{
+        const txt = await f.text();
+        const obj = JSON.parse(txt);
+        mergeDictionary(obj);
+      } catch(err){
+        toast('Invalid JSON file');
+        console.error(err);
+      }
+    });
+
+    /****** Utilities ******/
+    function tokenize(text){
+      // grabs words, numbers, punctuation — preserves spaces between tokens
+      const regex = /([A-Za-z]+(?:'[A-Za-z]+)?)|([0-9]+)|([^A-Za-z0-9\s]+)/g;
+      const tokens = [];
+      let m; let last = 0;
+      while((m = regex.exec(text)) !== null){
+        if(m.index > last) tokens.push({type:'space', value: text.slice(last, m.index)});
+        const value = m[0];
+        if(m[1]) tokens.push({type:'word', value});
+        else if(m[2]) tokens.push({type:'number', value});
+        else tokens.push({type:'punct', value});
+        last = regex.lastIndex;
+      }
+      if(last < text.length) tokens.push({type:'space', value: text.slice(last)});
+      return tokens;
+    }
+
+    function escapeRegExp(s){ return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+    // Levenshtein distance (for suggestions)
+    function levenshtein(a,b){
+      a = a.toLowerCase(); b = b.toLowerCase();
+      const m = a.length, n = b.length;
+      const dp = new Array(n+1);
+      for(let j=0;j<=n;j++) dp[j] = j;
+      for(let i=1;i<=m;i++){
+        let prev = i-1;
+        dp[0] = i;
+        for(let j=1;j<=n;j++){
+          const tmp = dp[j];
+          const cost = a[i-1] === b[j-1] ? 0 : 1;
+          dp[j] = Math.min(dp[j] + 1, dp[j-1] + 1, prev + cost);
+          prev = tmp;
+        }
+      }
+      return dp[n];
+    }
+
+    function suggest(word, limit=5){
+      const w = word.toLowerCase();
+      const candidates = [];
+      for(const dw of englishWords){
+        const dlen = Math.abs(dw.length - w.length);
+        if(dlen > 3) continue;
+        const score = levenshtein(w, dw);
+        if(score <= 2) candidates.push([score, dw]);
+      }
+      candidates.sort((a,b)=> a[0]-b[0] || a[1].localeCompare(b[1]));
+      return candidates.slice(0, limit).map(x=>x[1]);
+    }
+
+    function isEnglishWord(w){ return englishWords.has((w||'').toLowerCase()); }
+    function getHindi(w){ return DICT[(w||'').toLowerCase()] || []; }
+
+    /****** Render spell-check and meanings ******/
+    const spellOut = document.getElementById('spellOut');
+    const meaningsOut = document.getElementById('meaningsOut');
+    const pop = document.getElementById('popover');
+
+    function renderSpell(text){
+      spellOut.innerHTML = '';
+      meaningsOut.innerHTML = '';
+      const tokens = tokenize(text);
+      const frag = document.createDocumentFragment();
+      const meaningMap = new Map();
+
+      tokens.forEach((t, idx) => {
+        if(t.type === 'word'){
+          const span = document.createElement('span');
+          span.className = 'token';
+          const ok = isEnglishWord(t.value);
+          if(ok) span.classList.add('correct');
+          else {
+            span.classList.add('wrong');
+            span.title = 'Click for suggestions';
+            span.addEventListener('click', (e) => showSuggestions(e.currentTarget, t.value));
+          }
+          span.textContent = t.value;
+          frag.appendChild(span);
+
+          const m = getHindi(t.value);
+          if(m.length) meaningMap.set(t.value.toLowerCase(), m);
+        } else {
+          frag.appendChild(document.createTextNode(t.value));
+        }
+      });
+
+      spellOut.appendChild(frag);
+
+      if(meaningMap.size){
+        const ul = document.createElement('ul');
+        for(const [en, arr] of meaningMap){
+          const li = document.createElement('li');
+          li.innerHTML = `<strong>${en}</strong>: <span class="muted">${arr.join(', ')}</span>`;
+          ul.appendChild(li);
+        }
+        meaningsOut.appendChild(ul);
+      } else {
+        meaningsOut.innerHTML = '<span class="muted">No known words from the dictionary found. Load a larger dictionary.json to expand coverage.</span>';
+      }
+    }
+
+    function showSuggestions(target, word){
+      const rect = target.getBoundingClientRect();
+      const suggestions = suggest(word);
+      const items = suggestions.length ? suggestions : ['(no close match)'];
+      pop.innerHTML = '';
+      items.forEach(s => {
+        const btn = document.createElement('button');
+        btn.textContent = s;
+        btn.disabled = s === '(no close match)';
+        btn.style.display = 'block';
+        btn.style.width = '100%';
+        btn.style.margin = '4px 0';
+        btn.addEventListener('click', () => replaceToken(target, s));
+        pop.appendChild(btn);
+      });
+      pop.style.left = `${rect.left + window.scrollX}px`;
+      pop.style.top = `${rect.bottom + window.scrollY + 8}px`;
+      pop.style.display = 'block';
+      const hide = (ev) => {
+        if(!pop.contains(ev.target) && ev.target !== target){
+          pop.style.display = 'none';
+          window.removeEventListener('click', hide);
+        }
+      };
+      window.addEventListener('click', hide);
+    }
+
+    function replaceToken(span, replacement){
+      const before = span.textContent;
+      span.textContent = replacement;
+      span.classList.remove('wrong');
+      span.classList.add('correct');
+      pop.style.display = 'none';
+
+      // Patch textarea text (replace first exact occurrence)
+      const textEl = document.getElementById('textInput');
+      const text = textEl.value;
+      const re = new RegExp(`\\b${escapeRegExp(before)}\\b`);
+      textEl.value = text.replace(re, replacement);
+    }
+
+    /****** Single-word lookup ******/
+    const wordInput = document.getElementById('singleWord');
+    const wordResult = document.getElementById('wordResult');
+
+    function lookupWord(){
+      const w = (wordInput.value || '').trim();
+      if(!w){ wordResult.textContent = '—'; return; }
+      const m = getHindi(w);
+      if(m.length){
+        wordResult.innerHTML = `<strong>${w}</strong> → <span class="muted">${m.join(', ')}</span>`;
+      } else {
+        const sug = suggest(w).slice(0,3);
+        wordResult.innerHTML = `<strong>${w}</strong> → <span class="muted">not found</span>${sug.length ? ` · did you mean: <em>${sug.join(', ')}</em>?` : ''}`;
+      }
+    }
+
+    /****** Text-to-Speech (TTS) ******/
+    let VOICES = [];
+    let voiceEnIN = null;
+    let voiceHi = null;
+
+    function loadVoices(){
+      VOICES = speechSynthesis.getVoices();
+      voiceEnIN = VOICES.find(v => v.lang && v.lang.toLowerCase().startsWith('en-in')) || VOICES.find(v => v.lang && v.lang.toLowerCase().startsWith('en'));
+      voiceHi = VOICES.find(v => v.lang && v.lang.toLowerCase().startsWith('hi')) || null;
+    }
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+    loadVoices();
+
+    function speak(text, lang){
+      if(!('speechSynthesis' in window)){ toast('TTS not supported in this browser'); return; }
+      const u = new SpeechSynthesisUtterance(text);
+      const rate = parseFloat(document.getElementById('rate').value || '1');
+      u.rate = Math.min(2, Math.max(0.1, rate));
+      if(lang === 'hi'){
+        if(voiceHi) u.voice = voiceHi;
+        u.lang = (voiceHi?.lang) || 'hi-IN';
+      } else {
+        if(voiceEnIN) u.voice = voiceEnIN;
+        u.lang = (voiceEnIN?.lang) || 'en-IN';
+      }
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    }
+
+    function speakInput(lang){
+      const text = document.getElementById('textInput').value.trim();
+      if(!text) return;
+      speak(text, lang);
+    }
+    function speakWord(lang){
+      const w = (wordInput.value || '').trim();
+      if(!w) return;
+      if(lang === 'hi'){
+        const m = getHindi(w);
+        const phrase = m.length ? m[0] : w;
+        speak(phrase, 'hi');
+      } else speak(w, 'en');
+    }
+
+    /****** Controls wiring ******/
+    document.getElementById('analyzeBtn').addEventListener('click', ()=> renderSpell(document.getElementById('textInput').value));
+    document.getElementById('lookupBtn').addEventListener('click', lookupWord);
+    document.getElementById('speakEnBtn').addEventListener('click', ()=> speakInput('en'));
+    document.getElementById('speakHiBtn').addEventListener('click', ()=> speakInput('hi'));
+    document.getElementById('wordSpeakEn').addEventListener('click', ()=> speakWord('en'));
+    document.getElementById('wordSpeakHi').addEventListener('click', ()=> speakWord('hi'));
+    document.getElementById('clearBtn').addEventListener('click', ()=>{
+      document.getElementById('textInput').value = '';
+      document.getElementById('singleWord').value = '';
+      spellOut.innerHTML = '';
+      meaningsOut.innerHTML = '';
+      wordResult.textContent = '—';
+    });
+    document.getElementById('rate').addEventListener('input', (e)=> {
+      document.getElementById('rateVal').textContent = parseFloat(e.target.value).toFixed(2) + '×';
+    });
+
+    // demo initial text
+    document.getElementById('textInput').value = 'The student will read a beautiful book under the tree.';
+    renderSpell(document.getElementById('textInput').value);
+
+    /****** Toast helper ******/
+    function toast(msg){
+      const d = document.createElement('div');
+      d.textContent = msg;
+      d.style.position = 'fixed';
+      d.style.bottom = '14px';
+      d.style.left = '50%';
+      d.style.transform = 'translateX(-50%)';
+      d.style.background = '#07121a';
+      d.style.border = '1px solid #123041';
+      d.style.padding = '8px 12px';
+      d.style.borderRadius = '8px';
+      d.style.color = 'white';
+      d.style.zIndex = 9999;
+      document.body.appendChild(d);
+      setTimeout(()=> d.remove(), 2200);
+    }
+
+    /****** Service Worker (dynamic inline) ******/
+    if('serviceWorker' in navigator){
+      const swCode = `
+        const CACHE = 'eng-hi-dict-v1';
+        self.addEventListener('install', e => {
+          self.skipWaiting();
+          e.waitUntil((async()=>{
+            const cache = await caches.open(CACHE);
+            try {
+              const req = new Request(self.registration.scope, { cache: 'reload' });
+              const res = await fetch(req);
+              await cache.put(req, res.clone());
+            } catch (err) {
+              // ignore
+            }
+          })());
+        });
+        self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
+        self.addEventListener('fetch', e => {
+          const url = new URL(e.request.url);
+          // network-first for dictionary.json so updates are picked up; cache-first for rest
+          if (url.pathname.endsWith('/dictionary.json')) {
+            e.respondWith((async()=>{
+              try {
+                const net = await fetch(e.request);
+                const cache = await caches.open(CACHE);
+                cache.put(e.request, net.clone());
+                return net;
+              } catch {
+                const cache = await caches.open(CACHE);
+                const c = await cache.match(e.request);
+                return c || new Response('{}', { headers: { 'Content-Type': 'application/json' } });
+              }
+            })());
+            return;
+          }
+          e.respondWith((async()=>{
+            const cache = await caches.open(CACHE);
+            const c = await cache.match(e.request);
+            if (c) return c;
+            try {
+              const net = await fetch(e.request);
+              cache.put(e.request, net.clone());
+              return net;
+            } catch {
+              return c || fetch(e.request);
+            }
+          })());
+        });
+      `;
+      const blob = new Blob([swCode], { type: 'text/javascript' });
+      const swURL = URL.createObjectURL(blob);
+      navigator.serviceWorker.register(swURL).catch(()=>{/* ignore */});
+    }
+  </script>
+</body>
+</html>
