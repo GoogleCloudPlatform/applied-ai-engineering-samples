@@ -20,10 +20,10 @@ steps:
     args:
       - -c
       - |
-        gsutil cp gs://${_AUTOMATION_BUCKET}/providers/* .
+        gcloud storage cp gs://${_AUTOMATION_BUCKET}/providers/* .
         sed -i "s/<FOLDER-NAME>/${_ENV_NAME}\/tfstate\/gke_config/g" backend.tf
-        gsutil cp gs://${_AUTOMATION_BUCKET}/tfvars/0-bootstrap.auto.tfvars.json .
-        gsutil cp gs://${_AUTOMATION_BUCKET}/${_ENV_NAME}/tfvars/1-base-infra.auto.tfvars.json .
+        gcloud storage cp gs://${_AUTOMATION_BUCKET}/tfvars/0-bootstrap.auto.tfvars.json .
+        gcloud storage cp gs://${_AUTOMATION_BUCKET}/${_ENV_NAME}/tfvars/1-base-infra.auto.tfvars.json .
         echo '{"env_name":"${_ENV_NAME}"}' > env-name.auto.tfvars.json
         
   - id: 'Destroy GKE config - tf init'
@@ -47,9 +47,9 @@ steps:
     args:
       - -c
       - |
-        gsutil cp gs://${_AUTOMATION_BUCKET}/providers/* .
+        gcloud storage cp gs://${_AUTOMATION_BUCKET}/providers/* .
         sed -i "s/<FOLDER-NAME>/${_ENV_NAME}\/tfstate\/base_infra/g" backend.tf
-        gsutil cp gs://${_AUTOMATION_BUCKET}/tfvars/0-bootstrap.auto.tfvars.json .
+        gcloud storage cp gs://${_AUTOMATION_BUCKET}/tfvars/0-bootstrap.auto.tfvars.json .
         echo '{"env_name":"${_ENV_NAME}"}' > env-name.auto.tfvars.json
 
   - id: 'Destroy base infra - tf init'
