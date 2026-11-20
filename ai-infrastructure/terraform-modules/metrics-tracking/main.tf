@@ -204,17 +204,21 @@ resource "google_pubsub_subscription" "performance_metrics_bq_subscription" {
     write_metadata      = true
   }
 
-  depends_on = [google_project_iam_member.viewer, google_project_iam_member.editor]
+  depends_on = [google_bigquery_table_iam_member.viewer, google_bigquery_table_iam_member.editor]
 }
 
-resource "google_project_iam_member" "viewer" {
-  project = data.google_project.project.project_id
-  role    = "roles/bigquery.metadataViewer"
-  member  = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
+resource "google_bigquery_table_iam_member" "viewer" {
+  project    = data.google_project.project.project_id
+  dataset_id = google_bigquery_dataset.performance_metrics_dataset.dataset_id
+  table_id   = google_bigquery_table.performance_metrics_table.table_id
+  role       = "roles/bigquery.metadataViewer"
+  member     = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
 }
 
-resource "google_project_iam_member" "editor" {
-  project = data.google_project.project.project_id
-  role    = "roles/bigquery.dataEditor"
-  member  = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
+resource "google_bigquery_table_iam_member" "editor" {
+  project    = data.google_project.project.project_id
+  dataset_id = google_bigquery_dataset.performance_metrics_dataset.dataset_id
+  table_id   = google_bigquery_table.performance_metrics_table.table_id
+  role       = "roles/bigquery.dataEditor"
+  member     = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
 }
